@@ -1,0 +1,72 @@
+/* FV Workshop — Archivio Eventi (Native WP Style / FluentCRM Pattern) */
+
+.wva {
+    color: #2c3338;
+    max-width: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.wva h2 {
+    color: #1d2327;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #dcdcde;
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+}
+
+.wva-empty {
+    text-align: center;
+    color: #646970;
+    padding: 40px 0;
+    font-size: 14px;
+    background: #fff;
+    border: 1px dashed #c3c4c7;
+    border-radius: 4px;
+}
+
+.wva-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.wva-card {
+    background: #ffffff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.15s ease-in-out;
+}
+
+.wva-card:hover {
+    border-color: #2271b1;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.wva-card-title {
+    color: #1d2327;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.wva-card-meta {
+    color: #646970;
+    font-size: 12px;
+}
+
+.wva-card-stats {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f1;
+    font-size: 13px;
+    color: #2c3338;
+}

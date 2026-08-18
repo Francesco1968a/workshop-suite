@@ -1,0 +1,449 @@
+/* FV Workshop Admin — Native WordPress Theme (FluentCRM Pattern) */
+
+.fvw-admin-wrap {
+    margin: 10px 20px 0 2px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: #2c3338;
+}
+
+.wv-dash {
+    color: #2c3338;
+    max-width: 1200px;
+    margin: 0;
+}
+
+.wv-dash h2, .fvw-admin-wrap h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #dcdcde;
+}
+
+/* Native Nav Tabs (Categorie / Tipologia / Eventi / Partecipanti) */
+.wv-dash nav {
+    display: flex !important;
+    gap: 8px !important;
+    margin-bottom: 24px !important;
+    border-bottom: 1px solid #dcdcde !important;
+    padding-bottom: 12px !important;
+}
+
+.wv-dash nav a {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 8px 18px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: #50575e !important;
+    text-decoration: none !important;
+    border-radius: 6px !important;
+    background: #f0f0f1 !important;
+    border: 1px solid #c3c4c7 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+}
+
+.wv-dash nav a:hover {
+    background: #ffffff !important;
+    color: #1d2327 !important;
+    border-color: #8c8f94 !important;
+}
+
+.wv-dash nav a.active {
+    background: #2271b1 !important;
+    color: #ffffff !important;
+    border-color: #2271b1 !important;
+    box-shadow: 0 1px 3px rgba(34, 113, 177, 0.3) !important;
+}
+
+.wv-dash h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #50575e;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 20px 0 12px 0;
+}
+
+.wv-dash h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0 0 6px 0;
+}
+
+.wv-dash .wv-card, .fvw-card-native {
+    background: #ffffff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.wv-dash form {
+    max-width: 840px;
+}
+
+.wv-dash .wv-field, .fvw-admin-wrap .wv-field {
+    margin-bottom: 22px !important;
+    max-width: 840px;
+}
+
+.wv-dash label, .fvw-admin-wrap label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #1d2327 !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+.wv-dash input[type=text],
+.wv-dash input[type=email],
+.wv-dash input[type=url],
+.wv-dash input[type=number],
+.wv-dash input[type=date],
+.wv-dash input[type=time],
+.wv-dash select,
+.wv-dash textarea {
+    background-color: #fff !important;
+    color: #2c3338 !important;
+    border: 1px solid #8c8f94 !important;
+    border-radius: 4px !important;
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.07) !important;
+    width: 100%;
+    max-width: 680px;
+    box-sizing: border-box;
+    height: 34px;
+}
+
+.wv-dash input:focus,
+.wv-dash select:focus,
+.wv-dash textarea:focus {
+    border-color: #2271b1 !important;
+    box-shadow: 0 0 0 1px #2271b1 !important;
+    outline: 2px solid transparent !important;
+}
+
+.wv-dash textarea {
+    min-height: 140px;
+    height: auto !important;
+    max-width: 840px !important;
+    font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", monospace !important;
+    line-height: 1.5;
+}
+
+.wv-dash .hint {
+    color: #646970;
+    font-size: 12.5px;
+    margin-top: 8px;
+    line-height: 1.65;
+    max-width: 840px;
+    word-break: break-word;
+}
+
+.wv-dash .hint code {
+    display: inline-block;
+    background: #f0f0f1;
+    color: #1d2327;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    margin: 2px 3px;
+    border: 1px solid #dcdcde;
+}
+
+/* Native WP Buttons */
+.wv-dash button,
+.wv-dash .wv-btn {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 2.15384615;
+    min-height: 30px;
+    margin: 0;
+    padding: 0 12px;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    -webkit-appearance: none;
+    border-radius: 3px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff !important;
+    font-weight: 500;
+    transition: background 0.1s ease-in-out;
+}
+
+.wv-dash button:hover,
+.wv-dash .wv-btn:hover {
+    background: #135e96;
+    border-color: #135e96;
+    color: #fff !important;
+}
+
+.wv-dash .wv-btn-ghost,
+.wv-dash .wv-btn-secondary {
+    background: #f6f7f7 !important;
+    border-color: #2271b1 !important;
+    color: #2271b1 !important;
+}
+
+.wv-dash .wv-btn-ghost:hover,
+.wv-dash .wv-btn-secondary:hover {
+    background: #f0f0f1 !important;
+    border-color: #135e96 !important;
+    color: #135e96 !important;
+}
+
+.wv-dash .wv-btn-del,
+.wv-dash .wv-btn-danger {
+    background: #b32d2e !important;
+    border-color: #b32d2e !important;
+    color: #fff !important;
+}
+
+.wv-dash .wv-btn-del:hover,
+.wv-dash .wv-btn-danger:hover {
+    background: #8a2424 !important;
+    border-color: #8a2424 !important;
+}
+
+/* Button Action Groups & Form Actions (Separation & Alignment) */
+.wv-dash .wv-form-actions,
+.wv-dash .wv-actions {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    margin-top: 14px !important;
+}
+
+.wv-dash .wv-actions {
+    margin-top: 10px !important;
+}
+
+.wv-dash .wv-btn-sm, 
+.wv-dash button.wv-btn-sm, 
+.wv-dash label.wv-btn-sm,
+.wv-dash a.wv-btn-sm {
+    box-sizing: border-box !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+    line-height: 32px !important;
+    padding: 0 16px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    margin: 0 !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+}
+
+/* Native Notices */
+.wv-dash .msg {
+    background: #fff;
+    border-left: 4px solid #2271b1;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+    margin: 15px 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #1d2327;
+}
+
+.wv-dash .msg.msg-success {
+    border-left-color: #00a32a;
+}
+
+.wv-dash .msg.msg-error {
+    border-left-color: #d63638;
+}
+
+/* WP Table Grid Layout */
+.fvw-table-native {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    margin-top: 10px;
+}
+
+.fvw-table-native th {
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid #c3c4c7;
+    background: #f6f7f7;
+    color: #2c3338;
+}
+
+.fvw-table-native td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #f0f0f1;
+    color: #2c3338;
+}
+
+.fvw-table-native tr:nth-child(even) {
+    background-color: #f6f7f7;
+}
+
+/* Dashboard Cockpit & Stat Cards (Native WP Style) */
+.wvr-cockpit {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+    .wvr-cockpit { flex-direction: column; }
+}
+
+.wvr-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+}
+.wvr-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.wvr-section {
+    background: #ffffff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    padding: 16px;
+    margin-bottom: 16px;
+}
+.wvr-section h3 {
+    margin-top: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.wvr-rings {
+    display: flex;
+    gap: 12px;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.wvr-ring-wrap {
+    flex: 1;
+    text-align: center;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 12px 8px;
+    text-decoration: none;
+    color: #1d2327 !important;
+}
+.wvr-ring-wrap .v {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d2327;
+}
+.wvr-ring-wrap .s {
+    font-size: 11px;
+    color: #646970;
+}
+.wvr-ring-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2c3338;
+    margin-top: 6px;
+}
+
+/* Linear Progress Bar */
+.wvr-progress-bar-container {
+    width: 100%;
+    margin-bottom: 6px;
+}
+.wvr-progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: #dcdcde;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.wvr-progress-bar-fill {
+    height: 100%;
+    background: #2271b1;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+/* Stat Rows */
+.wvr-stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f1;
+    text-decoration: none;
+    color: #2c3338 !important;
+    font-size: 13px;
+}
+.wvr-stat-row .val {
+    font-weight: 600;
+    color: #1d2327;
+}
+
+/* Event Cards Grid */
+.wvr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+}
+.wvr-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.wvr-card:hover {
+    border-color: #2271b1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.wvr-card-body {
+    padding: 12px 14px;
+    color: #2c3338;
+    font-size: 13px;
+}
+.wvr-filtro {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.wvr-filtro a {
+    cursor: pointer;
+    padding: 6px 12px;
+    background: #f6f7f7;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    color: #2c3338;
+    font-size: 13px;
+    text-decoration: none;
+}
+.wvr-filtro a.on {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+}
+

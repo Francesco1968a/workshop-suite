@@ -1,0 +1,126 @@
+<?php
+
+if (!defined('ABSPATH')) exit;
+
+/**
+ * Ported from legacy snippet 12 "Workshop CRM 3 Eventi Categoria".
+ * Shortcode [eventi_categoria slug="..." max_width="1100"] — grid of
+ * upcoming eventi for a given categoria_evento. Verbatim port with
+ * `wv_format_periodo()` / `wv_stato_posti()` → `WS_Data::` equivalents.
+ * Excludes eventi flagged `nascondi_dal_frontend` (same ACF meta key
+ * already read/written by WS_Rest_Admin).
+ */
+final class WS_Shortcode_Eventi_Categoria implements WS_Module {
+
+    public function should_load(): bool {
+        return true;
+    }
+
+    public function register(): void {
+        add_shortcode('eventi_categoria', [$this, 'render']);
+    }
+
+    public function render($atts) {
+        $atts = shortcode_atts([
+            'slug'      => '',
+            'max_width' => '1100',
+        ], $atts);
+        if (!$atts['slug']) return '<p>Specifica slug categoria.</p>';
+
+        $term = get_term_by('slug', $atts['slug'], 'categoria_evento');
+        $foto = $term ? WS_Data::get_field('foto_categoria', 'categoria_evento_' . $term->term_id) : '';
+
+        $oggi = date('Y-m-d');
+        $q = new WP_Query([
+            'post_type'      => 'evento',
+            'posts_per_page' => -1,
+            'tax_query'      => [['taxonomy' => 'categoria_evento', 'field' => 'slug', 'terms' => $atts['slug']]],
+            'meta_key'       => 'data_evento',
+            'orderby'        => 'meta_value',
+            'order'          => 'ASC',
+            'meta_query'     => [
+                'relation' => 'AND',
+                // Solo eventi futuri
+                ['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE'],
+                // Escludi eventi nascosti dal frontend
+                [
+                    'relation' => 'OR',
+                    ['key' => 'nascondi_dal_frontend', 'compare' => 'NOT EXISTS'],
+                    ['key' => 'nascondi_dal_frontend', 'value' => '1', 'compare' => '!='],
+                ],
+            ],
+        ]);
+
+        if (!$q->have_posts()) return '<p style="text-align:center;color:#888;">Nessuna data in programma.</p>';
+
+        $max_w = (int) $atts['max_width'];
+        if ($max_w < 400) $max_w = 1100;
+
+        ob_start(); ?>
+        <style>
+          .wv-eventi-wrap { max-width:<?php echo $max_w; ?>px; margin:30px auto; padding:0 16px; box-sizing:border-box; }
+          .wv-grid { display:flex; flex-wrap:wrap; gap:32px; justify-content:center; }
+          .wv-grid .wv-evcard { flex:0 1 calc(25% - 24px); min-width:200px; max-width:240px;
+            border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.02);
+            display:flex; flex-direction:column; padding:14px; box-sizing:border-box;
+            cursor:pointer; transition:border-color .2s, transform .2s, background .2s; }
+          .wv-grid .wv-evcard:hover { border-color:rgba(255,255,255,.5); background:rgba(255,255,255,.05); transform:translateY(-2px); }
+          .wv-grid .wv-evfoto { width:100%; aspect-ratio:4/3; background-size:cover; background-position:center; background-color:#1a1a1a; }
+          .wv-grid .wv-evbody { padding:14px 4px 6px; text-align:center; }
+          .wv-grid .wv-evperiodo { font-size:15px; color:#fff; font-weight:600; margin-bottom:10px; line-height:1.3; }
+          .wv-grid .wv-evposti { font-size:13px; color:#ddd; line-height:1.5; }
+          .wv-grid .wv-evposti strong { color:#fff; font-weight:600; }
+          .wv-grid .wv-soldout { display:inline-block; margin-top:6px; font-size:10px; letter-spacing:.2em;
+            text-transform:uppercase; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 12px; }
+          @media (max-width:1100px){ .wv-grid .wv-evcard { flex:0 1 calc(33.33% - 22px); } }
+          @media (max-width:800px){ .wv-grid .wv-evcard { flex:0 1 calc(50% - 16px); } }
+          @media (max-width:520px){ .wv-grid .wv-evcard { flex:0 1 100%; max-width:280px; } }
+        </style>
+        <div class="wv-eventi-wrap">
+          <div class="wv-grid">
+            <?php while ($q->have_posts()): $q->the_post();
+              $id = get_the_ID();
+              $s = WS_Data::stato_posti($id); ?>
+              <div class="wv-evcard" data-evento-id="<?php echo $id; ?>" role="button" tabindex="0" aria-label="Prenota questa data">
+                <?php if ($foto): ?>
+                  <div class="wv-evfoto" style="background-image:url('<?php echo esc_url($foto); ?>');"></div>
+                <?php else: ?>
+                  <div class="wv-evfoto"></div>
+                <?php endif; ?>
+                <div class="wv-evbody">
+                  <div class="wv-evperiodo"><?php echo esc_html(WS_Data::format_periodo($id)); ?></div>
+                  <?php if ($s['sold_out']): ?>
+                    <span class="wv-soldout">Sold Out</span>
+                  <?php else: ?>
+                    <div class="wv-evposti">Posti: Totali <strong><?php echo (int)$s['totali']; ?></strong> / Disponibili <strong><?php echo (int)$s['disponibili']; ?></strong></div>
+                  <?php endif; ?>
+                </div>
+              </div>
+            <?php endwhile; wp_reset_postdata(); ?>
+          </div>
+        </div>
+        <script>
+        (function(){
+          function preFillAndOpen(eid){
+            if (!eid) return;
+            window.WV_MODAL_PRESELECT = String(eid);
+            var btn = document.querySelector('.fv-ecta-btn');
+            if (btn) btn.click();
+          }
+          document.querySelectorAll('.wv-evcard[data-evento-id]').forEach(function(card){
+            card.addEventListener('click', function(){
+              preFillAndOpen(card.dataset.eventoId);
+            });
+            card.addEventListener('keydown', function(e){
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                preFillAndOpen(card.dataset.eventoId);
+              }
+            });
+          });
+        })();
+        </script>
+        <?php
+        return ob_get_clean();
+    }
+}

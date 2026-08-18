@@ -1,0 +1,443 @@
+/* FV Workshop — Locandine 3-Column Layout & Native WordPress Theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Bebas+Neue&family=Poppins:wght@400;600;700&family=Special+Elite&display=swap');
+
+/* Local Font-Face Fallbacks */
+@font-face {
+    font-family: 'Bebas Neue';
+    src: url('../fonts/bebas-neue-1.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Special Elite';
+    src: url('../fonts/special-elite-1.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/poppins-1.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Antonio';
+    src: url('../fonts/antonio-1.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* App Container & Full Width Fluid Layout */
+#fvw-locandine-app {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: #2c3338;
+}
+
+/* 3-Column Grid Layout: Col 1 (Controlli 360px), Col 2 (Canvas Preview 480-540px), Col 3 (Modelli Salvati 1fr) */
+.fvw-loc-grid {
+    display: grid;
+    grid-template-columns: 360px minmax(420px, 520px) 1fr;
+    gap: 32px;
+    align-items: start;
+    position: relative;
+    width: 100%;
+}
+
+@media (max-width: 1380px) {
+    .fvw-loc-grid {
+        grid-template-columns: 340px minmax(380px, 460px) 1fr;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .fvw-loc-grid {
+        grid-template-columns: 340px 1fr;
+    }
+    .fvw-loc-col-3 {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .fvw-loc-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.fvw-loc-col-1 {
+    min-width: 0;
+}
+
+.fvw-loc-col-2 {
+    position: sticky;
+    top: 32px;
+    min-width: 0;
+}
+
+.fvw-loc-col-3 {
+    min-width: 0;
+}
+
+/* Titoli Sezioni */
+.fvw-locandine-app h3, .fvw-loc-col-1 h3, .fvw-loc-col-3 h3 {
+    color: #1d2327;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 32px 0 16px 0 !important;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.fvw-loc-col-1 h3:first-child, .fvw-loc-col-3 h3:first-child {
+    margin-top: 0 !important;
+}
+
+.fvw-locandine-app h4 {
+    color: #1d2327;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 16px 0 8px 0;
+}
+
+/* Card Contenitori Nativi */
+.fvw-loc-col-1 .wv-card, .fvw-loc-col-3 .wv-card {
+    background: #ffffff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+/* Campi Form e Input Nativi WP */
+#fvw-locandine-app .wv-field,
+.fvw-loc-col-1 .wv-field,
+.wv-field {
+    margin-bottom: 22px !important;
+}
+
+#fvw-locandine-app label,
+.fvw-loc-col-1 label,
+.wv-field label {
+    color: #1d2327 !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    margin-bottom: 2px !important;
+    display: block !important;
+}
+
+#fvw-locandine-app input[type="text"],
+#fvw-locandine-app select,
+#fvw-locandine-app textarea,
+.fvw-loc-col-1 input[type="text"],
+.fvw-loc-col-1 select,
+.fvw-loc-col-1 textarea {
+    background: #ffffff !important;
+    border: 1px solid #8c8f94 !important;
+    border-radius: 4px !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.07) !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    color: #2c3338 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#fvw-locandine-app input[type="text"]:focus,
+#fvw-locandine-app select:focus,
+#fvw-locandine-app textarea:focus {
+    border-color: #2271b1 !important;
+    box-shadow: 0 0 0 1px #2271b1 !important;
+    outline: none !important;
+}
+
+/* Pulsanti Standard WordPress & Alta Leggibilità */
+#fvw-locandine-app button,
+#fvw-locandine-app .button,
+#fvw-locandine-app .wv-btn,
+.fvw-loc-col-1 button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px !important;
+    line-height: 2.15384615;
+    min-height: 30px;
+    margin: 0;
+    padding: 0 12px !important;
+    cursor: pointer;
+    border: 1px solid #2271b1 !important;
+    border-radius: 3px !important;
+    background: #2271b1 !important;
+    color: #ffffff !important;
+    text-decoration: none;
+    font-weight: 600 !important;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+}
+
+#fvw-locandine-app button:hover,
+#fvw-locandine-app .button:hover,
+#fvw-locandine-app .wv-btn:hover,
+.fvw-loc-col-1 button:hover {
+    background: #135e96 !important;
+    border-color: #135e96 !important;
+    color: #ffffff !important;
+}
+
+#fvw-locandine-app .button-secondary,
+#fvw-locandine-app .wv-btn-ghost,
+#fvw-locandine-app button.wv-btn-ghost,
+.fvw-loc-field-row button,
+.fvw-loc-col-1 .button-secondary,
+.fvw-loc-col-1 .fvw-loc-field-row button {
+    background: #ffffff !important;
+    border: 1px solid #2271b1 !important;
+    color: #2271b1 !important;
+    font-weight: 600 !important;
+}
+
+#fvw-locandine-app .button-secondary:hover,
+#fvw-locandine-app .wv-btn-ghost:hover,
+.fvw-loc-field-row button:hover,
+.fvw-loc-col-1 .button-secondary:hover,
+.fvw-loc-col-1 .fvw-loc-field-row button:hover {
+    background: #2271b1 !important;
+    border-color: #2271b1 !important;
+    color: #ffffff !important;
+}
+
+#fvw-locandine-app .wv-btn-del,
+#fvw-locandine-app button.wv-btn-del,
+#fvw-locandine-app .button-link-delete {
+    background: #ffffff !important;
+    border: 1px solid #d63638 !important;
+    color: #d63638 !important;
+    font-weight: 600 !important;
+}
+#fvw-locandine-app .wv-btn-del:hover,
+#fvw-locandine-app button.wv-btn-del:hover,
+#fvw-locandine-app .button-link-delete:hover {
+    background: #d63638 !important;
+    border-color: #d63638 !important;
+    color: #ffffff !important;
+}
+
+/* Righe di dettaglio campi (Brand, Categoria, Tipologia, Date, Descrizione) */
+.fvw-loc-field-row {
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 12px !important;
+    margin-bottom: 0 !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.fvw-loc-field-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Canvas Preview & Wrapper */
+.fvw-loc-canvas-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    padding: 16px;
+}
+
+.fvw-loc-canvas {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.fvw-loc-canvas-actions {
+    margin-top: 14px;
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Modelli Salvati (Colonna 3) */
+#fvw-models {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.fvw-model-card {
+    background: #ffffff !important;
+    border: 1px solid #c3c4c7 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+    padding: 12px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.15s ease-in-out;
+}
+
+.fvw-model-card:hover {
+    border-color: #2271b1 !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08) !important;
+}
+
+.fvw-model-preview-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f1;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 1px solid #dcdcde;
+}
+
+.fvw-model-canvas {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    display: block;
+}
+
+.fvw-model-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fvw-model-name {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #1d2327 !important;
+    margin: 0 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fvw-model-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.fvw-model-actions button.button-primary {
+    flex: 1;
+    min-height: 28px !important;
+    font-size: 12px !important;
+    padding: 0 10px !important;
+}
+
+.fvw-model-actions button.button-link-delete {
+    min-height: 28px !important;
+    font-size: 12px !important;
+    padding: 0 8px !important;
+    background: #fcf0f1 !important;
+    border-color: #f8d7da !important;
+    color: #d63638 !important;
+}
+
+.fvw-model-actions button.button-link-delete:hover {
+    background: #d63638 !important;
+    border-color: #d63638 !important;
+    color: #ffffff !important;
+}
+
+/* ───────── Left Vertical Narrow Modal Drawer ───────── */
+.fvw-drawer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.25);
+    z-index: 99998;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.fvw-drawer-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.fvw-drawer-left {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 360px;
+    max-width: 85vw;
+    height: 100vh;
+    z-index: 99999;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 24px 20px;
+    overflow-y: auto;
+    background: #ffffff;
+    color: #2c3338;
+    border-right: 1px solid #c3c4c7;
+}
+
+.fvw-drawer-left.active {
+    transform: translateX(0);
+}
+
+.fvw-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.fvw-drawer-header h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #1d2327;
+    border: none;
+    padding: 0;
+}
+
+.fvw-drawer-body {
+    flex: 1;
+}

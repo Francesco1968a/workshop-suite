@@ -1,0 +1,432 @@
+# Copyright (C) 2026 Francesco Verolino
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Workshop Suite 1.0.0
+"
+"Report-Msgid-Bugs-To: https://francescoverolino.com/workshop-suite
+"
+"Last-Translator: Francesco Verolino <francescoverolino@gmail.com>
+"
+"Language-Team: Workshop Suite Team
+"
+"MIME-Version: 1.0
+"
+"Content-Type: text/plain; charset=UTF-8
+"
+"Content-Transfer-Encoding: 8bit
+"
+"POT-Creation-Date: 2026-08-18T08:23:00+00:00
+"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE
+"
+"X-Generator: Workshop Suite i18n Tool
+"
+"X-Domain: workshop-suite
+"
+
+msgid "A destra puoi aggiungere regole CSS personalizzate che sovrascriveranno lo stile dell\'applicazione. A sinistra è visibile il codice CSS predefinito di riferimento."
+msgstr ""
+
+msgid "ATTIVA"
+msgstr ""
+
+msgid "Abbiamo già una tua richiesta per questo evento. Abbiamo aggiornato il tuo messaggio!"
+msgstr ""
+
+msgid "Abilita invio automatico promemoria a 15 giorni dall\'evento (T-15)"
+msgstr ""
+
+msgid "Admin Calendar"
+msgstr ""
+
+msgid "Aggiungi Tipo Evento"
+msgstr ""
+
+msgid "Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:"
+msgstr ""
+
+msgid "Attiva limitazione richieste per indirizzo IP"
+msgstr ""
+
+msgid "Automazioni Promemoria"
+msgstr ""
+
+msgid "Azione"
+msgstr ""
+
+msgid "Biografia / Presentazione"
+msgstr ""
+
+msgid "Blocca invii con campo trappola compilato (anti-bot invisibile)"
+msgstr ""
+
+msgid "Canali Social"
+msgstr ""
+
+msgid "Carica / Scegli Foto"
+msgstr ""
+
+msgid "Categoria"
+msgstr ""
+
+msgid "Categorie Workshop"
+msgstr ""
+
+msgid "Categories & Types"
+msgstr ""
+
+msgid "Chiave di Licenza"
+msgstr ""
+
+msgid "Città di provenienza"
+msgstr ""
+
+msgid "Codice CSS Personalizzato"
+msgstr ""
+
+msgid "Codice Custom (CSS Personalizzato)"
+msgstr ""
+
+msgid "Codice Esistente (CSS Predefinito)"
+msgstr ""
+
+msgid "Cognome"
+msgstr ""
+
+msgid "Consigliata immagine quadrata ad alta risoluzione (min. 400x400 px)."
+msgstr ""
+
+msgid "Contacts & Participants"
+msgstr ""
+
+msgid "Contatti & Presenza Web"
+msgstr ""
+
+msgid "Copia"
+msgstr ""
+
+msgid "Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di FV Workshop."
+msgstr ""
+
+msgid "Crittografia"
+msgstr ""
+
+msgid "Custom CSS Code"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Dati Docente / Proponente"
+msgstr ""
+
+msgid "Descrivi la tua esperienza, il tuo approccio didattico e i traguardi raggiunti..."
+msgstr ""
+
+msgid "Descrizione"
+msgstr ""
+
+msgid "Elenco Shortcode Disponibili"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Email Mittente"
+msgstr ""
+
+msgid "Email Mittente Risposte"
+msgstr ""
+
+msgid "Email Pubblica"
+msgstr ""
+
+msgid "Errore durante il salvataggio dei dati."
+msgstr ""
+
+msgid "Errore durante la creazione dell\'iscrizione."
+msgstr ""
+
+msgid "Eventi"
+msgstr ""
+
+msgid "Evento"
+msgstr ""
+
+msgid "Evento selezionato non valido."
+msgstr ""
+
+msgid "Events & Registrations"
+msgstr ""
+
+msgid "Events Archive"
+msgstr ""
+
+msgid "Finestra Temporale (secondi)"
+msgstr ""
+
+msgid "Foto Profilo / Avatar"
+msgstr ""
+
+msgid "Funzionalità"
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi."
+msgstr ""
+
+msgid "Hai inviato troppe richieste in poco tempo. Attendi qualche minuto prima di riprovare."
+msgstr ""
+
+msgid "Host IMAP"
+msgstr ""
+
+msgid "Host SMTP"
+msgstr ""
+
+msgid "Impostazioni della casella mail salvate e protette con crittografia AES-256."
+msgstr ""
+
+msgid "Incolla questo shortcode in qualsiasi pagina, articolo o footer:"
+msgstr ""
+
+msgid "Indica le lingue in cui puoi condurre i workshop o comunicare con i corsisti."
+msgstr ""
+
+msgid "Indirizzo predefinito da cui partiranno le mail di risposta e promemoria."
+msgstr ""
+
+msgid "Inserisci la chiave di licenza acquistata per abilitare il supporto e gli aggiornamenti automatici."
+msgstr ""
+
+msgid "Intervallo di tempo per il calcolo del limite (default: 60 secondi)."
+msgstr ""
+
+msgid "Invia Richiesta Iscrizione"
+msgstr ""
+
+msgid "Invia in automatico una mail riassuntiva ai partecipanti confermati 15 giorni prima della data inizio."
+msgstr ""
+
+msgid "Invio Mail (SMTP / Mittente)"
+msgstr ""
+
+msgid "Invio in corso..."
+msgstr ""
+
+msgid "Iscrizione"
+msgstr ""
+
+msgid "Iscrizioni"
+msgstr ""
+
+msgid "Iscrizioni aperte"
+msgstr ""
+
+msgid "Lettura Mail (IMAP)"
+msgstr ""
+
+msgid "License"
+msgstr ""
+
+msgid "Lingue Parlate"
+msgstr ""
+
+msgid "Mail Configuration"
+msgstr ""
+
+msgid "Mail Inbox"
+msgstr ""
+
+msgid "Messaggio / Richiesta informazioni"
+msgstr ""
+
+msgid "NON ATTIVA / NON VALIDA"
+msgstr ""
+
+msgid "Nome"
+msgstr ""
+
+msgid "Nome & Cognome"
+msgstr ""
+
+msgid "Nome Brand / Organizzazione"
+msgstr ""
+
+msgid "Nome Mittente"
+msgstr ""
+
+msgid "Nome Mittente Email"
+msgstr ""
+
+msgid "Nome ed email sono obbligatori."
+msgstr ""
+
+msgid "Nome visualizzato dal destinatario come mittente delle notifiche."
+msgstr ""
+
+msgid "Numero massimo di iscrizioni consentite dallo stesso IP (default: 5)."
+msgstr ""
+
+msgid "Numero persone"
+msgstr ""
+
+msgid "Partecipante"
+msgstr ""
+
+msgid "Partecipanti"
+msgstr ""
+
+msgid "Password Account"
+msgstr ""
+
+msgid "Password protetta con cifratura OpenSSL AES-256."
+msgstr ""
+
+msgid "Porta IMAP"
+msgstr ""
+
+msgid "Porta SMTP"
+msgstr ""
+
+msgid "Poster Templates"
+msgstr ""
+
+msgid "Profilo del proponente e scheda Bio salvati con successo."
+msgstr ""
+
+msgid "Proteggi il server e l\'endpoint delle iscrizioni da invii automatici di bot e attacchi flood."
+msgstr ""
+
+msgid "Protezione Anti-Spam & Rate Limit Iscrizioni"
+msgstr ""
+
+msgid "Protezione Honeypot"
+msgstr ""
+
+msgid "Questa biografia verrà mostrata nella scheda docente sul tuo sito e sul portale mondiale Workshop Hub."
+msgstr ""
+
+msgid "Questo evento si è già concluso."
+msgstr ""
+
+msgid "Rate Limiting IP"
+msgstr ""
+
+msgid "Richiesta di iscrizione inviata con successo! Ti abbiamo inviato un\'email di conferma."
+msgstr ""
+
+msgid "Richiesta inviata con successo!"
+msgstr ""
+
+msgid "Richiesta ricevuta."
+msgstr ""
+
+msgid "Rimuovi"
+msgstr ""
+
+msgid "Salva Codice Custom"
+msgstr ""
+
+msgid "Salva Configurazione Posta & Sicurezza"
+msgstr ""
+
+msgid "Salva Impostazioni"
+msgstr ""
+
+msgid "Salva Profilo Proponente"
+msgstr ""
+
+msgid "Salva Tipi Evento"
+msgstr ""
+
+msgid "Salva e Verifica Licenza"
+msgstr ""
+
+msgid "Scade il: %s"
+msgstr ""
+
+msgid "Scrivi qui le tue domande o note particolari..."
+msgstr ""
+
+msgid "Sede / Città Base"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Shortcode Tag"
+msgstr ""
+
+msgid "Shortcodes"
+msgstr ""
+
+msgid "Si è verificato un errore. Riprova più tardi."
+msgstr ""
+
+msgid "Simbolo Valuta"
+msgstr ""
+
+msgid "Simbolo valuta mostrato nei form di iscrizione (es. €)."
+msgstr ""
+
+msgid "Sito Ufficiale"
+msgstr ""
+
+msgid "Sito Web Ufficiale"
+msgstr ""
+
+msgid "Soglia Massima Richieste"
+msgstr ""
+
+msgid "Stato Licenza"
+msgstr ""
+
+msgid "Stile grafico applicato agli shortcode e ai moduli pubblici nel frontend del sito."
+msgstr ""
+
+msgid "Telefono / WhatsApp"
+msgstr ""
+
+msgid "Tema Dark (Scuro)"
+msgstr ""
+
+msgid "Tema Frontend Predefinito"
+msgstr ""
+
+msgid "Tema Light (Chiaro)"
+msgstr ""
+
+msgid "Tema:"
+msgstr ""
+
+msgid "Titolo / Ruolo"
+msgstr ""
+
+msgid "Trainer Profile / Bio"
+msgstr ""
+
+msgid "Usato nelle firme email automatiche e nei calendari ICS."
+msgstr ""
+
+msgid "Utente IMAP"
+msgstr ""
+
+msgid "Workshop Suite"
+msgstr ""
+
+msgid "Workshop Suite Dashboard"
+msgstr ""
+
+msgid "Workshop Suite Settings"
+msgstr ""
+
+msgid "🏷️ Tipi di Evento"
+msgstr ""
+
+msgid "💡 Come mostrare la Bio nel sito"
+msgstr ""
+

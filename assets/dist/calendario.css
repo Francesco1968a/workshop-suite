@@ -1,0 +1,68 @@
+/* FV Workshop — Calendario / ICS Sync (Native WP Style / FluentCRM Pattern) */
+
+.wv-cal {
+    color: #2c3338;
+    max-width: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.wv-cal h2 {
+    color: #1d2327;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #dcdcde;
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+}
+
+.wv-cal-box {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.wv-cal-box h3 {
+    margin-top: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+    text-transform: uppercase;
+}
+
+.wv-cal-url-wrap {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.wv-cal-url-wrap input {
+    background: #f6f7f7 !important;
+    border: 1px solid #8c8f94 !important;
+    color: #2c3338 !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    border-radius: 4px !important;
+    flex: 1;
+}
+
+.wv-cal-instructions {
+    color: #50575e;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-top: 14px;
+}
+
+.wv-cal-instructions ol {
+    margin-left: 20px;
+    padding-left: 0;
+}
+
+.wv-cal-instructions li {
+    margin-bottom: 6px;
+}
