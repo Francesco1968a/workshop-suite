@@ -703,4 +703,28 @@ final class WS_Data {
         }
         return $result;
     }
+
+    /**
+     * The one place any payment connector calls once a real payment has
+     * succeeded — gateway-agnostic on purpose, so Stripe (still just a
+     * stub) and WooCommerce (Fase 6) funnel into the exact same completion
+     * path instead of each duplicating "what happens when payment
+     * succeeds". Idempotent: webhooks can and do fire more than once for
+     * the same event, so a second call is a safe no-op.
+     */
+    public static function grant_course_access_after_payment(int $iscrizione_id, float $amount_paid): void {
+        if (get_post_type($iscrizione_id) !== 'iscrizione') return;
+        if (self::get_field('tipo_iscrizione', $iscrizione_id) !== 'corso') return;
+        if (self::get_field('stato', $iscrizione_id) === 'confermato') return;
+
+        self::update_field('stato', 'confermato', $iscrizione_id);
+        $anticipo = (float) self::get_field('anticipo', $iscrizione_id);
+        self::update_field('anticipo', $anticipo + $amount_paid, $iscrizione_id);
+
+        $partecipante_id = (int) self::get_field('partecipante', $iscrizione_id);
+        $course_id = (int) self::get_field('corso', $iscrizione_id);
+        if ($partecipante_id && $course_id) {
+            self::send_course_access_email($partecipante_id, $course_id);
+        }
+    }
 }
