@@ -609,6 +609,47 @@ final class WS_Data {
         return $isc_id;
     }
 
+    /**
+     * Lesson-completion tracking (Fase 5). Stored as a JSON array of lesson
+     * post IDs on the corso iscrizione — same JSON-blob-in-postmeta
+     * convention already used for wv_thread/stato_log.
+     */
+    private const META_COMPLETED_LESSONS = '_ws_completed_lessons';
+
+    /** Idempotent — marking an already-completed lesson complete again is a no-op. */
+    public static function mark_lesson_complete(int $iscrizione_id, int $lesson_id): void {
+        $completed = self::completed_lesson_ids($iscrizione_id);
+        if (!in_array($lesson_id, $completed, true)) {
+            $completed[] = $lesson_id;
+            update_post_meta($iscrizione_id, self::META_COMPLETED_LESSONS, wp_json_encode($completed));
+        }
+    }
+
+    /** @return int[] */
+    public static function completed_lesson_ids(int $iscrizione_id): array {
+        $raw = get_post_meta($iscrizione_id, self::META_COMPLETED_LESSONS, true);
+        $ids = $raw ? json_decode($raw, true) : [];
+        return is_array($ids) ? array_map('intval', $ids) : [];
+    }
+
+    /** @return array{completed: int[], total: int, pct: int} */
+    public static function course_progress(int $iscrizione_id, int $course_id): array {
+        $total_ids = get_posts([
+            'post_type' => 'ws_lesson', 'post_status' => 'publish', 'posts_per_page' => -1, 'fields' => 'ids',
+            'meta_key' => '_ws_parent_course_id', 'meta_value' => $course_id, 'no_found_rows' => true,
+        ]);
+        $completed = $iscrizione_id ? self::completed_lesson_ids($iscrizione_id) : [];
+        // Only count completions that still match a real, published lesson
+        // of this course — a lesson unpublished/moved after being marked
+        // complete shouldn't inflate the percentage past 100.
+        $completed = array_values(array_intersect($completed, $total_ids));
+
+        $total = count($total_ids);
+        $pct = $total ? (int) round(count($completed) * 100 / $total) : 0;
+
+        return ['completed' => $completed, 'total' => $total, 'pct' => $pct];
+    }
+
     /** Cookie value for a resolved course visitor: "$partecipante_id|$identity_token". */
     public static function course_visitor_cookie_value(int $partecipante_id): string {
         return $partecipante_id . '|' . self::partecipante_identity_token($partecipante_id);
