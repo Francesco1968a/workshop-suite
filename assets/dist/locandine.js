@@ -4,10 +4,10 @@
     'use strict';
 
     function restUrl(path) {
-        return ((window.FVW_CONFIG && window.FVW_CONFIG.restUrl) || '/wp-json/fv-workshop/v1/') + path;
+        return ((window.FVW_CONFIG && window.FVW_CONFIG.restUrl) || (window.WS_CONFIG && window.WS_CONFIG.restUrl) || '/wp-json/workshop-suite/v1/') + path;
     }
     function headers(extra) {
-        return Object.assign({ 'X-WP-Nonce': (window.FVW_CONFIG && window.FVW_CONFIG.nonce) || '' }, extra || {});
+        return Object.assign({ 'X-WP-Nonce': (window.FVW_CONFIG && window.FVW_CONFIG.nonce) || (window.WS_CONFIG && window.WS_CONFIG.nonce) || '' }, extra || {});
     }
 
     var FORMATS = [
