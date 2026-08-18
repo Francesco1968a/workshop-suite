@@ -136,9 +136,21 @@ final class WS_Rest_Riepilogo implements WS_Module {
         ]))->posts;
         if (!empty($confermati_ids)) {
             update_postmeta_cache($confermati_ids);
+
+            // Resolve each iscrizione's evento first, then batch-prime the
+            // eventi meta cache too — otherwise get_field('data_evento', $eid_p)
+            // below hits an uncached get_post_meta() per iscrizione (N+1).
+            $eid_by_isc = [];
             foreach ($confermati_ids as $isc_p_id) {
                 $eid_p = (int) WS_Data::get_field('evento', $isc_p_id);
-                if (!$eid_p) continue;
+                if ($eid_p) $eid_by_isc[$isc_p_id] = $eid_p;
+            }
+            $unique_eids = array_unique(array_values($eid_by_isc));
+            if (!empty($unique_eids)) {
+                update_postmeta_cache($unique_eids);
+            }
+
+            foreach ($eid_by_isc as $isc_p_id => $eid_p) {
                 $date_p = WS_Data::get_field('data_evento', $eid_p);
                 if (!$date_p || $date_p > $in30 || $date_p < $oggi) continue;
                 $anticipo_p = (float) WS_Data::get_field('anticipo', $isc_p_id);

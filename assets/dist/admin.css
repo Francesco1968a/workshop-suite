@@ -447,3 +447,98 @@
     color: #fff;
 }
 
+
+/* Auto-extracted from inline styles in class-ws-admin-settings-page.php */
+.fvw-s1 { font-size:11px;opacity:0.7;margin-right:4px; }
+.fvw-s2 { max-width:600px; }
+.fvw-s3 { font-size:22px;margin-bottom:8px;font-weight:600; }
+.fvw-s4 { opacity:0.8;margin-bottom:20px; }
+.fvw-s5 { display:flex;flex-direction:column;gap:12px;margin-bottom:16px; }
+.fvw-s6 { display:flex;gap:10px;align-items:center; }
+.fvw-s7 { color:#ff4d4f;border-color:#ff4d4f; }
+.fvw-s8 { display:flex;gap:12px;align-items:center;margin-top:20px; }
+.fvw-s9 { margin-bottom: 20px; }
+.fvw-s10 { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color:#ffffff; border-radius:12px; padding:20px 24px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+.fvw-s11 { background:rgba(37,99,235,0.3);border:1px solid #3b82f6;color:#93c5fd;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase; }
+.fvw-s12 { margin:8px 0 4px 0;font-size:18px;font-weight:800;color:#ffffff; }
+.fvw-s13 { margin:0;font-size:13.5px;color:#94a3b8; }
+.fvw-s14 { background:#2563eb;border-color:#2563eb;font-weight:700;padding:6px 20px;height:auto;font-size:14px;border-radius:8px; }
+.fvw-s15 { display:grid;grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));gap:20px;margin-bottom:24px; }
+.fvw-s16 { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
+.fvw-s17 { display:flex;align-items:center;gap:10px; }
+.fvw-s18 { font-size:24px; }
+.fvw-s19 { font-size:10px;font-weight:700;letter-spacing:0.5px;padding:3px 8px;border-radius:4px;background:#f1f5f9;color:#475569; }
+.fvw-s20 { font-size:11.5px;font-weight:700;color:#2563eb;text-decoration:none;background:#eff6ff;padding:5px 12px;border-radius:6px;border:1px solid #bfdbfe; }
+.fvw-s21 { margin:0;font-size:13px;line-height:1.5;color:#64748b; }
+.fvw-s22 { margin-top:16px;padding-top:12px;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center; }
+.fvw-s23 { font-size:11px;color:#94a3b8; }
+.fvw-s24 { margin-top:20px; }
+.fvw-s25 { display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin-bottom:20px; }
+.fvw-s26 { margin-top:0;margin-bottom:12px;font-size:14px;border-bottom:1px solid #dcdcde;padding-bottom:8px; }
+.fvw-s27 { margin-bottom:22px; }
+.fvw-s28 { display:block;font-weight:600;margin-bottom:6px; }
+.fvw-s29 { display:flex;align-items:center;gap:16px; }
+.fvw-s30 { width:72px;height:72px;border-radius:50%;overflow:hidden;background:#f0f0f1;border:1px solid #c3c4c7;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.fvw-s31 { font-size:24px;color:#8c8f94; }
+.fvw-s32 { width:100%;height:100%;object-fit:cover;display:none; }
+.fvw-s33 { flex:1; }
+.fvw-s34 { margin-top:4px; }
+.fvw-s35 { margin-top:0; }
+.fvw-s36 { display:flex;flex-wrap:wrap;gap:12px 18px;padding-top:4px; }
+.fvw-s37 { display:inline-flex;align-items:center;gap:6px;font-size:13px; }
+.fvw-s38 { margin-top:8px; }
+.fvw-s39 { display:flex;flex-direction:column;gap:20px; }
+.fvw-s40 { background:#f6f7f7; }
+.fvw-s41 { margin-top:0;margin-bottom:8px;font-size:13px; }
+.fvw-s42 { font-size:12px;color:#50575e;margin-bottom:8px; }
+.fvw-s43 { display:block;padding:8px 12px;background:#ffffff;border:1px solid #c3c4c7;border-radius:4px;font-size:13px;font-weight:600;color:#2271b1; }
+.fvw-s44 { display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px; }
+.fvw-s45 { color:#008a20; }
+.fvw-s46 { margin-bottom:20px; }
+.fvw-s47 { margin-bottom:14px; }
+.fvw-s48 { margin-bottom:16px; }
+.fvw-s49 { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
+.fvw-s50 { font-weight:600;margin-bottom:6px;display:block;color:#1d2327; }
+.fvw-s51 { height:460px;font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f7f7;color:#50575e; }
+.fvw-s52 { margin-top:12px; }
+.fvw-s53 { border: 1px solid #c3c4c7; }
+.fvw-s54 { width: 25%; font-weight: 600; }
+.fvw-s55 { width: 40%; font-weight: 600; }
+.fvw-s56 { width: 20%; font-weight: 600; }
+.fvw-s57 { width: 15%; text-align: right; font-weight: 600; }
+.fvw-s58 { color:#646970; }
+.fvw-s59 { text-align: right; }
+.fvw-s60 { color:#008a20;vertical-align:middle; }
+.fvw-s61 { color:#d63638;vertical-align:middle; }
+.fvw-s62 { color:#d63638; }
+
+/* Manually extracted (dynamic PHP conditional styles converted to state classes) */
+.fvw-dashboard-wrapper { padding:24px;border-radius:12px;margin-top:20px;min-height:80vh;box-sizing:border-box;transition:all 0.3s ease; }
+.fvw-flex-input { flex:1;padding:8px 12px;border-radius:6px; }
+
+.fvw-mod-card { display:flex;flex-direction:column;justify-content:space-between;border-radius:10px;padding:20px;transition:all 0.2s ease;border:1px solid; }
+.fvw-mod-card--locked { border-color:#e2e8f0;background:#f8fafc; }
+.fvw-mod-card--active { border-color:#2563eb;background:#ffffff; }
+.fvw-mod-card--inactive { border-color:#cbd5e1;background:#ffffff; }
+
+.fvw-pro-badge { font-size:10px;font-weight:800;letter-spacing:0.5px;padding:3px 8px;border-radius:4px;border:1px solid; }
+.fvw-pro-badge--unlocked { background:#ecfdf5;color:#065f46;border-color:#a7f3d0; }
+.fvw-pro-badge--locked { background:#fef3c7;color:#92400e;border-color:#fde68a; }
+
+.fvw-mod-title { margin:0 0 8px 0;font-size:15px;font-weight:700;color:#0f172a; }
+.fvw-mod-title--locked { color:#64748b; }
+
+.fvw-mod-status { font-size:12px;font-weight:600;color:#94a3b8; }
+.fvw-mod-status--active { color:#10b981; }
+.fvw-mod-status--inactive { color:#94a3b8; }
+.fvw-mod-status--locked { color:#94a3b8; }
+
+.fvw-photo-preview { width:100%;height:100%;object-fit:cover; }
+.fvw-remove-photo-btn { margin-left:8px; }
+.fvw-hidden { display:none; }
+
+.fvw-css-editor { height:460px;font-family:ui-monospace,Menlo,monospace;font-size:12px; }
+
+.fvw-sc-badge { display:inline-block;margin-top:4px;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:600;text-transform:uppercase; }
+.fvw-sc-badge--admin { background:#fff8e5;color:#8c5b00;border:1px solid #f0c33c; }
+.fvw-sc-badge--default { background:#edfaef;color:#008a20;border:1px solid #c3e6cb; }
