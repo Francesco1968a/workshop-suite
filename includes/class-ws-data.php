@@ -135,8 +135,14 @@ final class WS_Data {
         }
         $events = [];
         foreach ($iscrizioni as $isc) {
-            $eid = self::get_field('evento', $isc->ID);
-            $ev_label = $eid ? get_the_title($eid) : '?';
+            $tipo = self::get_field('tipo_iscrizione', $isc->ID) ?: 'workshop';
+            if ($tipo === 'corso') {
+                $cid = self::get_field('corso', $isc->ID);
+                $ev_label = $cid ? get_the_title($cid) : '?';
+            } else {
+                $eid = self::get_field('evento', $isc->ID);
+                $ev_label = $eid ? get_the_title($eid) : '?';
+            }
             $msg_orig = self::get_field('messaggio_originale', $isc->ID);
             $events[] = ['t' => get_post_time('Y-m-d H:i:s', false, $isc->ID),
                 'icon' => '📝', 'titolo' => 'Iscrizione creata', 'evento' => $ev_label,
@@ -341,6 +347,17 @@ final class WS_Data {
         return (int) ($q->posts[0] ?? 0);
     }
 
+    public static function find_iscrizione_corso(int $partecipante_id, int $corso_id): int {
+        $q = new WP_Query([
+            'post_type' => 'iscrizione', 'posts_per_page' => 1, 'fields' => 'ids',
+            'meta_query' => ['relation' => 'AND',
+                ['key' => 'partecipante', 'value' => $partecipante_id, 'compare' => '='],
+                ['key' => 'corso', 'value' => $corso_id, 'compare' => '=']],
+            'no_found_rows' => true,
+        ]);
+        return (int) ($q->posts[0] ?? 0);
+    }
+
     public static function find_partecipante_by_email(string $email): int {
         $email = sanitize_email($email);
         if (!$email) return 0;
@@ -398,6 +415,37 @@ final class WS_Data {
             '{saldo}' => '€ ' . number_format($saldo, 2, ',', '.'),
             '{messaggio_originale}' => $msg_orig,
         ];
+
+        return strtr($template, $placeholders);
+    }
+
+    /**
+     * Placeholder substitution for corso (course) template emails — kept
+     * separate from render_template() since evento and corso placeholders
+     * are incompatible sets (seats/dates vs. course title/access link).
+     * $extra lets the caller (e.g. the access-link sender) merge in values
+     * this function has no way to compute on its own, like {link_accesso}.
+     */
+    public static function render_template_corso(string $template, int $iscrizione_id, array $extra = []): string {
+        if (!$template) return '';
+
+        $pid = (int) self::get_field('partecipante', $iscrizione_id);
+        $cid = (int) self::get_field('corso', $iscrizione_id);
+
+        $nome = $pid ? self::get_field('nome', $pid) : '';
+        $cognome = $pid ? self::get_field('cognome', $pid) : '';
+        $email = $pid ? self::get_field('email', $pid) : '';
+
+        $corso_titolo = $cid ? get_the_title($cid) : '';
+        $instructor = $cid ? get_post_meta($cid, '_ws_course_instructor', true) : '';
+
+        $placeholders = array_merge([
+            '{nome}' => $nome, '{cognome}' => $cognome, '{nome_completo}' => trim($nome . ' ' . $cognome),
+            '{email}' => $email,
+            '{corso_titolo}' => $corso_titolo,
+            '{instructor}' => $instructor,
+            '{link_accesso}' => '',
+        ], $extra);
 
         return strtr($template, $placeholders);
     }

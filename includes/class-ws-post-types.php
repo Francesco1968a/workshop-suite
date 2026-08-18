@@ -95,7 +95,9 @@ final class WS_Post_Types implements WS_Module {
             'key' => 'group_iscrizione', 'title' => 'Dati Iscrizione',
             'fields' => [
                 ['key' => 'field_i_part', 'label' => 'Partecipante', 'name' => 'partecipante', 'type' => 'post_object', 'post_type' => ['partecipante'], 'return_format' => 'id', 'required' => 1],
-                ['key' => 'field_i_evento', 'label' => 'Evento', 'name' => 'evento', 'type' => 'post_object', 'post_type' => ['evento'], 'return_format' => 'id', 'required' => 1],
+                ['key' => 'field_i_tipo', 'label' => 'Tipo iscrizione', 'name' => 'tipo_iscrizione', 'type' => 'select', 'choices' => ['workshop' => 'Workshop', 'corso' => 'Corso Online'], 'default_value' => 'workshop'],
+                ['key' => 'field_i_evento', 'label' => 'Evento', 'name' => 'evento', 'type' => 'post_object', 'post_type' => ['evento'], 'return_format' => 'id', 'required' => 0, 'conditional_logic' => [[['field' => 'field_i_tipo', 'operator' => '==', 'value' => 'workshop']]]],
+                ['key' => 'field_i_corso', 'label' => 'Corso', 'name' => 'corso', 'type' => 'post_object', 'post_type' => ['ws_course'], 'return_format' => 'id', 'required' => 0, 'conditional_logic' => [[['field' => 'field_i_tipo', 'operator' => '==', 'value' => 'corso']]]],
                 ['key' => 'field_i_stato', 'label' => 'Stato', 'name' => 'stato', 'type' => 'select', 'choices' => ['richiesta' => 'Richiesta', 'confermato' => 'Confermato'], 'default_value' => 'richiesta'],
                 ['key' => 'field_i_anticipo', 'label' => 'Anticipo pagato (€)', 'name' => 'anticipo', 'type' => 'number', 'step' => '0.01', 'default_value' => 0],
                 ['key' => 'field_i_saldo', 'label' => 'Saldo pagato (€)', 'name' => 'saldo', 'type' => 'number', 'step' => '0.01', 'default_value' => 0],
