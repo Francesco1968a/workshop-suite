@@ -573,11 +573,40 @@ final class WS_Data {
         if ($linked_evento) {
             $isc_workshop = self::find_iscrizione($partecipante_id, $linked_evento);
             if ($isc_workshop && self::get_field('stato', $isc_workshop) === 'confermato') {
+                // Lazy shadow-iscrizione (tipo_iscrizione=corso), created only
+                // now — the first time this confirmed attendee actually opens
+                // the course — not eagerly when their workshop iscrizione was
+                // confirmed. It exists purely as a container for course
+                // progress tracking (Fase 5); entitlement itself still comes
+                // from the workshop iscrizione, not this one.
+                if (!$isc_corso) {
+                    self::ensure_shadow_iscrizione_corso($partecipante_id, $course_id);
+                }
                 return true;
             }
         }
 
         return false;
+    }
+
+    /** Get-or-create a confermato tipo_iscrizione=corso row with no side effect beyond that. */
+    private static function ensure_shadow_iscrizione_corso(int $partecipante_id, int $course_id): int {
+        $existing = self::find_iscrizione_corso($partecipante_id, $course_id);
+        if ($existing) return $existing;
+
+        $isc_id = wp_insert_post([
+            'post_type'   => 'iscrizione',
+            'post_title'  => 'iscr-corso-' . $partecipante_id . '-' . $course_id,
+            'post_status' => 'publish',
+        ]);
+        if (is_wp_error($isc_id) || !$isc_id) return 0;
+
+        update_post_meta($isc_id, 'partecipante', $partecipante_id);
+        update_post_meta($isc_id, 'tipo_iscrizione', 'corso');
+        update_post_meta($isc_id, 'corso', $course_id);
+        update_post_meta($isc_id, 'stato', 'confermato');
+
+        return $isc_id;
     }
 
     /** Cookie value for a resolved course visitor: "$partecipante_id|$identity_token". */
