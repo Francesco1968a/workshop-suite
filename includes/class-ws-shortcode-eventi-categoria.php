@@ -51,7 +51,7 @@ final class WS_Shortcode_Eventi_Categoria implements WS_Module {
             ],
         ]);
 
-        if (!$q->have_posts()) return '<p style="text-align:center;color:#888;">Nessuna data in programma.</p>';
+        if (!$q->have_posts()) return '<style>.wv-empty-msg{text-align:center;color:#888;}</style><p class="wv-empty-msg">Nessuna data in programma.</p>';
 
         $max_w = (int) $atts['max_width'];
         if ($max_w < 400) $max_w = 1100;
