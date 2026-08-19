@@ -23,14 +23,14 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
         
         wp_register_style(
             'ws-form-iscrizione',
-            WS_URL . 'assets/css/fvw-form-iscrizione.css',
+            WS_URL . 'assets/css/ws-form-iscrizione.css',
             [],
             WS_VERSION
         );
 
         wp_register_script(
             'ws-form-iscrizione',
-            WS_URL . 'assets/js/fvw-form-iscrizione.js',
+            WS_URL . 'assets/js/ws-form-iscrizione.js',
             [],
             WS_VERSION,
             true
@@ -80,45 +80,45 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
 
         ob_start();
         ?>
-        <div class="fvw-form-wrapper" id="fvw-form-container">
-            <form id="fvw-registration-form" class="fvw-form">
+        <div class="ws-form-wrapper" id="ws-form-container">
+            <form id="ws-registration-form" class="ws-form">
                 <input type="hidden" name="evento_id" value="<?php echo esc_attr($evento_id); ?>">
                 
                 <!-- Honeypot anti-spam -->
-                <div class="fvw-honeypot" aria-hidden="true">
+                <div class="ws-honeypot" aria-hidden="true">
                     <input type="text" name="website_url" tabindex="-1" autocomplete="off">
                 </div>
 
-                <div class="fvw-form-row fvw-form-row-2">
-                    <div class="fvw-form-group">
-                        <label for="fvw-nome"><?php esc_html_e('Nome', 'workshop-suite'); ?> <span class="req">*</span></label>
-                        <input type="text" id="fvw-nome" name="nome" class="fvw-input" required placeholder="Es. Mario">
+                <div class="ws-form-row ws-form-row-2">
+                    <div class="ws-form-group">
+                        <label for="ws-nome"><?php esc_html_e('Nome', 'workshop-suite'); ?> <span class="req">*</span></label>
+                        <input type="text" id="ws-nome" name="nome" class="ws-input" required placeholder="Es. Mario">
                     </div>
-                    <div class="fvw-form-group">
-                        <label for="fvw-cognome"><?php esc_html_e('Cognome', 'workshop-suite'); ?> <span class="req">*</span></label>
-                        <input type="text" id="fvw-cognome" name="cognome" class="fvw-input" required placeholder="Es. Rossi">
-                    </div>
-                </div>
-
-                <div class="fvw-form-row fvw-form-row-2">
-                    <div class="fvw-form-group">
-                        <label for="fvw-email"><?php esc_html_e('Email', 'workshop-suite'); ?> <span class="req">*</span></label>
-                        <input type="email" id="fvw-email" name="email" class="fvw-input" required placeholder="mario.rossi@email.com">
-                    </div>
-                    <div class="fvw-form-group">
-                        <label for="fvw-telefono"><?php esc_html_e('Telefono / WhatsApp', 'workshop-suite'); ?></label>
-                        <input type="tel" id="fvw-telefono" name="telefono" class="fvw-input" placeholder="+39 333 1234567">
+                    <div class="ws-form-group">
+                        <label for="ws-cognome"><?php esc_html_e('Cognome', 'workshop-suite'); ?> <span class="req">*</span></label>
+                        <input type="text" id="ws-cognome" name="cognome" class="ws-input" required placeholder="Es. Rossi">
                     </div>
                 </div>
 
-                <div class="fvw-form-row fvw-form-row-2">
-                    <div class="fvw-form-group">
-                        <label for="fvw-citta"><?php esc_html_e('Città di provenienza', 'workshop-suite'); ?></label>
-                        <input type="text" id="fvw-citta" name="citta" class="fvw-input" placeholder="Es. Milano">
+                <div class="ws-form-row ws-form-row-2">
+                    <div class="ws-form-group">
+                        <label for="ws-email"><?php esc_html_e('Email', 'workshop-suite'); ?> <span class="req">*</span></label>
+                        <input type="email" id="ws-email" name="email" class="ws-input" required placeholder="mario.rossi@email.com">
                     </div>
-                    <div class="fvw-form-group">
-                        <label for="fvw-persone"><?php esc_html_e('Numero persone', 'workshop-suite'); ?></label>
-                        <select id="fvw-persone" name="numero_persone" class="fvw-select">
+                    <div class="ws-form-group">
+                        <label for="ws-telefono"><?php esc_html_e('Telefono / WhatsApp', 'workshop-suite'); ?></label>
+                        <input type="tel" id="ws-telefono" name="telefono" class="ws-input" placeholder="+39 333 1234567">
+                    </div>
+                </div>
+
+                <div class="ws-form-row ws-form-row-2">
+                    <div class="ws-form-group">
+                        <label for="ws-citta"><?php esc_html_e('Città di provenienza', 'workshop-suite'); ?></label>
+                        <input type="text" id="ws-citta" name="citta" class="ws-input" placeholder="Es. Milano">
+                    </div>
+                    <div class="ws-form-group">
+                        <label for="ws-persone"><?php esc_html_e('Numero persone', 'workshop-suite'); ?></label>
+                        <select id="ws-persone" name="numero_persone" class="ws-select">
                             <option value="1">1 persona</option>
                             <option value="2">2 persone</option>
                             <option value="3">3 persone</option>
@@ -127,18 +127,18 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
                     </div>
                 </div>
 
-                <div class="fvw-form-group">
-                    <label for="fvw-messaggio"><?php esc_html_e('Messaggio / Richiesta informazioni', 'workshop-suite'); ?></label>
-                    <textarea id="fvw-messaggio" name="messaggio" class="fvw-textarea" rows="4" placeholder="<?php esc_attr_e('Scrivi qui le tue domande o note particolari...', 'workshop-suite'); ?>"></textarea>
+                <div class="ws-form-group">
+                    <label for="ws-messaggio"><?php esc_html_e('Messaggio / Richiesta informazioni', 'workshop-suite'); ?></label>
+                    <textarea id="ws-messaggio" name="messaggio" class="ws-textarea" rows="4" placeholder="<?php esc_attr_e('Scrivi qui le tue domande o note particolari...', 'workshop-suite'); ?>"></textarea>
                 </div>
 
-                <div class="fvw-form-actions">
-                    <button type="submit" class="fvw-btn-submit" id="fvw-submit-btn">
+                <div class="ws-form-actions">
+                    <button type="submit" class="ws-btn-submit" id="ws-submit-btn">
                         <span><?php esc_html_e('Invia Richiesta Iscrizione', 'workshop-suite'); ?></span>
                     </button>
                 </div>
 
-                <div id="fvw-form-message" class="fvw-form-response"></div>
+                <div id="ws-form-message" class="ws-form-response"></div>
             </form>
         </div>
         <?php

@@ -13,7 +13,7 @@ final class WS_Shortcode_Calendario extends WS_Shortcode_Base {
     protected function handle(): string  { return 'ws-calendario'; }
     protected function js_file(): string  { return 'assets/dist/calendario.js'; }
     protected function css_file(): string { return 'assets/dist/calendario.css'; }
-    protected function app_id(): string   { return 'fvw-calendario-app'; }
+    protected function app_id(): string   { return 'ws-calendario-app'; }
 
     protected function access_denied_html(): string {
         return '<p>Accesso riservato.</p>';

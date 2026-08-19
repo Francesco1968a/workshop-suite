@@ -296,41 +296,41 @@ final class WS_Admin_Settings_Page implements WS_Module {
     }
 
     public function render_dashboard(): void {
-        $this->render_panel_wrapper('fvw-riepilogo-app', 'ws-riepilogo', 'assets/dist/riepilogo.js', 'assets/dist/riepilogo.css');
+        $this->render_panel_wrapper('ws-riepilogo-app', 'ws-riepilogo', 'assets/dist/riepilogo.js', 'assets/dist/riepilogo.css');
     }
 
     public function render_riepilogo(): void {
         if (!isset($_GET['vista'])) {
             $_GET['vista'] = 'categorie';
         }
-        $this->render_panel_wrapper('fvw-admin-app', 'ws-admin', 'assets/dist/admin.js', 'assets/dist/admin.css');
+        $this->render_panel_wrapper('ws-admin-app', 'ws-admin', 'assets/dist/admin.js', 'assets/dist/admin.css');
     }
 
     public function render_eventi_partecipanti(): void {
         if (!isset($_GET['vista'])) {
             $_GET['vista'] = 'eventi';
         }
-        $this->render_panel_wrapper('fvw-admin-app', 'ws-admin', 'assets/dist/admin.js', 'assets/dist/admin.css');
+        $this->render_panel_wrapper('ws-admin-app', 'ws-admin', 'assets/dist/admin.js', 'assets/dist/admin.css');
     }
 
     public function render_locandine(): void {
-        $this->render_panel_wrapper('fvw-locandine-app', 'ws-locandine', 'assets/dist/locandine.js', 'assets/dist/locandine.css');
+        $this->render_panel_wrapper('ws-locandine-app', 'ws-locandine', 'assets/dist/locandine.js', 'assets/dist/locandine.css');
     }
 
     public function render_partecipanti(): void {
-        $this->render_panel_wrapper('fvw-partecipanti-lista-app', 'ws-partecipanti-lista', 'assets/dist/partecipanti-lista.js', 'assets/dist/partecipanti-lista.css');
+        $this->render_panel_wrapper('ws-partecipanti-lista-app', 'ws-partecipanti-lista', 'assets/dist/partecipanti-lista.js', 'assets/dist/partecipanti-lista.css');
     }
 
     public function render_messaggi(): void {
-        $this->render_panel_wrapper('fvw-messaggi-app', 'ws-messaggi', 'assets/dist/messaggi.js', 'assets/dist/messaggi.css');
+        $this->render_panel_wrapper('ws-messaggi-app', 'ws-messaggi', 'assets/dist/messaggi.js', 'assets/dist/messaggi.css');
     }
 
     public function render_calendario(): void {
-        $this->render_panel_wrapper('fvw-calendario-app', 'ws-calendario', 'assets/dist/calendario.js', 'assets/dist/calendario.css');
+        $this->render_panel_wrapper('ws-calendario-app', 'ws-calendario', 'assets/dist/calendario.js', 'assets/dist/calendario.css');
     }
 
     public function render_archivio(): void {
-        $this->render_panel_wrapper('fvw-archivio-app', 'ws-archivio', 'assets/dist/archivio.js', 'assets/dist/archivio.css');
+        $this->render_panel_wrapper('ws-archivio-app', 'ws-archivio', 'assets/dist/archivio.js', 'assets/dist/archivio.css');
     }
 
     public function render_event_types_panel(): void {

@@ -15,7 +15,7 @@ final class WS_Shortcode_Locandine extends WS_Shortcode_Base {
     protected function handle(): string  { return 'ws-locandine'; }
     protected function js_file(): string  { return 'assets/dist/locandine.js'; }
     protected function css_file(): string { return 'assets/dist/locandine.css'; }
-    protected function app_id(): string   { return 'fvw-locandine-app'; }
+    protected function app_id(): string   { return 'ws-locandine-app'; }
 
     protected function extra_config(): array {
         return [

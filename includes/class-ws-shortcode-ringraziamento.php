@@ -51,6 +51,6 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
         wp_localize_script('ws-ringraziamento', 'WS_CONFIG', $ringraziamento_config);
         wp_localize_script('ws-ringraziamento', 'FVW_CONFIG', $ringraziamento_config);
 
-        return '<div id="fvw-ringraziamento-app"></div>';
+        return '<div id="ws-ringraziamento-app"></div>';
     }
 }

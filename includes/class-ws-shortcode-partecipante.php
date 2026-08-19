@@ -16,7 +16,7 @@ final class WS_Shortcode_Partecipante extends WS_Shortcode_Base {
     protected function handle(): string  { return 'ws-partecipante'; }
     protected function js_file(): string  { return 'assets/dist/partecipante.js'; }
     protected function css_file(): string { return 'assets/dist/partecipante.css'; }
-    protected function app_id(): string   { return 'fvw-partecipante-app'; }
+    protected function app_id(): string   { return 'ws-partecipante-app'; }
 
     protected function access_denied_html(): string {
         return '';

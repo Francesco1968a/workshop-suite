@@ -1247,7 +1247,7 @@
 
     /* ───────── mount ───────── */
     function mount() {
-        var root = document.getElementById('fvw-locandine-app');
+        var root = (document.getElementById('ws-locandine-app')||document.getElementById('fvw-locandine-app'));
         if (!root || root.dataset.mounted) return;
         root.dataset.mounted = '1';
 

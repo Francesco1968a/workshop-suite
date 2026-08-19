@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('fvw-registration-form');
+    const form = document.getElementById('ws-registration-form');
     if (!form) return;
 
-    const submitBtn = document.getElementById('fvw-submit-btn');
-    const msgContainer = document.getElementById('fvw-form-message');
+    const submitBtn = document.getElementById('ws-submit-btn');
+    const msgContainer = document.getElementById('ws-form-message');
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (btnText) btnText.textContent = WS_Form_Vars.i18n.sending;
 
         msgContainer.style.display = 'none';
-        msgContainer.className = 'fvw-form-response';
+        msgContainer.className = 'ws-form-response';
 
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());

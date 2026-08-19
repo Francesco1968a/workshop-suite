@@ -8,7 +8,7 @@ final class WS_Shortcode_Archivio extends WS_Shortcode_Base {
     protected function handle(): string  { return 'ws-archivio'; }
     protected function js_file(): string  { return 'assets/dist/archivio.js'; }
     protected function css_file(): string { return 'assets/dist/archivio.css'; }
-    protected function app_id(): string   { return 'fvw-archivio-app'; }
+    protected function app_id(): string   { return 'ws-archivio-app'; }
 
     public function register(): void {
         $this->add_shortcodes('workshop_archivio');

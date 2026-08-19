@@ -29,7 +29,7 @@ abstract class WS_Shortcode_Base implements WS_Module {
     /** Relative path from WS_PATH, e.g. 'assets/dist/admin.css' — empty string to skip. */
     abstract protected function css_file(): string;
 
-    /** The HTML id of the Vue mount point, e.g. 'fvw-admin-app' */
+    /** The HTML id of the Vue mount point, e.g. 'ws-admin-app' */
     abstract protected function app_id(): string;
 
     /**

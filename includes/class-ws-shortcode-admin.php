@@ -12,7 +12,7 @@ final class WS_Shortcode_Admin extends WS_Shortcode_Base {
     protected function handle(): string  { return 'ws-admin'; }
     protected function js_file(): string  { return 'assets/dist/admin.js'; }
     protected function css_file(): string { return 'assets/dist/admin.css'; }
-    protected function app_id(): string   { return 'fvw-admin-app'; }
+    protected function app_id(): string   { return 'ws-admin-app'; }
 
     public function register(): void {
         $this->add_shortcodes('workshop_admin', 'workshop_app', 'fv_workshop');
