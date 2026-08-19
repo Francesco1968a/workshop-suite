@@ -39,6 +39,7 @@ final class WS_Rest_Admin implements WS_Module {
         register_rest_route($ns, '/admin/categorie', ['methods' => 'POST', 'callback' => [$this, 'crea_categoria'], 'permission_callback' => $perm]);
         register_rest_route($ns, '/admin/categorie/(?P<id>\d+)', ['methods' => 'PUT', 'callback' => [$this, 'modifica_categoria'], 'permission_callback' => $perm]);
         register_rest_route($ns, '/admin/categorie/(?P<id>\d+)', ['methods' => 'DELETE', 'callback' => [$this, 'elimina_categoria'], 'permission_callback' => $perm]);
+        register_rest_route($ns, '/admin/crea-pagina-categoria', ['methods' => 'POST', 'callback' => [$this, 'crea_pagina_categoria'], 'permission_callback' => $perm]);
 
         register_rest_route($ns, '/admin/tipi-tab', ['methods' => 'GET', 'callback' => [$this, 'get_tipi_tab'], 'permission_callback' => $perm]);
         register_rest_route($ns, '/admin/tipi', ['methods' => 'POST', 'callback' => [$this, 'salva_tipi'], 'permission_callback' => $perm]);
@@ -566,6 +567,45 @@ final class WS_Rest_Admin implements WS_Module {
         }
 
         return (string) $upload['url'];
+    }
+
+    /**
+     * Creates a real WP page for a categoria_evento on the spot, so the
+     * admin doesn't have to leave the Categorie panel to set up its booking
+     * page. Optionally pre-fills the page with the [eventi_categoria]
+     * shortcode already tied to that category's slug, so the page is
+     * immediately functional rather than just created-but-empty.
+     */
+    public function crea_pagina_categoria(WP_REST_Request $request) {
+        $title = sanitize_text_field((string) $request->get_param('title'));
+        if (!$title) return new WP_Error('invalid', 'Titolo obbligatorio.', ['status' => 400]);
+
+        $tid = (int) $request->get_param('categoria_id');
+        $term = $tid ? get_term($tid, 'categoria_evento') : null;
+        if (!$tid || !$term || is_wp_error($term)) {
+            return new WP_Error('invalid', 'Categoria non valida.', ['status' => 400]);
+        }
+
+        $add_shortcode = $request->get_param('add_shortcode');
+        $add_shortcode = $add_shortcode === null ? true : (bool) $add_shortcode;
+        $content = $add_shortcode ? '[eventi_categoria slug="' . $term->slug . '"]' : '';
+
+        $page_id = wp_insert_post([
+            'post_type'    => 'page',
+            'post_title'   => $title,
+            'post_content' => $content,
+            'post_status'  => 'publish',
+        ], true);
+
+        if (is_wp_error($page_id)) {
+            return new WP_Error('failed', $page_id->get_error_message(), ['status' => 500]);
+        }
+
+        return new WP_REST_Response([
+            'id'    => $page_id,
+            'title' => $title,
+            'url'   => get_permalink($page_id),
+        ]);
     }
 
     public function crea_categoria(WP_REST_Request $request) {
