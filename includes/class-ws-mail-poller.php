@@ -45,11 +45,11 @@ final class WS_Mail_Poller implements WS_Module {
                notice can render on any workshop-suite admin page, and by the
                time this callback runs admin.css's own enqueue may already be
                past WordPress's style-printing point for that page. */
-            .fvw-mail-poll-error { padding: 10px 14px; border-radius: 6px; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-            .fvw-mail-poll-error p { margin: 0; font-weight: 600; }
-            .fvw-mail-poll-error code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #fca5a5; }
+            .ws-mail-poll-error { padding: 10px 14px; border-radius: 6px; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+            .ws-mail-poll-error p { margin: 0; font-weight: 600; }
+            .ws-mail-poll-error code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #fca5a5; }
         </style>
-        <div class="notice notice-error is-dismissible fvw-mail-poll-error">
+        <div class="notice notice-error is-dismissible ws-mail-poll-error">
             <p>
                 ⚠️ <?php /* translators: %s: date and time of the last failed poll */ printf(esc_html__('Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:', 'workshop-suite'), esc_html($error['date'] ?? '')); ?>
                 <code><?php echo esc_html($error['msg'] ?? ''); ?></code>

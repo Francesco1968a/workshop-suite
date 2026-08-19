@@ -98,11 +98,11 @@ final class WS_Onboarding_Wizard implements WS_Module {
         }
 
         ?>
-        <div class="wrap fvw-wizard-wrap">
-            <div class="fvw-wizard-box">
-                <div class="fvw-wizard-steps">
-                    <span class="fvw-wizard-step<?php echo $step === 1 ? ' fvw-wizard-step--active' : ''; ?>">1. <?php esc_html_e('Condivisione dati', 'workshop-suite'); ?></span>
-                    <span class="fvw-wizard-step<?php echo $step === 2 ? ' fvw-wizard-step--active' : ''; ?>">2. <?php esc_html_e('Casella mail', 'workshop-suite'); ?></span>
+        <div class="wrap ws-wizard-wrap">
+            <div class="ws-wizard-box">
+                <div class="ws-wizard-steps">
+                    <span class="ws-wizard-step<?php echo $step === 1 ? ' ws-wizard-step--active' : ''; ?>">1. <?php esc_html_e('Condivisione dati', 'workshop-suite'); ?></span>
+                    <span class="ws-wizard-step<?php echo $step === 2 ? ' ws-wizard-step--active' : ''; ?>">2. <?php esc_html_e('Casella mail', 'workshop-suite'); ?></span>
                 </div>
 
                 <?php if ($step === 1): $this->render_step1(); else: $this->render_step2(); endif; ?>
@@ -114,9 +114,9 @@ final class WS_Onboarding_Wizard implements WS_Module {
     private function render_step1(): void {
         ?>
         <h1><?php esc_html_e('Benvenuto in Workshop Suite 👋', 'workshop-suite'); ?></h1>
-        <p class="fvw-wizard-lead"><?php esc_html_e('Prima di iniziare, una scelta che riguarda solo te: vuoi condividere i tuoi eventi pubblicati con la directory pubblica di Workshop Suite?', 'workshop-suite'); ?></p>
+        <p class="ws-wizard-lead"><?php esc_html_e('Prima di iniziare, una scelta che riguarda solo te: vuoi condividere i tuoi eventi pubblicati con la directory pubblica di Workshop Suite?', 'workshop-suite'); ?></p>
 
-        <div class="fvw-wizard-disclosure">
+        <div class="ws-wizard-disclosure">
             <p><strong><?php esc_html_e('Cosa viene inviato, se accetti:', 'workshop-suite'); ?></strong></p>
             <p><?php esc_html_e('Titolo, descrizione, date e luogo, categoria, prezzo e acconto, posti disponibili, immagine in evidenza, URL della pagina di prenotazione, e il tuo profilo pubblico da proponente (nome, ruolo, bio, foto, sito, lingue) come lo configurerai nelle impostazioni.', 'workshop-suite'); ?></p>
             <p><?php esc_html_e('Va a workshopsuite.pro, la directory pubblica del progetto Workshop Suite — serve a farti trovare da chi cerca corsi come i tuoi. Puoi cambiare questa scelta in qualsiasi momento da Impostazioni → Moduli & Add-ons.', 'workshop-suite'); ?></p>
@@ -124,16 +124,16 @@ final class WS_Onboarding_Wizard implements WS_Module {
 
         <form method="post">
             <?php wp_nonce_field('ws_wizard_nonce', 'ws_wizard_nonce_field'); ?>
-            <label class="fvw-wizard-choice">
+            <label class="ws-wizard-choice">
                 <input type="radio" name="ws_hub_consent" value="1">
                 <span><strong><?php esc_html_e('Sì, condividi i miei eventi', 'workshop-suite'); ?></strong> — <?php esc_html_e('aumenta la visibilità, aiuta anche la bio proponente ad avere uno scopo', 'workshop-suite'); ?></span>
             </label>
-            <label class="fvw-wizard-choice">
+            <label class="ws-wizard-choice">
                 <input type="radio" name="ws_hub_consent" value="0" checked>
                 <span><strong><?php esc_html_e('No, resta tutto sul mio sito', 'workshop-suite'); ?></strong> — <?php esc_html_e('nessun dato lascia il tuo sito', 'workshop-suite'); ?></span>
             </label>
 
-            <div class="fvw-wizard-actions">
+            <div class="ws-wizard-actions">
                 <button type="submit" name="ws_wizard_step1_submit" value="1" class="button button-primary button-hero"><?php esc_html_e('Continua →', 'workshop-suite'); ?></button>
             </div>
         </form>
@@ -143,14 +143,14 @@ final class WS_Onboarding_Wizard implements WS_Module {
     private function render_step2(): void {
         ?>
         <h1><?php esc_html_e('Casella mail per la messaggistica', 'workshop-suite'); ?></h1>
-        <p class="fvw-wizard-lead"><?php esc_html_e('Workshop Suite può inviare conferme, promemoria e rispondere ai partecipanti direttamente dalla tua casella mail. Puoi configurarla ora, oppure più tardi da Impostazioni → Mail.', 'workshop-suite'); ?></p>
+        <p class="ws-wizard-lead"><?php esc_html_e('Workshop Suite può inviare conferme, promemoria e rispondere ai partecipanti direttamente dalla tua casella mail. Puoi configurarla ora, oppure più tardi da Impostazioni → Mail.', 'workshop-suite'); ?></p>
 
         <form method="post">
             <?php wp_nonce_field('ws_wizard_nonce', 'ws_wizard_nonce_field'); ?>
-            <div class="fvw-wizard-actions">
+            <div class="ws-wizard-actions">
                 <button type="submit" name="ws_wizard_finish" value="1" class="button button-secondary"><?php esc_html_e('Configura dopo', 'workshop-suite'); ?></button>
-                <button type="submit" name="ws_wizard_finish" value="1" data-go-mail="1" onclick="document.getElementById('fvw-wizard-go-mail').value='1';" class="button button-primary button-hero"><?php esc_html_e('Configura ora →', 'workshop-suite'); ?></button>
-                <input type="hidden" id="fvw-wizard-go-mail" name="ws_go_to_mail" value="0">
+                <button type="submit" name="ws_wizard_finish" value="1" data-go-mail="1" onclick="document.getElementById('ws-wizard-go-mail').value='1';" class="button button-primary button-hero"><?php esc_html_e('Configura ora →', 'workshop-suite'); ?></button>
+                <input type="hidden" id="ws-wizard-go-mail" name="ws_go_to_mail" value="0">
             </div>
         </form>
         <?php

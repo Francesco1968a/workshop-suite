@@ -289,7 +289,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
         wp_localize_script($handle, 'FVW_CONFIG', $config);
 
         ?>
-        <div class="wrap fvw-admin-wrap">
+        <div class="wrap ws-admin-wrap">
             <div id="<?php echo esc_attr($app_id); ?>"></div>
         </div>
         <?php
@@ -338,30 +338,30 @@ final class WS_Admin_Settings_Page implements WS_Module {
         $settings = WS_Settings::get_all();
         $default_theme = WS_Settings::get('default_theme_mode', 'dark');
         ?>
-        <div class="wrap fvw-theme-wrapper fvw-theme-<?php echo esc_attr($default_theme); ?> fvw-dashboard-wrapper" id="fvw-dashboard-wrapper">
+        <div class="wrap ws-theme-wrapper fvw-theme-<?php echo esc_attr($default_theme); ?> ws-dashboard-wrapper" id="ws-dashboard-wrapper">
             
-            <div class="fvw-theme-switch-bar">
-                <span class="fvw-s1"><?php esc_html_e('Tema:', 'workshop-suite'); ?></span>
-                <button type="button" class="fvw-theme-btn <?php echo $default_theme === 'dark' ? 'active' : ''; ?>" id="btn-theme-dark" onclick="fvwSetTheme('dark')">🌙 Dark</button>
-                <button type="button" class="fvw-theme-btn <?php echo $default_theme === 'light' ? 'active' : ''; ?>" id="btn-theme-light" onclick="fvwSetTheme('light')">☀️ Light</button>
+            <div class="ws-theme-switch-bar">
+                <span class="ws-s1"><?php esc_html_e('Tema:', 'workshop-suite'); ?></span>
+                <button type="button" class="ws-theme-btn <?php echo $default_theme === 'dark' ? 'active' : ''; ?>" id="btn-theme-dark" onclick="fvwSetTheme('dark')">🌙 Dark</button>
+                <button type="button" class="ws-theme-btn <?php echo $default_theme === 'light' ? 'active' : ''; ?>" id="btn-theme-light" onclick="fvwSetTheme('light')">☀️ Light</button>
             </div>
 
-            <div class="fvw-s2">
-                <h2 class="fvw-s3"><?php esc_html_e('🏷️ Tipi di Evento', 'workshop-suite'); ?></h2>
-                <p class="fvw-s4"><?php esc_html_e('Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi.', 'workshop-suite'); ?></p>
+            <div class="ws-s2">
+                <h2 class="ws-s3"><?php esc_html_e('🏷️ Tipi di Evento', 'workshop-suite'); ?></h2>
+                <p class="ws-s4"><?php esc_html_e('Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi.', 'workshop-suite'); ?></p>
 
                 <style>
-                .fvw-theme-light #fvw-event-types-container input {
+                .ws-theme-light #ws-event-types-container input {
                     background: #ffffff !important;
                     color: #0f172a !important;
                     border: 1px solid #cbd5e1 !important;
                 }
-                .fvw-theme-light #fvw-event-types-container button {
+                .ws-theme-light #ws-event-types-container button {
                     background: #fff1f2 !important;
                     border-color: #f43f5e !important;
                     color: #e11d48 !important;
                 }
-                .fvw-theme-dark #fvw-event-types-container input {
+                .ws-theme-dark #ws-event-types-container input {
                     background: rgba(255,255,255,0.05) !important;
                     color: #ffffff !important;
                     border: 1px solid rgba(255,255,255,0.2) !important;
@@ -378,19 +378,19 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[default_theme_mode]" value="<?php echo esc_attr($settings['default_theme_mode']); ?>">
                     <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[enable_t15_reminders]" value="<?php echo esc_attr($settings['enable_t15_reminders']); ?>">
 
-                    <div class="fvw-s5" id="fvw-event-types-container">
+                    <div class="ws-s5" id="ws-event-types-container">
                         <?php 
                         $types = $settings['event_types'] ?? ['Workshop', 'Viaggio Fotografico', 'Masterclass'];
                         foreach ($types as $t) : 
                         ?>
-                            <div class="fvw-type-row fvw-s6">
-                                <input name="<?php echo WS_Settings::OPTION_KEY; ?>[event_types][]" type="text" value="<?php echo esc_attr($t); ?>" class="regular-text fvw-flex-input" placeholder="Es. Workshop">
-                                <button type="button" class="button button-secondary fvw-s7" onclick="this.parentNode.remove()">✕ Rimuovi</button>
+                            <div class="ws-type-row ws-s6">
+                                <input name="<?php echo WS_Settings::OPTION_KEY; ?>[event_types][]" type="text" value="<?php echo esc_attr($t); ?>" class="regular-text ws-flex-input" placeholder="Es. Workshop">
+                                <button type="button" class="button button-secondary ws-s7" onclick="this.parentNode.remove()">✕ Rimuovi</button>
                             </div>
                         <?php endforeach; ?>
                     </div>
 
-                    <div class="fvw-s8">
+                    <div class="ws-s8">
                         <button type="button" class="button button-secondary" onclick="fvwAddEventTypeRow()">+ <?php esc_html_e('Aggiungi Tipo Evento', 'workshop-suite'); ?></button>
                         <?php submit_button(__('Salva Tipi Evento', 'workshop-suite'), 'primary', 'submit', false); ?>
                     </div>
@@ -400,27 +400,27 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         <script>
         function fvwAddEventTypeRow() {
-            var container = document.getElementById('fvw-event-types-container');
+            var container = document.getElementById('ws-event-types-container');
             var row = document.createElement('div');
-            row.className = 'fvw-type-row';
+            row.className = 'ws-type-row';
             row.style.cssText = 'display:flex;gap:10px;align-items:center;';
-            row.innerHTML = '<input name="<?php echo WS_Settings::OPTION_KEY; ?>[event_types][]" type="text" value="" class="regular-text fvw-flex-input" placeholder="Es. Corso Online">' +
-                            '<button type="button" class="button button-secondary fvw-s7" onclick="this.parentNode.remove()">✕ Rimuovi</button>';
+            row.innerHTML = '<input name="<?php echo WS_Settings::OPTION_KEY; ?>[event_types][]" type="text" value="" class="regular-text ws-flex-input" placeholder="Es. Corso Online">' +
+                            '<button type="button" class="button button-secondary ws-s7" onclick="this.parentNode.remove()">✕ Rimuovi</button>';
             container.appendChild(row);
         }
         function fvwSetTheme(theme) {
-            var wrapper = document.getElementById('fvw-dashboard-wrapper');
+            var wrapper = document.getElementById('ws-dashboard-wrapper');
             var btnDark = document.getElementById('btn-theme-dark');
             var btnLight = document.getElementById('btn-theme-light');
 
             if (theme === 'light') {
-                wrapper.classList.remove('fvw-theme-dark');
-                wrapper.classList.add('fvw-theme-light');
+                wrapper.classList.remove('ws-theme-dark');
+                wrapper.classList.add('ws-theme-light');
                 if (btnLight) btnLight.classList.add('active');
                 if (btnDark) btnDark.classList.remove('active');
             } else {
-                wrapper.classList.remove('fvw-theme-light');
-                wrapper.classList.add('fvw-theme-dark');
+                wrapper.classList.remove('ws-theme-light');
+                wrapper.classList.add('ws-theme-dark');
                 if (btnDark) btnDark.classList.add('active');
                 if (btnLight) btnLight.classList.remove('active');
             }
@@ -470,11 +470,11 @@ final class WS_Admin_Settings_Page implements WS_Module {
         $settings = WS_Settings::get_all();
         $license  = WS_License_Manager::get_license_data();
         ?>
-        <div class="wrap fvw-admin-wrap">
+        <div class="wrap ws-admin-wrap">
             <h1 class="wp-heading-inline"><?php esc_html_e('Workshop Suite Settings', 'workshop-suite'); ?></h1>
             <hr class="wp-header-end">
             
-            <nav class="nav-tab-wrapper wp-clearfix fvw-s9">
+            <nav class="nav-tab-wrapper wp-clearfix ws-s9">
                 <a href="?page=workshop-suite-settings&tab=general" class="nav-tab <?php echo $tab === 'general' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('General', 'workshop-suite'); ?></a>
                 <a href="?page=workshop-suite-settings&tab=modules" class="nav-tab <?php echo $tab === 'modules' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Modules & Add-ons', 'workshop-suite'); ?></a>
                 <a href="?page=workshop-suite-settings&tab=proponente" class="nav-tab <?php echo $tab === 'proponente' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Trainer Profile / Bio', 'workshop-suite'); ?></a>
@@ -664,13 +664,13 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 ];
             ?>
                 <?php if (!$is_pro_active) : ?>
-                    <div class="fvw-s10">
+                    <div class="ws-s10">
                         <div>
-                            <span class="fvw-s11">Workshop Suite Free</span>
-                            <h3 class="fvw-s12">Sblocca il Potere Completo con Workshop Suite PRO</h3>
-                            <p class="fvw-s13">Installa l'Add-on PRO per sbloccare la Piattaforma Corsi Didattici, Live Streaming Zoom, Pagamenti Stripe, AI Copywriter e Voucher PDF.</p>
+                            <span class="ws-s11">Workshop Suite Free</span>
+                            <h3 class="ws-s12">Sblocca il Potere Completo con Workshop Suite PRO</h3>
+                            <p class="ws-s13">Installa l'Add-on PRO per sbloccare la Piattaforma Corsi Didattici, Live Streaming Zoom, Pagamenti Stripe, AI Copywriter e Voucher PDF.</p>
                         </div>
-                        <a href="https://workshopsuite.pro/#pricing" target="_blank" class="button button-primary fvw-s14">
+                        <a href="https://workshopsuite.pro/#pricing" target="_blank" class="button button-primary ws-s14">
                             Sblocca Tutti i Moduli PRO (99€) →
                         </a>
                     </div>
@@ -680,22 +680,22 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     <?php wp_nonce_field('ws_save_modules_nonce'); ?>
                     <input type="hidden" name="ws_save_modules_action" value="1">
 
-                    <div class="fvw-s15">
+                    <div class="ws-s15">
                         <?php foreach ($available_modules as $mod_key => $mod_data) : 
                             $is_locked = ($mod_data['is_pro'] && !$is_pro_active);
                             $is_active = $is_locked ? false : (isset($active_mods[$mod_key]) ? !empty($active_mods[$mod_key]) : $mod_data['default']);
                         ?>
-                            <div class="fvw-card-native fvw-mod-card <?php echo $is_locked ? 'fvw-mod-card--locked' : ($is_active ? 'fvw-mod-card--active' : 'fvw-mod-card--inactive'); ?>">
+                            <div class="ws-card-native ws-mod-card <?php echo $is_locked ? 'ws-mod-card--locked' : ($is_active ? 'ws-mod-card--active' : 'ws-mod-card--inactive'); ?>">
                                 <div>
-                                    <div class="fvw-s16">
-                                        <div class="fvw-s17">
-                                            <span class="fvw-s18"><?php echo esc_html($mod_data['icon']); ?></span>
+                                    <div class="ws-s16">
+                                        <div class="ws-s17">
+                                            <span class="ws-s18"><?php echo esc_html($mod_data['icon']); ?></span>
                                             <?php if ($mod_data['is_pro']): ?>
-                                                <span class="fvw-pro-badge <?php echo $is_pro_active ? 'fvw-pro-badge--unlocked' : 'fvw-pro-badge--locked'; ?>">
+                                                <span class="ws-pro-badge <?php echo $is_pro_active ? 'ws-pro-badge--unlocked' : 'ws-pro-badge--locked'; ?>">
                                                     <?php echo $is_pro_active ? '✓ PRO UNLOCKED' : '🔒 PRO REQUIRED'; ?>
                                                 </span>
                                             <?php else: ?>
-                                                <span class="fvw-s19">
+                                                <span class="ws-s19">
                                                     <?php echo esc_html($mod_data['badge']); ?>
                                                 </span>
                                             <?php endif; ?>
@@ -703,7 +703,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
                                         <!-- Toggle Switch -->
                                         <?php if ($is_locked): ?>
-                                            <a class="fvw-s20" href="https://workshopsuite.pro/#pricing" target="_blank">
+                                            <a class="ws-s20" href="https://workshopsuite.pro/#pricing" target="_blank">
                                                 🔒 Sblocca PRO
                                             </a>
                                         <?php else: ?>
@@ -714,19 +714,19 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                         <?php endif; ?>
                                     </div>
 
-                                    <h3 class="fvw-mod-title<?php echo $is_locked ? ' fvw-mod-title--locked' : ''; ?>">
+                                    <h3 class="ws-mod-title<?php echo $is_locked ? ' ws-mod-title--locked' : ''; ?>">
                                         <?php echo esc_html($mod_data['title']); ?>
                                     </h3>
-                                    <p class="fvw-s21">
+                                    <p class="ws-s21">
                                         <?php echo esc_html($mod_data['desc']); ?>
                                     </p>
                                 </div>
 
-                                <div class="fvw-s22">
-                                    <span class="ws-mod-status-label fvw-mod-status <?php echo $is_locked ? 'fvw-mod-status--locked' : ($is_active ? 'fvw-mod-status--active' : 'fvw-mod-status--inactive'); ?>">
+                                <div class="ws-s22">
+                                    <span class="ws-mod-status-label ws-mod-status <?php echo $is_locked ? 'ws-mod-status--locked' : ($is_active ? 'ws-mod-status--active' : 'ws-mod-status--inactive'); ?>">
                                         ● <?php echo $is_locked ? esc_html__('Richiede PRO', 'workshop-suite') : ($is_active ? esc_html__('Attivo', 'workshop-suite') : esc_html__('Disattivato', 'workshop-suite')); ?>
                                     </span>
-                                    <span class="fvw-s23">
+                                    <span class="ws-s23">
                                         <code>ws-mod-<?php echo esc_html($mod_key); ?></code>
                                     </span>
                                 </div>
@@ -780,7 +780,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
                     <script>
                     function wsToggleModuleLive(checkbox, modKey) {
-                        const card = checkbox.closest('.fvw-card-native');
+                        const card = checkbox.closest('.ws-card-native');
                         const statusLabel = card.querySelector('.ws-mod-status-label');
                         const isActive = checkbox.checked;
 
@@ -809,7 +809,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     }
                     </script>
 
-                    <div class="fvw-s24">
+                    <div class="ws-s24">
                         <?php submit_button(__('Salva Stato Moduli', 'workshop-suite')); ?>
                     </div>
                 </form>
@@ -834,36 +834,36 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     <?php wp_nonce_field('ws_save_proponente_nonce'); ?>
                     <input type="hidden" name="ws_save_proponente_action" value="1">
 
-                    <div class="fvw-s25">
+                    <div class="ws-s25">
                         
                         <!-- Colonna 1: Bio & Dati Personali -->
-                        <div class="fvw-card-native">
-                            <h2 class="fvw-s26">
+                        <div class="ws-card-native">
+                            <h2 class="ws-s26">
                                 👤 <?php esc_html_e('Dati Docente / Proponente', 'workshop-suite'); ?>
                             </h2>
 
                             <!-- Foto Profilo con Uploader WP Media -->
-                            <div class="fvw-s27">
-                                <label class="fvw-s28"><?php esc_html_e('Foto Profilo / Avatar', 'workshop-suite'); ?></label>
-                                <div class="fvw-s29">
-                                    <div class="fvw-s30" id="ws-photo-preview-wrap">
+                            <div class="ws-s27">
+                                <label class="ws-s28"><?php esc_html_e('Foto Profilo / Avatar', 'workshop-suite'); ?></label>
+                                <div class="ws-s29">
+                                    <div class="ws-s30" id="ws-photo-preview-wrap">
                                         <?php if (!empty($settings['proponente_foto'])) : ?>
-                                            <img src="<?php echo esc_url($settings['proponente_foto']); ?>" id="ws-photo-img" class="fvw-photo-preview">
+                                            <img src="<?php echo esc_url($settings['proponente_foto']); ?>" id="ws-photo-img" class="ws-photo-preview">
                                         <?php else : ?>
-                                            <span class="fvw-s31" id="ws-photo-placeholder">👤</span>
-                                            <img class="fvw-s32" src="" id="ws-photo-img">
+                                            <span class="ws-s31" id="ws-photo-placeholder">👤</span>
+                                            <img class="ws-s32" src="" id="ws-photo-img">
                                         <?php endif; ?>
                                     </div>
-                                    <div class="fvw-s33">
+                                    <div class="ws-s33">
                                         <input type="hidden" name="ws_proponente[proponente_foto]" id="ws_proponente_foto" value="<?php echo esc_attr($settings['proponente_foto']); ?>">
                                         <button type="button" class="button button-secondary" id="ws-upload-photo-btn"><?php esc_html_e('Carica / Scegli Foto', 'workshop-suite'); ?></button>
-                                        <button type="button" class="button button-link-delete fvw-remove-photo-btn<?php echo empty($settings['proponente_foto']) ? ' fvw-hidden' : ''; ?>" id="ws-remove-photo-btn"><?php esc_html_e('Rimuovi', 'workshop-suite'); ?></button>
-                                        <p class="description fvw-s34"><?php esc_html_e('Consigliata immagine quadrata ad alta risoluzione (min. 400x400 px).', 'workshop-suite'); ?></p>
+                                        <button type="button" class="button button-link-delete ws-remove-photo-btn<?php echo empty($settings['proponente_foto']) ? ' ws-hidden' : ''; ?>" id="ws-remove-photo-btn"><?php esc_html_e('Rimuovi', 'workshop-suite'); ?></button>
+                                        <p class="description ws-s34"><?php esc_html_e('Consigliata immagine quadrata ad alta risoluzione (min. 400x400 px).', 'workshop-suite'); ?></p>
                                     </div>
                                 </div>
                             </div>
 
-                            <table class="form-table fvw-s35" role="presentation">
+                            <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
                                         <th scope="row"><label for="prop_nome"><?php esc_html_e('Nome & Cognome', 'workshop-suite'); ?></label></th>
@@ -893,15 +893,15 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     <tr>
                                         <th scope="row"><?php esc_html_e('Lingue Parlate', 'workshop-suite'); ?></th>
                                         <td>
-                                            <div class="fvw-s36">
+                                            <div class="ws-s36">
                                                 <?php foreach ($lingue_disponibili as $key => $label) : ?>
-                                                    <label class="fvw-s37">
+                                                    <label class="ws-s37">
                                                         <input type="checkbox" name="ws_proponente[proponente_lingue][]" value="<?php echo esc_attr($key); ?>" <?php checked(in_array($key, $lingue_attive, true)); ?>>
                                                         <?php echo esc_html($label); ?>
                                                     </label>
                                                 <?php endforeach; ?>
                                             </div>
-                                            <p class="description fvw-s38"><?php esc_html_e('Indica le lingue in cui puoi condurre i workshop o comunicare con i corsisti.', 'workshop-suite'); ?></p>
+                                            <p class="description ws-s38"><?php esc_html_e('Indica le lingue in cui puoi condurre i workshop o comunicare con i corsisti.', 'workshop-suite'); ?></p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -909,14 +909,14 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         </div>
 
                         <!-- Colonna 2: Contatti & Canali Social -->
-                        <div class="fvw-s39">
+                        <div class="ws-s39">
                             
                             <!-- Card Contatti -->
-                            <div class="fvw-card-native">
-                                <h2 class="fvw-s26">
+                            <div class="ws-card-native">
+                                <h2 class="ws-s26">
                                     🌐 <?php esc_html_e('Contatti & Presenza Web', 'workshop-suite'); ?>
                                 </h2>
-                                <table class="form-table fvw-s35" role="presentation">
+                                <table class="form-table ws-s35" role="presentation">
                                     <tbody>
                                         <tr>
                                             <th scope="row"><label for="prop_sito"><?php esc_html_e('Sito Web Ufficiale', 'workshop-suite'); ?></label></th>
@@ -941,11 +941,11 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             </div>
 
                             <!-- Card Social Links -->
-                            <div class="fvw-card-native">
-                                <h2 class="fvw-s26">
+                            <div class="ws-card-native">
+                                <h2 class="ws-s26">
                                     📱 <?php esc_html_e('Canali Social', 'workshop-suite'); ?>
                                 </h2>
-                                <table class="form-table fvw-s35" role="presentation">
+                                <table class="form-table ws-s35" role="presentation">
                                     <tbody>
                                         <tr>
                                             <th scope="row"><label for="prop_ig">Instagram</label></th>
@@ -988,10 +988,10 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             </div>
 
                             <!-- Card Shortcode -->
-                            <div class="fvw-card-native fvw-s40">
-                                <h2 class="fvw-s41"><?php esc_html_e('💡 Come mostrare la Bio nel sito', 'workshop-suite'); ?></h2>
-                                <p class="fvw-s42"><?php esc_html_e('Incolla questo shortcode in qualsiasi pagina, articolo o footer:', 'workshop-suite'); ?></p>
-                                <code class="fvw-s43">[ws_proponente]</code>
+                            <div class="ws-card-native ws-s40">
+                                <h2 class="ws-s41"><?php esc_html_e('💡 Come mostrare la Bio nel sito', 'workshop-suite'); ?></h2>
+                                <p class="ws-s42"><?php esc_html_e('Incolla questo shortcode in qualsiasi pagina, articolo o footer:', 'workshop-suite'); ?></p>
+                                <code class="ws-s43">[ws_proponente]</code>
                             </div>
 
                         </div>
@@ -1058,12 +1058,12 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     <?php wp_nonce_field('fvw_save_mail_nonce'); ?>
                     <input type="hidden" name="fvw_save_mail_action" value="1">
 
-                    <div class="fvw-s44">
+                    <div class="ws-s44">
                         <!-- Column 1: IMAP (Reading) -->
-                        <div class="fvw-card-native">
-                            <h2 class="fvw-s26"><?php esc_html_e('Lettura Mail (IMAP)', 'workshop-suite'); ?></h2>
+                        <div class="ws-card-native">
+                            <h2 class="ws-s26"><?php esc_html_e('Lettura Mail (IMAP)', 'workshop-suite'); ?></h2>
                             
-                            <table class="form-table fvw-s35" role="presentation">
+                            <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
                                         <th scope="row"><label for="imap_host"><?php esc_html_e('Host IMAP', 'workshop-suite'); ?></label></th>
@@ -1092,7 +1092,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                         <td>
                                             <input name="fvw_mail[password]" type="password" id="imap_password" value="" class="regular-text" placeholder="<?php echo $has_password ? '•••••••• (Inalterata)' : 'Inserisci password'; ?>">
                                             <?php if ($has_password) : ?>
-                                                <p class="description fvw-s45">🔒 <?php esc_html_e('Password protetta con cifratura OpenSSL AES-256.', 'workshop-suite'); ?></p>
+                                                <p class="description ws-s45">🔒 <?php esc_html_e('Password protetta con cifratura OpenSSL AES-256.', 'workshop-suite'); ?></p>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
@@ -1101,10 +1101,10 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         </div>
 
                         <!-- Column 2: SMTP & Sender (Writing) -->
-                        <div class="fvw-card-native">
-                            <h2 class="fvw-s26"><?php esc_html_e('Invio Mail (SMTP / Mittente)', 'workshop-suite'); ?></h2>
+                        <div class="ws-card-native">
+                            <h2 class="ws-s26"><?php esc_html_e('Invio Mail (SMTP / Mittente)', 'workshop-suite'); ?></h2>
                             
-                            <table class="form-table fvw-s35" role="presentation">
+                            <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
                                         <th scope="row"><label for="reply_from_name"><?php esc_html_e('Nome Mittente', 'workshop-suite'); ?></label></th>
@@ -1138,11 +1138,11 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     </div>
 
                     <!-- Anti-Spam & Rate Limiting Section -->
-                    <div class="fvw-card-native fvw-s46">
-                        <h2 class="fvw-s26"><?php esc_html_e('Protezione Anti-Spam & Rate Limit Iscrizioni', 'workshop-suite'); ?></h2>
-                        <p class="description fvw-s47"><?php esc_html_e('Proteggi il server e l\'endpoint delle iscrizioni da invii automatici di bot e attacchi flood.', 'workshop-suite'); ?></p>
+                    <div class="ws-card-native ws-s46">
+                        <h2 class="ws-s26"><?php esc_html_e('Protezione Anti-Spam & Rate Limit Iscrizioni', 'workshop-suite'); ?></h2>
+                        <p class="description ws-s47"><?php esc_html_e('Proteggi il server e l\'endpoint delle iscrizioni da invii automatici di bot e attacchi flood.', 'workshop-suite'); ?></p>
                         
-                        <table class="form-table fvw-s35" role="presentation">
+                        <table class="form-table ws-s35" role="presentation">
                             <tbody>
                                 <tr>
                                     <th scope="row"><?php esc_html_e('Rate Limiting IP', 'workshop-suite'); ?></th>
@@ -1183,16 +1183,16 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     <?php submit_button(__('Salva Configurazione Posta & Sicurezza', 'workshop-suite')); ?>
                 </form>
             <?php elseif ($tab === 'custom_css') : ?>
-                <div class="fvw-card-native">
-                    <h2 class="fvw-s35"><?php esc_html_e('Codice CSS Personalizzato', 'workshop-suite'); ?></h2>
-                    <p class="description fvw-s48">
+                <div class="ws-card-native">
+                    <h2 class="ws-s35"><?php esc_html_e('Codice CSS Personalizzato', 'workshop-suite'); ?></h2>
+                    <p class="description ws-s48">
                         <?php esc_html_e('A destra puoi aggiungere regole CSS personalizzate che sovrascriveranno lo stile dell\'applicazione. A sinistra è visibile il codice CSS predefinito di riferimento.', 'workshop-suite'); ?>
                     </p>
 
-                    <div class="fvw-s49">
+                    <div class="ws-s49">
                         <div>
-                            <label class="fvw-s50"><?php esc_html_e('Codice Esistente (CSS Predefinito)', 'workshop-suite'); ?></label>
-                            <textarea readonly class="large-text code fvw-s51"><?php 
+                            <label class="ws-s50"><?php esc_html_e('Codice Esistente (CSS Predefinito)', 'workshop-suite'); ?></label>
+                            <textarea readonly class="large-text code ws-s51"><?php 
                                 $default_css_file = WS_PATH . 'assets/dist/admin.css';
                                 echo file_exists($default_css_file) ? esc_html(file_get_contents($default_css_file)) : '/* CSS predefinito non trovato */'; 
                             ?></textarea>
@@ -1207,10 +1207,10 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                 <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[enable_t15_reminders]" value="<?php echo esc_attr($settings['enable_t15_reminders']); ?>">
                                 <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[default_theme_mode]" value="<?php echo esc_attr($settings['default_theme_mode']); ?>">
 
-                                <label class="fvw-s50"><?php esc_html_e('Codice Custom (CSS Personalizzato)', 'workshop-suite'); ?></label>
-                                <textarea name="<?php echo WS_Settings::OPTION_KEY; ?>[custom_css]" class="large-text code fvw-css-editor" placeholder="/* Scrivi qui il tuo codice CSS personalizzato */"><?php echo esc_html($settings['custom_css'] ?? ''); ?></textarea>
+                                <label class="ws-s50"><?php esc_html_e('Codice Custom (CSS Personalizzato)', 'workshop-suite'); ?></label>
+                                <textarea name="<?php echo WS_Settings::OPTION_KEY; ?>[custom_css]" class="large-text code ws-css-editor" placeholder="/* Scrivi qui il tuo codice CSS personalizzato */"><?php echo esc_html($settings['custom_css'] ?? ''); ?></textarea>
                                 
-                                <div class="fvw-s52">
+                                <div class="ws-s52">
                                     <?php submit_button(__('Salva Codice Custom', 'workshop-suite'), 'primary', 'submit', false); ?>
                                 </div>
                             </form>
@@ -1218,9 +1218,9 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     </div>
                 </div>
             <?php elseif ($tab === 'shortcodes') : ?>
-                <div class="fvw-card-native">
-                    <h2 class="fvw-s35"><?php esc_html_e('Elenco Shortcode Disponibili', 'workshop-suite'); ?></h2>
-                    <p class="description fvw-s48">
+                <div class="ws-card-native">
+                    <h2 class="ws-s35"><?php esc_html_e('Elenco Shortcode Disponibili', 'workshop-suite'); ?></h2>
+                    <p class="description ws-s48">
                         <?php esc_html_e('Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di Workshop Suite.', 'workshop-suite'); ?>
                     </p>
 
@@ -1240,13 +1240,13 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         ['tag' => '[workshop_archivio]', 'alias' => null, 'title' => 'Archivio Storico Eventi', 'desc' => 'Consultazione dei workshop passati e conclusi (richiede login).', 'badge' => 'Admin']
                     ];
                     ?>
-                    <table class="widefat striped fvw-s53">
+                    <table class="widefat striped ws-s53">
                         <thead>
                             <tr>
-                                <th class="fvw-s54"><?php esc_html_e('Funzionalità', 'workshop-suite'); ?></th>
-                                <th class="fvw-s55"><?php esc_html_e('Descrizione', 'workshop-suite'); ?></th>
-                                <th class="fvw-s56"><?php esc_html_e('Shortcode Tag', 'workshop-suite'); ?></th>
-                                <th class="fvw-s57"><?php esc_html_e('Azione', 'workshop-suite'); ?></th>
+                                <th class="ws-s54"><?php esc_html_e('Funzionalità', 'workshop-suite'); ?></th>
+                                <th class="ws-s55"><?php esc_html_e('Descrizione', 'workshop-suite'); ?></th>
+                                <th class="ws-s56"><?php esc_html_e('Shortcode Tag', 'workshop-suite'); ?></th>
+                                <th class="ws-s57"><?php esc_html_e('Azione', 'workshop-suite'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1255,7 +1255,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     <td>
                                         <strong><?php echo esc_html($sc['title']); ?></strong>
                                         <br>
-                                        <span class="fvw-badge-native fvw-sc-badge <?php echo $sc['badge'] === 'Admin' ? 'fvw-sc-badge--admin' : 'fvw-sc-badge--default'; ?>">
+                                        <span class="ws-badge-native ws-sc-badge <?php echo $sc['badge'] === 'Admin' ? 'ws-sc-badge--admin' : 'ws-sc-badge--default'; ?>">
                                             <?php echo esc_html($sc['badge']); ?>
                                         </span>
                                     </td>
@@ -1263,10 +1263,10 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     <td>
                                         <code><?php echo esc_html($sc['tag']); ?></code>
                                         <?php if ($sc['alias']) : ?>
-                                            <br><small class="fvw-s58"><?php echo esc_html($sc['alias']); ?></small>
+                                            <br><small class="ws-s58"><?php echo esc_html($sc['alias']); ?></small>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="fvw-s59">
+                                    <td class="ws-s59">
                                         <button type="button" class="button button-small" onclick="navigator.clipboard.writeText('<?php echo esc_js($sc['tag']); ?>'); this.innerText='✓ Copiato!'; setTimeout(() => this.innerText='Copia', 2000);">
                                             <?php esc_html_e('Copia', 'workshop-suite'); ?>
                                         </button>
@@ -1293,14 +1293,14 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                 <th scope="row"><?php esc_html_e('Stato Licenza', 'workshop-suite'); ?></th>
                                 <td>
                                     <?php if ($license['status'] === 'active') : ?>
-                                        <span class="dashicons dashicons-yes-alt fvw-s60"></span>
-                                        <strong class="fvw-s45"><?php esc_html_e('ATTIVA', 'workshop-suite'); ?></strong> (Piano: <?php echo esc_html(strtoupper($license['type'])); ?>)
+                                        <span class="dashicons dashicons-yes-alt ws-s60"></span>
+                                        <strong class="ws-s45"><?php esc_html_e('ATTIVA', 'workshop-suite'); ?></strong> (Piano: <?php echo esc_html(strtoupper($license['type'])); ?>)
                                         <?php if ($license['expires']) : ?>
                                             — <?php /* translators: %s: license expiration date */ printf(esc_html__('Scade il: %s', 'workshop-suite'), esc_html($license['expires'])); ?>
                                         <?php endif; ?>
                                     <?php else : ?>
-                                        <span class="dashicons dashicons-dismiss fvw-s61"></span>
-                                        <strong class="fvw-s62"><?php esc_html_e('NON ATTIVA / NON VALIDA', 'workshop-suite'); ?></strong>
+                                        <span class="dashicons dashicons-dismiss ws-s61"></span>
+                                        <strong class="ws-s62"><?php esc_html_e('NON ATTIVA / NON VALIDA', 'workshop-suite'); ?></strong>
                                     <?php endif; ?>
                                 </td>
                             </tr>
