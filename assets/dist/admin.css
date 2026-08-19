@@ -85,6 +85,45 @@
     margin-bottom: 20px;
 }
 
+.wv-eventi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 1400px) {
+    .wv-eventi-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 1000px) {
+    .wv-eventi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+    .wv-eventi-grid { grid-template-columns: 1fr; }
+}
+
+.wv-dash .wv-evcard-grid {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.wv-evcard-foto {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: #ececec;
+    background-position: center;
+    background-size: cover;
+}
+
+.wv-evcard-grid .wv-evento-head {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
 .wv-dash form {
     max-width: 840px;
 }
