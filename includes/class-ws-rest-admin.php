@@ -218,6 +218,8 @@ final class WS_Rest_Admin implements WS_Module {
                 'id' => $edit_isc,
                 'nome' => $p ? trim(WS_Data::get_field('nome', $p) . ' ' . WS_Data::get_field('cognome', $p)) : get_the_title($edit_isc),
                 'stato' => WS_Data::get_field('stato', $edit_isc) === 'confermato' ? 'confermato' : 'richiesta',
+                'stato_pagamento' => in_array((string) WS_Data::get_field('stato_pagamento', $edit_isc), ['in_attesa', 'acconto_pagato', 'saldato'], true)
+                    ? WS_Data::get_field('stato_pagamento', $edit_isc) : 'in_attesa',
                 'curr_evento_id' => $curr_eid,
                 'num_persone' => max(1, (int) get_post_meta($edit_isc, 'num_persone', true) ?: 1),
                 'anticipo' => (float) WS_Data::get_field('anticipo', $edit_isc),
@@ -407,6 +409,10 @@ final class WS_Rest_Admin implements WS_Module {
         }
 
         WS_Data::update_field('stato', $st_new, $isc);
+        $sp_new = (string) $request->get_param('stato_pagamento');
+        if (in_array($sp_new, ['in_attesa', 'acconto_pagato', 'saldato'], true)) {
+            WS_Data::update_field('stato_pagamento', $sp_new, $isc);
+        }
         WS_Data::update_field('anticipo', (float) $request->get_param('anticipo'), $isc);
         WS_Data::update_field('saldo', (float) $request->get_param('saldo'), $isc);
         WS_Data::update_field('note', sanitize_textarea_field((string) $request->get_param('note')), $isc);

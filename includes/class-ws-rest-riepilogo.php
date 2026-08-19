@@ -14,6 +14,9 @@ final class WS_Rest_Riepilogo implements WS_Module {
 
     private const META_THREAD = 'wv_thread';
 
+    /** Valori ammessi per il campo stato_pagamento, indipendente da 'stato'. */
+    private const STATI_PAGAMENTO = ['in_attesa', 'acconto_pagato', 'saldato'];
+
     public function should_load(): bool {
         return true;
     }
@@ -33,6 +36,9 @@ final class WS_Rest_Riepilogo implements WS_Module {
         ]);
         register_rest_route('workshop-suite/v1', '/riepilogo/iscrizione/(?P<id>\d+)/conferma', [
             'methods' => 'POST', 'callback' => [$this, 'conferma_iscrizione'], 'permission_callback' => $perm,
+        ]);
+        register_rest_route('workshop-suite/v1', '/riepilogo/iscrizione/(?P<id>\d+)/stato-pagamento', [
+            'methods' => 'POST', 'callback' => [$this, 'aggiorna_stato_pagamento'], 'permission_callback' => $perm,
         ]);
         register_rest_route('workshop-suite/v1', '/riepilogo/iscrizione/(?P<id>\d+)/nota', [
             'methods' => 'POST', 'callback' => [$this, 'save_nota'], 'permission_callback' => $perm,
@@ -248,6 +254,7 @@ final class WS_Rest_Riepilogo implements WS_Module {
             foreach ($iscrizioni_ids as $isc) {
                 $p = WS_Data::get_field('partecipante', $isc);
                 if (!$p) continue;
+                $stato_pagamento = (string) WS_Data::get_field('stato_pagamento', $isc);
                 $iscrizioni[] = [
                     'id' => $isc,
                     'nome' => trim(WS_Data::get_field('nome', $p) . ' ' . WS_Data::get_field('cognome', $p)),
@@ -255,6 +262,7 @@ final class WS_Rest_Riepilogo implements WS_Module {
                     'citta' => WS_Data::get_field('citta', $p) ?: '',
                     'telefono' => WS_Data::get_field('telefono', $p) ?: '',
                     'stato' => WS_Data::get_field('stato', $isc) === 'confermato' ? 'confermato' : 'richiesta',
+                    'stato_pagamento' => in_array($stato_pagamento, self::STATI_PAGAMENTO, true) ? $stato_pagamento : 'in_attesa',
                     'anticipo' => (float) WS_Data::get_field('anticipo', $isc),
                     'saldo' => (float) WS_Data::get_field('saldo', $isc),
                     'note' => (string) WS_Data::get_field('note', $isc),
@@ -322,6 +330,26 @@ final class WS_Rest_Riepilogo implements WS_Module {
         WS_Data::append_thread($isc_id, 'out', $subject, $body);
 
         return new WP_REST_Response(['stato' => 'confermato']);
+    }
+
+    /**
+     * Aggiorna solo stato_pagamento — indipendente dal campo 'stato'
+     * (uno traccia la conferma della prenotazione, l'altro il denaro).
+     */
+    public function aggiorna_stato_pagamento(WP_REST_Request $request) {
+        $isc_id = (int) $request['id'];
+        if (get_post_type($isc_id) !== 'iscrizione') {
+            return new WP_Error('not_found', 'Iscrizione non trovata', ['status' => 404]);
+        }
+
+        $stato = (string) $request->get_param('stato');
+        if (!in_array($stato, self::STATI_PAGAMENTO, true)) {
+            return new WP_Error('invalid', 'Stato pagamento non valido.', ['status' => 400]);
+        }
+
+        WS_Data::update_field('stato_pagamento', $stato, $isc_id);
+
+        return new WP_REST_Response(['stato_pagamento' => $stato]);
     }
 
     public function save_nota(WP_REST_Request $request) {
