@@ -43,7 +43,7 @@ abstract class WS_Shortcode_Base implements WS_Module {
     }
 
     // -----------------------------------------------------------------------
-    // FVW_Module default implementations
+    // WS_Module default implementations
     // -----------------------------------------------------------------------
 
     public function should_load(): bool {

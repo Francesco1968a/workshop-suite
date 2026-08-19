@@ -20,11 +20,6 @@ define('WS_PATH', plugin_dir_path(__FILE__));
 define('WS_URL', plugin_dir_url(__FILE__));
 define('WS_VERSION', '1.0.0');
 
-// Backward-compatibility constants
-if (!defined('FVW_PATH')) define('FVW_PATH', WS_PATH);
-if (!defined('FVW_URL')) define('FVW_URL', WS_URL);
-if (!defined('FVW_VERSION')) define('FVW_VERSION', WS_VERSION);
-
 add_action('init', function () {
     load_plugin_textdomain('workshop-suite', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });
@@ -55,11 +50,6 @@ interface WS_Module {
     public function should_load(): bool;
     public function register(): void;
 }
-if (!interface_exists('FVW_Module')) {
-    interface_FVW_Module_shim:
-    class_alias('WS_Module', 'FVW_Module');
-}
-
 final class WS_Plugin {
     /** @var WS_Module[] */
     private array $modules = [];
@@ -158,28 +148,6 @@ require_once WS_PATH . 'includes/class-ws-onboarding-wizard.php';
 WS_Rest_Modules_Toggle::init();
 
 register_activation_hook(__FILE__, ['WS_Onboarding_Wizard', 'on_activate']);
-
-// Class Aliases for full backward compatibility
-class_alias('WS_Data', 'FVW_Data');
-class_alias('WS_Settings', 'FVW_Settings');
-class_alias('WS_Mail_Inbox', 'FVW_Mail_Inbox');
-class_alias('WS_License_Manager', 'FVW_License_Manager');
-class_alias('WS_T15_Reminder', 'FVW_T15_Reminder');
-class_alias('WS_Mail_Templates', 'FVW_Mail_Templates');
-class_alias('WS_Mail_Poller', 'FVW_Mail_Poller');
-class_alias('WS_Fluent_Forms_Intake', 'FVW_Fluent_Forms_Intake');
-class_alias('WS_Ringraziamento', 'FVW_Ringraziamento');
-class_alias('WS_Post_Types', 'FVW_Post_Types');
-class_alias('WS_Ics_Feed', 'FVW_Ics_Feed');
-class_alias('WS_Rest_Admin', 'FVW_Rest_Admin');
-class_alias('WS_Rest_Riepilogo', 'FVW_Rest_Riepilogo');
-class_alias('WS_Rest_Partecipanti', 'FVW_Rest_Partecipanti');
-class_alias('WS_Rest_Partecipante', 'FVW_Rest_Partecipante');
-class_alias('WS_Rest_Messaggi', 'FVW_Rest_Messaggi');
-class_alias('WS_Rest_Archivio', 'FVW_Rest_Archivio');
-class_alias('WS_Rest_Calendario', 'FVW_Rest_Calendario');
-class_alias('WS_Rest_Intake', 'FVW_Rest_Intake');
-class_alias('WS_Rest_Mail_Inbox', 'FVW_Rest_Mail_Inbox');
 
 add_action('plugins_loaded', function () {
     // Bootstrap
