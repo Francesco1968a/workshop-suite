@@ -12,6 +12,7 @@ import vue from '@vitejs/plugin-vue';
 // compiled file in assets/dist/ stays untouched and keeps working.
 const ENTRIES = {
   calendario: fileURLToPath(new URL('./src/calendario/main.js', import.meta.url)),
+  archivio: fileURLToPath(new URL('./src/archivio/main.js', import.meta.url)),
 };
 
 const target = process.env.WS_BUNDLE || 'calendario';
