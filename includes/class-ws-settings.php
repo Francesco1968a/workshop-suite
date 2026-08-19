@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Central settings helper for FV Workshop Admin.
+ * Central settings helper for Workshop Suite.
  * Handles options storage and default values for site-wide configuration.
  */
 final class WS_Settings {

@@ -35,7 +35,7 @@ final class WS_Mail_Poller implements WS_Module {
         $error = self::last_error();
         if (!$error) return;
 
-        // Display notice only on FV Workshop admin pages
+        // Display notice only on Workshop Suite admin pages
         $page = isset($_GET['page']) ? (string) $_GET['page'] : '';
         if (strpos($page, 'workshop-suite') !== 0) return;
 
@@ -59,7 +59,7 @@ final class WS_Mail_Poller implements WS_Module {
     }
 
     public function add_schedule(array $schedules): array {
-        $schedules['fvw_15min'] = ['interval' => 15 * 60, 'display' => 'Ogni 15 minuti (FV Workshop)'];
+        $schedules['fvw_15min'] = ['interval' => 15 * 60, 'display' => 'Ogni 15 minuti (Workshop Suite)'];
         return $schedules;
     }
 

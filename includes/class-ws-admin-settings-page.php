@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Native WP Admin settings page for FV Workshop Admin.
+ * Native WP Admin settings page for Workshop Suite.
  */
 final class WS_Admin_Settings_Page implements WS_Module {
 
@@ -1221,7 +1221,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 <div class="fvw-card-native">
                     <h2 class="fvw-s35"><?php esc_html_e('Elenco Shortcode Disponibili', 'workshop-suite'); ?></h2>
                     <p class="description fvw-s48">
-                        <?php esc_html_e('Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di FV Workshop.', 'workshop-suite'); ?>
+                        <?php esc_html_e('Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di Workshop Suite.', 'workshop-suite'); ?>
                     </p>
 
                     <?php

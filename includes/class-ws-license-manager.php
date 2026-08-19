@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * License Manager for FV Workshop Admin.
+ * License Manager for Workshop Suite.
  * Handles license key validation, status checking and updates integration.
  * Built to be compatible with Freemius / EDD (Easy Digital Downloads) Software Licensing.
  */
@@ -89,7 +89,7 @@ final class WS_License_Manager implements WS_Module {
             'timeout' => 15,
             'body'    => [
                 'license' => $key,
-                'item_name' => 'FV Workshop Admin',
+                'item_name' => 'Workshop Suite',
                 'url'       => home_url(),
             ],
         ]);
