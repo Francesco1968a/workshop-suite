@@ -65,6 +65,12 @@ The poster builder operates entirely client-side using the HTML5 Canvas API. It 
 * Payment status tracking on registrations (pending / deposit paid / paid in full).
 * Category price/deposit prefill in the attendee intake form.
 * Category-scoped date filtering for the registration form shortcode.
+* Category and event geo-location fields (city, country, address), with automatic fallback from event to category and syndication to the Global Hub.
+* Full Vue 3 source rewrite of every admin panel (Calendario, Archivio, Messaggi, Riepilogo, Scheda Partecipante, Anagrafica, Ringraziamento, Dashboard) — no more editing minified bundles by hand.
+* Monthly calendar view added to the Calendario panel, alongside the existing subscription/ICS card.
+* Restored the frontend dark/light theme switch for shortcode-embedded admin panels (Impostazioni → Tema Frontend Predefinito); wp-admin's own pages are unaffected.
+* New `[workshop_categorie]` shortcode for a dedicated frontend Categorie/Tipologia panel, alongside the existing `[workshop_admin]` (Eventi/Partecipanti).
+* Removed several hundred lines of dead code (an abandoned course-access subsystem, an unreachable Locandine prototype, a handful of orphaned helper functions).
 * Ongoing rebrand cleanup and internal hardening.
 
 = 1.0.0 =
