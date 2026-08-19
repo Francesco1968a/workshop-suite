@@ -94,6 +94,21 @@
     max-width: 840px;
 }
 
+.wv-dash .ws-field-row-2, .ws-admin-wrap .ws-field-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 840px;
+}
+.wv-dash .ws-field-row-2 .wv-field, .ws-admin-wrap .ws-field-row-2 .wv-field {
+    max-width: none;
+}
+@media (max-width: 480px) {
+    .wv-dash .ws-field-row-2, .ws-admin-wrap .ws-field-row-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
 .wv-dash label, .ws-admin-wrap label {
     font-size: 13px !important;
     font-weight: 600 !important;
