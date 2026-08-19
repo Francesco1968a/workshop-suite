@@ -24,8 +24,14 @@ final class WS_Shortcode_Eventi_Categoria implements WS_Module {
         $atts = shortcode_atts([
             'slug'      => '',
             'max_width' => '1100',
+            // 'light' (default): dark text, readable on a light/white page
+            // background. 'dark': the original white-text palette, for use
+            // on pages with a black/dark background.
+            'theme'     => 'light',
         ], $atts);
         if (!$atts['slug']) return '<p>Specifica slug categoria.</p>';
+
+        $is_dark = ($atts['theme'] === 'dark');
 
         $term = get_term_by('slug', $atts['slug'], 'categoria_evento');
         $foto = $term ? WS_Data::get_field('foto_categoria', 'categoria_evento_' . $term->term_id) : '';
@@ -56,22 +62,43 @@ final class WS_Shortcode_Eventi_Categoria implements WS_Module {
         $max_w = (int) $atts['max_width'];
         if ($max_w < 400) $max_w = 1100;
 
+        // Same layout for both themes; only colors differ.
+        if ($is_dark) {
+            $card_border      = 'rgba(255,255,255,.15)';
+            $card_bg          = 'rgba(255,255,255,.02)';
+            $card_border_hov  = 'rgba(255,255,255,.5)';
+            $card_bg_hov      = 'rgba(255,255,255,.05)';
+            $foto_bg          = '#1a1a1a';
+            $periodo_color    = '#fff';
+            $posti_color      = '#ddd';
+            $posti_strong     = '#fff';
+        } else {
+            $card_border      = 'rgba(0,0,0,.12)';
+            $card_bg          = 'rgba(0,0,0,.015)';
+            $card_border_hov  = 'rgba(0,0,0,.35)';
+            $card_bg_hov      = 'rgba(0,0,0,.035)';
+            $foto_bg          = '#ececec';
+            $periodo_color    = '#1a1a1a';
+            $posti_color      = '#555';
+            $posti_strong     = '#111';
+        }
+
         ob_start(); ?>
         <style>
           .wv-eventi-wrap { max-width:<?php echo $max_w; ?>px; margin:30px auto; padding:0 16px; box-sizing:border-box; }
           .wv-grid { display:flex; flex-wrap:wrap; gap:32px; justify-content:center; }
           .wv-grid .wv-evcard { flex:0 1 calc(25% - 24px); min-width:200px; max-width:240px;
-            border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.02);
+            border:1px solid <?php echo $card_border; ?>; background:<?php echo $card_bg; ?>;
             display:flex; flex-direction:column; padding:14px; box-sizing:border-box;
             cursor:pointer; transition:border-color .2s, transform .2s, background .2s; }
-          .wv-grid .wv-evcard:hover { border-color:rgba(255,255,255,.5); background:rgba(255,255,255,.05); transform:translateY(-2px); }
-          .wv-grid .wv-evfoto { width:100%; aspect-ratio:4/3; background-size:cover; background-position:center; background-color:#1a1a1a; }
+          .wv-grid .wv-evcard:hover { border-color:<?php echo $card_border_hov; ?>; background:<?php echo $card_bg_hov; ?>; transform:translateY(-2px); }
+          .wv-grid .wv-evfoto { width:100%; aspect-ratio:4/3; background-size:cover; background-position:center; background-color:<?php echo $foto_bg; ?>; }
           .wv-grid .wv-evbody { padding:14px 4px 6px; text-align:center; }
-          .wv-grid .wv-evperiodo { font-size:15px; color:#fff; font-weight:600; margin-bottom:10px; line-height:1.3; }
-          .wv-grid .wv-evposti { font-size:13px; color:#ddd; line-height:1.5; }
-          .wv-grid .wv-evposti strong { color:#fff; font-weight:600; }
+          .wv-grid .wv-evperiodo { font-size:15px; color:<?php echo $periodo_color; ?>; font-weight:600; margin-bottom:10px; line-height:1.3; }
+          .wv-grid .wv-evposti { font-size:13px; color:<?php echo $posti_color; ?>; line-height:1.5; }
+          .wv-grid .wv-evposti strong { color:<?php echo $posti_strong; ?>; font-weight:600; }
           .wv-grid .wv-soldout { display:inline-block; margin-top:6px; font-size:10px; letter-spacing:.2em;
-            text-transform:uppercase; color:#ff6b6b; border:1px solid #ff6b6b; padding:5px 12px; }
+            text-transform:uppercase; color:#e74c3c; border:1px solid #e74c3c; padding:5px 12px; }
           @media (max-width:1100px){ .wv-grid .wv-evcard { flex:0 1 calc(33.33% - 22px); } }
           @media (max-width:800px){ .wv-grid .wv-evcard { flex:0 1 calc(50% - 16px); } }
           @media (max-width:520px){ .wv-grid .wv-evcard { flex:0 1 100%; max-width:280px; } }
