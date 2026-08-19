@@ -134,6 +134,13 @@ abstract class WS_Shortcode_Base implements WS_Module {
         wp_localize_script($handle, 'FVW_CONFIG', $config);
         WS_I18n::localize($handle);
 
-        return '<div id="' . esc_attr($this->app_id()) . '"></div>';
+        // Frontend-only theming: the wp-admin dashboard pages never go
+        // through this method (they use render_panel_wrapper() in
+        // WS_Admin_Settings_Page instead), so this wrapper class only ever
+        // affects the shortcode-embedded frontend pages, never wp-admin.
+        $theme = WS_Settings::get('default_theme_mode', 'dark');
+        $theme = in_array($theme, ['dark', 'light'], true) ? $theme : 'dark';
+
+        return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><div id="' . esc_attr($this->app_id()) . '"></div></div>';
     }
 }

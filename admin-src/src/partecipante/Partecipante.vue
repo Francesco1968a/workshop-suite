@@ -514,4 +514,133 @@ a.wvpx-isc-evento:hover {
   margin-top: 4px;
   white-space: pre-wrap;
 }
+
+/* Frontend dark theme — see WS_Shortcode_Base::render(). */
+.ws-theme-dark .wvpx {
+  color: #fff;
+}
+
+.ws-theme-dark .wvpx-toast {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: #7ddc8e;
+}
+
+.ws-theme-dark .wvpx-toast--error {
+  border-left-color: #ff6608;
+}
+
+.ws-theme-dark .head {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.ws-theme-dark .head-row h2 {
+  color: #fff;
+}
+
+.ws-theme-dark .meta {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ws-theme-dark .meta a {
+  color: #ff9a6f;
+}
+
+.ws-theme-dark .wvpx-grid2 label {
+  color: #fff;
+}
+
+.ws-theme-dark .wvpx-grid2 input {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.ws-theme-dark .wvpx-btn {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.ws-theme-dark .wvpx-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ws-theme-dark .wvpx-btn--accent {
+  background: #ff6608;
+  border-color: #ff6608;
+  color: #fff;
+}
+
+.ws-theme-dark .wvpx-btn--accent:hover {
+  background: #e05a00;
+}
+
+.ws-theme-dark .wvpx-stat {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.ws-theme-dark .wvpx-stat .n {
+  color: #fff;
+}
+
+.ws-theme-dark .wvpx-stat .l {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvpx-stat--accent .n {
+  color: #ff6608;
+}
+
+.ws-theme-dark .wvpx-card {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.ws-theme-dark .wvpx-card textarea {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.ws-theme-dark .wvpx-isc-row {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.ws-theme-dark .wvpx-isc-evento {
+  color: #fff;
+}
+
+.ws-theme-dark a.wvpx-isc-evento {
+  color: #ff9a6f;
+}
+
+.ws-theme-dark .wvpx-isc-data {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvpx-empty {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvpx-tl > li {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.ws-theme-dark .wvpx-tl .titolo {
+  color: #fff;
+}
+
+.ws-theme-dark .wvpx-tl .sub {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvpx-tl .extra {
+  color: rgba(255, 255, 255, 0.6);
+}
 </style>

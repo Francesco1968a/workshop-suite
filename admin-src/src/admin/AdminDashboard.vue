@@ -4,8 +4,12 @@ import PartecipantiTab from './PartecipantiTab.vue';
 import EventiTab from './EventiTab.vue';
 import CategorieTipiTab from './CategorieTipiTab.vue';
 
+// wp-admin backend: distinguished by the ?page= WP always appends for its
+// own submenu URLs. Frontend shortcodes have no such URL naturally, so
+// WS_Shortcode_Categorie passes an explicit panelMode config flag instead
+// — see includes/class-ws-shortcode-categorie.php.
 const page = new URL(window.location.href).searchParams.get('page');
-const isCatPage = page === 'workshop-suite-categorie';
+const isCatPage = page === 'workshop-suite-categorie' || window.WS_CONFIG?.panelMode === 'categorie';
 const tabs = isCatPage ? { categorie: 'Categorie', tipologia: 'Tipologia' } : { eventi: 'Eventi', partecipanti: 'Aggiungi Partecipante' };
 
 const initVista = new URL(window.location.href).searchParams.get('vista') || Object.keys(tabs)[0];

@@ -51,6 +51,9 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
         wp_localize_script('ws-ringraziamento', 'WS_CONFIG', $ringraziamento_config);
         wp_localize_script('ws-ringraziamento', 'FVW_CONFIG', $ringraziamento_config);
 
-        return '<div id="ws-ringraziamento-app"></div>';
+        $theme = WS_Settings::get('default_theme_mode', 'dark');
+        $theme = in_array($theme, ['dark', 'light'], true) ? $theme : 'dark';
+
+        return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><div id="ws-ringraziamento-app"></div></div>';
     }
 }

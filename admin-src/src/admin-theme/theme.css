@@ -1,0 +1,208 @@
+/* Frontend dark theme for the Admin dashboard (Eventi/Categorie/Tipologia/
+   Partecipanti). See WS_Shortcode_Base::render() — this wrapper class is
+   only ever added around the shortcode-embedded frontend output, never
+   around the wp-admin menu pages (which use admin.css's native/light
+   styling unconditionally and never carry this class). */
+
+.ws-theme-dark .wv-dash {
+  color: #fff;
+}
+
+.ws-theme-dark .wv-dash h2,
+.ws-theme-dark .ws-admin-wrap h2 {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+.ws-theme-dark .wv-dash h3 {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ws-theme-dark .wv-dash h4 {
+  color: #fff;
+}
+
+.ws-theme-dark .wv-dash nav a {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.ws-theme-dark .wv-dash nav a:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.ws-theme-dark .wv-dash nav a.active {
+  background: #ff6608 !important;
+  color: #fff !important;
+  border-color: #ff6608 !important;
+  box-shadow: none !important;
+}
+
+.ws-theme-dark .wv-dash .wv-card,
+.ws-theme-dark .ws-card-native {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: none;
+}
+
+.ws-theme-dark .wv-catcard-grid,
+.ws-theme-dark .wv-dash .wv-evcard-grid {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: none;
+}
+
+.ws-theme-dark .wv-catcard-foto,
+.ws-theme-dark .wv-evcard-foto {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.ws-theme-dark .wv-catcard-prossimo {
+  color: #ff9a6f;
+}
+
+.ws-theme-dark .wv-catcard-prossimo--none {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ws-theme-dark .wv-dash label,
+.ws-theme-dark .ws-admin-wrap label {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.ws-theme-dark .wv-dash input[type='text'],
+.ws-theme-dark .wv-dash input[type='email'],
+.ws-theme-dark .wv-dash input[type='url'],
+.ws-theme-dark .wv-dash input[type='number'],
+.ws-theme-dark .wv-dash input[type='date'],
+.ws-theme-dark .wv-dash input[type='time'],
+.ws-theme-dark .wv-dash select,
+.ws-theme-dark .wv-dash textarea {
+  background-color: transparent !important;
+  color: #fff !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.ws-theme-dark .wv-dash input:focus,
+.ws-theme-dark .wv-dash select:focus,
+.ws-theme-dark .wv-dash textarea:focus {
+  border-bottom-color: #ff6608 !important;
+  box-shadow: none !important;
+}
+
+.ws-theme-dark .wv-dash textarea {
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.ws-theme-dark .wv-dash select option {
+  color: #fff;
+  background: #111;
+}
+
+.ws-theme-dark .wv-dash .hint {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ws-theme-dark .wv-dash .hint code {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ws-theme-dark .wv-dash button,
+.ws-theme-dark .wv-dash .wv-btn {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff !important;
+}
+
+.ws-theme-dark .wv-dash button:hover,
+.ws-theme-dark .wv-dash .wv-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+  color: #fff !important;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-ghost,
+.ws-theme-dark .wv-dash .wv-btn-secondary {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-ghost:hover,
+.ws-theme-dark .wv-dash .wv-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: #fff !important;
+  color: #fff !important;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-del,
+.ws-theme-dark .wv-dash .wv-btn-danger {
+  background: transparent !important;
+  border-color: rgba(255, 102, 8, 0.6) !important;
+  color: #ff6608 !important;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-del:hover,
+.ws-theme-dark .wv-dash .wv-btn-danger:hover {
+  background: #ff6608 !important;
+  border-color: #ff6608 !important;
+  color: #fff !important;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-hide {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-hide:hover {
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  color: #fff !important;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-pub {
+  background: transparent !important;
+  border-color: rgba(80, 200, 80, 0.5) !important;
+  color: #7ddc8e !important;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-pub:hover {
+  border-color: #7ddc8e !important;
+  color: #7ddc8e !important;
+}
+
+.ws-theme-dark .wv-dash .wv-badge-hidden {
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.ws-theme-dark .wv-dash .msg {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: #ff6608;
+}
+
+.ws-theme-dark .wv-dash .msg.msg-success {
+  border-left-color: #7ddc8e;
+}
+
+.ws-theme-dark .wv-dash .msg.msg-error {
+  border-left-color: #ff6608;
+}
+
+.ws-theme-dark .wv-dash .wv-row {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.ws-theme-dark .wv-dash code {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+}

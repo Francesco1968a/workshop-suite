@@ -19,6 +19,7 @@ const ENTRIES = {
   'partecipanti-lista': fileURLToPath(new URL('./src/partecipanti-lista/main.js', import.meta.url)),
   ringraziamento: fileURLToPath(new URL('./src/ringraziamento/main.js', import.meta.url)),
   admin: fileURLToPath(new URL('./src/admin/main.js', import.meta.url)),
+  'admin-theme': fileURLToPath(new URL('./src/admin-theme/main.js', import.meta.url)),
 };
 
 const target = process.env.WS_BUNDLE || 'calendario';
