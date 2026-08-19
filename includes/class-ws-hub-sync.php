@@ -15,6 +15,7 @@ final class WS_Hub_Sync implements WS_Module {
     }
 
     public function register(): void {
+        add_action('save_post_evento', [__CLASS__, 'on_event_save'], 20, 2);
         add_action('save_post_wv_eventi', [__CLASS__, 'on_event_save'], 20, 2);
         add_action('wp_trash_post', [__CLASS__, 'on_event_trash']);
     }
@@ -32,8 +33,34 @@ final class WS_Hub_Sync implements WS_Module {
     }
 
     public static function on_event_trash(int $post_id): void {
-        if (get_post_type($post_id) !== 'wv_eventi') return;
+        if (!in_array(get_post_type($post_id), ['evento', 'wv_eventi'], true)) return;
         self::delete_from_hub($post_id);
+    }
+
+    /**
+     * Batch syndicates all currently published events to the Global Hub.
+     */
+    public static function sync_all_published_events(): array {
+        $query = new WP_Query([
+            'post_type'      => ['evento', 'wv_eventi'],
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'no_found_rows'  => true,
+        ]);
+
+        $results = ['synced' => 0, 'failed' => 0, 'details' => []];
+        foreach ($query->posts as $id) {
+            $res = self::sync_single_event((int) $id);
+            if (!empty($res['success'])) {
+                $results['synced']++;
+            } else {
+                $results['failed']++;
+            }
+            $results['details'][$id] = $res;
+        }
+
+        return $results;
     }
 
     public static function sync_single_event(int $post_id): array {
