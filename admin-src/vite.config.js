@@ -17,6 +17,7 @@ const ENTRIES = {
   riepilogo: fileURLToPath(new URL('./src/riepilogo/main.js', import.meta.url)),
   partecipante: fileURLToPath(new URL('./src/partecipante/main.js', import.meta.url)),
   'partecipanti-lista': fileURLToPath(new URL('./src/partecipanti-lista/main.js', import.meta.url)),
+  ringraziamento: fileURLToPath(new URL('./src/ringraziamento/main.js', import.meta.url)),
 };
 
 const target = process.env.WS_BUNDLE || 'calendario';
