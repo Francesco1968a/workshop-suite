@@ -329,6 +329,18 @@ final class WS_Data {
         return substr(hash_hmac('sha256', 'wv_calendar_v1', wp_salt('auth')), 0, 32);
     }
 
+    /** Revokes and regenerates the calendar token for a given user */
+    public static function revoke_calendar_token(?int $user_id = null): string {
+        if (!$user_id) {
+            $user_id = get_current_user_id();
+        }
+        if ($user_id) {
+            $new_secret = wp_generate_password(32, false);
+            update_user_meta($user_id, 'ws_ics_secret_key', $new_secret);
+        }
+        return self::calendar_token($user_id);
+    }
+
     public static function calendar_url(?int $user_id = null): string {
         return home_url('/wv-calendar/' . self::calendar_token($user_id) . '.ics');
     }
@@ -339,6 +351,17 @@ final class WS_Data {
             'meta_query' => ['relation' => 'AND',
                 ['key' => 'partecipante', 'value' => $partecipante_id, 'compare' => '='],
                 ['key' => 'evento', 'value' => $evento_id, 'compare' => '=']],
+            'no_found_rows' => true,
+        ]);
+        return (int) ($q->posts[0] ?? 0);
+    }
+
+    public static function find_iscrizione_corso(int $partecipante_id, int $corso_id): int {
+        $q = new WP_Query([
+            'post_type' => 'iscrizione', 'posts_per_page' => 1, 'fields' => 'ids',
+            'meta_query' => ['relation' => 'AND',
+                ['key' => 'partecipante', 'value' => $partecipante_id, 'compare' => '='],
+                ['key' => 'corso', 'value' => $corso_id, 'compare' => '=']],
             'no_found_rows' => true,
         ]);
         return (int) ($q->posts[0] ?? 0);
@@ -405,6 +428,37 @@ final class WS_Data {
         return strtr($template, $placeholders);
     }
 
+    /**
+     * Placeholder substitution for corso (course) template emails — kept
+     * separate from render_template() since evento and corso placeholders
+     * are incompatible sets (seats/dates vs. course title/access link).
+     * $extra lets the caller (e.g. the access-link sender) merge in values
+     * this function has no way to compute on its own, like {link_accesso}.
+     */
+    public static function render_template_corso(string $template, int $iscrizione_id, array $extra = []): string {
+        if (!$template) return '';
+
+        $pid = (int) self::get_field('partecipante', $iscrizione_id);
+        $cid = (int) self::get_field('corso', $iscrizione_id);
+
+        $nome = $pid ? self::get_field('nome', $pid) : '';
+        $cognome = $pid ? self::get_field('cognome', $pid) : '';
+        $email = $pid ? self::get_field('email', $pid) : '';
+
+        $corso_titolo = $cid ? get_the_title($cid) : '';
+        $instructor = $cid ? get_post_meta($cid, '_ws_course_instructor', true) : '';
+
+        $placeholders = array_merge([
+            '{nome}' => $nome, '{cognome}' => $cognome, '{nome_completo}' => trim($nome . ' ' . $cognome),
+            '{email}' => $email,
+            '{corso_titolo}' => $corso_titolo,
+            '{instructor}' => $instructor,
+            '{link_accesso}' => '',
+        ], $extra);
+
+        return strtr($template, $placeholders);
+    }
+
     /** Ported 1:1 from the legacy `wv_genera_ics()` (single-event .ics for the Conferma attachment). */
     public static function genera_ics(int $evento_id): string {
         if (!$evento_id) return '';
@@ -442,6 +496,15 @@ final class WS_Data {
         return $ics;
     }
 
+    public static function count_partecipanti(int $evento_id): int {
+        return count(self::iscrizioni_evento($evento_id));
+    }
+
+    public static function format_data(int $evento_id): string {
+        $d = get_field('data_evento', $evento_id);
+        return $d ? date_i18n('D d M Y', strtotime($d)) : '';
+    }
+
     /** @return int[] iscrizione IDs */
     public static function iscrizioni_partecipante(int $partecipante_id): array {
         $q = new WP_Query([
@@ -451,4 +514,226 @@ final class WS_Data {
         return $q->posts;
     }
 
+    /**
+     * Course access control (Fase 3). There is no customer-facing WP login
+     * in this system — partecipanti are matched by email, never tied to a
+     * WP_User — so identity/entitlement for course content can't use
+     * is_user_logged_in(). This generalizes the calendar_token() HMAC
+     * pattern (see above) from a per-WP_User secret to a per-partecipante
+     * one, stored in postmeta instead of usermeta.
+     */
+
+    /** Get-or-create the per-partecipante secret backing every token below. */
+    public static function partecipante_access_secret(int $partecipante_id): string {
+        $secret = get_post_meta($partecipante_id, '_ws_access_secret', true);
+        if (!$secret) {
+            $secret = wp_generate_password(32, false);
+            update_post_meta($partecipante_id, '_ws_access_secret', $secret);
+        }
+        return $secret;
+    }
+
+    /**
+     * Token proving "this partecipante was granted access to this specific
+     * course" — scoped to $course_id so a leaked link for one course can't
+     * be replayed against another. Sent once via email; does NOT itself
+     * grant access (see has_course_access()) — it only proves identity.
+     */
+    public static function course_access_token(int $partecipante_id, int $course_id): string {
+        $secret = self::partecipante_access_secret($partecipante_id);
+        return substr(hash_hmac('sha256', 'ws_course_access_' . $partecipante_id . '_' . $course_id . '_' . $secret, wp_salt('auth')), 0, 32);
+    }
+
+    public static function verify_course_access_token(int $partecipante_id, int $course_id, string $token): bool {
+        if (!$partecipante_id || !$token) return false;
+        return hash_equals(self::course_access_token($partecipante_id, $course_id), $token);
+    }
+
+    /**
+     * Identity token backing the long-lived "who is this visitor" cookie —
+     * deliberately a different HMAC message than course_access_token() so
+     * a leaked one-course email link can't be reused to forge the cookie.
+     */
+    public static function partecipante_identity_token(int $partecipante_id): string {
+        $secret = self::partecipante_access_secret($partecipante_id);
+        return substr(hash_hmac('sha256', 'ws_identity_' . $partecipante_id . '_' . $secret, wp_salt('auth')), 0, 32);
+    }
+
+    /** Rotates the secret, invalidating every previously-issued link/cookie for this partecipante in one step (e.g. on refund). */
+    public static function revoke_partecipante_access(int $partecipante_id): void {
+        update_post_meta($partecipante_id, '_ws_access_secret', wp_generate_password(32, false));
+    }
+
+    /**
+     * The entitlement authority — does partecipante $partecipante_id
+     * currently have confirmed access to $course_id? Re-checked live on
+     * every call (never cached in the token/cookie), so revoking access
+     * (un-confirming an iscrizione, a refund) takes effect immediately.
+     */
+    public static function has_course_access(int $partecipante_id, int $course_id): bool {
+        if (!$partecipante_id || !$course_id) return false;
+
+        $isc_corso = self::find_iscrizione_corso($partecipante_id, $course_id);
+        if ($isc_corso && self::get_field('stato', $isc_corso) === 'confermato') {
+            return true;
+        }
+
+        $linked_evento = (int) get_post_meta($course_id, '_ws_linked_workshop_id', true);
+        if ($linked_evento) {
+            $isc_workshop = self::find_iscrizione($partecipante_id, $linked_evento);
+            if ($isc_workshop && self::get_field('stato', $isc_workshop) === 'confermato') {
+                // Lazy shadow-iscrizione (tipo_iscrizione=corso), created only
+                // now — the first time this confirmed attendee actually opens
+                // the course — not eagerly when their workshop iscrizione was
+                // confirmed. It exists purely as a container for course
+                // progress tracking (Fase 5); entitlement itself still comes
+                // from the workshop iscrizione, not this one.
+                if (!$isc_corso) {
+                    self::ensure_shadow_iscrizione_corso($partecipante_id, $course_id);
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** Get-or-create a confermato tipo_iscrizione=corso row with no side effect beyond that. */
+    private static function ensure_shadow_iscrizione_corso(int $partecipante_id, int $course_id): int {
+        $existing = self::find_iscrizione_corso($partecipante_id, $course_id);
+        if ($existing) return $existing;
+
+        $isc_id = wp_insert_post([
+            'post_type'   => 'iscrizione',
+            'post_title'  => 'iscr-corso-' . $partecipante_id . '-' . $course_id,
+            'post_status' => 'publish',
+        ]);
+        if (is_wp_error($isc_id) || !$isc_id) return 0;
+
+        update_post_meta($isc_id, 'partecipante', $partecipante_id);
+        update_post_meta($isc_id, 'tipo_iscrizione', 'corso');
+        update_post_meta($isc_id, 'corso', $course_id);
+        update_post_meta($isc_id, 'stato', 'confermato');
+
+        return $isc_id;
+    }
+
+    /**
+     * Lesson-completion tracking (Fase 5). Stored as a JSON array of lesson
+     * post IDs on the corso iscrizione — same JSON-blob-in-postmeta
+     * convention already used for wv_thread/stato_log.
+     */
+    private const META_COMPLETED_LESSONS = '_ws_completed_lessons';
+
+    /** Idempotent — marking an already-completed lesson complete again is a no-op. */
+    public static function mark_lesson_complete(int $iscrizione_id, int $lesson_id): void {
+        $completed = self::completed_lesson_ids($iscrizione_id);
+        if (!in_array($lesson_id, $completed, true)) {
+            $completed[] = $lesson_id;
+            update_post_meta($iscrizione_id, self::META_COMPLETED_LESSONS, wp_json_encode($completed));
+        }
+    }
+
+    /** @return int[] */
+    public static function completed_lesson_ids(int $iscrizione_id): array {
+        $raw = get_post_meta($iscrizione_id, self::META_COMPLETED_LESSONS, true);
+        $ids = $raw ? json_decode($raw, true) : [];
+        return is_array($ids) ? array_map('intval', $ids) : [];
+    }
+
+    /** @return array{completed: int[], total: int, pct: int} */
+    public static function course_progress(int $iscrizione_id, int $course_id): array {
+        $total_ids = get_posts([
+            'post_type' => 'ws_lesson', 'post_status' => 'publish', 'posts_per_page' => -1, 'fields' => 'ids',
+            'meta_key' => '_ws_parent_course_id', 'meta_value' => $course_id, 'no_found_rows' => true,
+        ]);
+        $completed = $iscrizione_id ? self::completed_lesson_ids($iscrizione_id) : [];
+        // Only count completions that still match a real, published lesson
+        // of this course — a lesson unpublished/moved after being marked
+        // complete shouldn't inflate the percentage past 100.
+        $completed = array_values(array_intersect($completed, $total_ids));
+
+        $total = count($total_ids);
+        $pct = $total ? (int) round(count($completed) * 100 / $total) : 0;
+
+        return ['completed' => $completed, 'total' => $total, 'pct' => $pct];
+    }
+
+    /** Cookie value for a resolved course visitor: "$partecipante_id|$identity_token". */
+    public static function course_visitor_cookie_value(int $partecipante_id): string {
+        return $partecipante_id . '|' . self::partecipante_identity_token($partecipante_id);
+    }
+
+    /**
+     * Resolves the current visitor's partecipante ID from the long-lived
+     * cookie (set by the course-engine module's template_redirect handler
+     * after a valid one-time email link is consumed). Pure cookie read —
+     * no GET/token handling here, since setting a cookie and redirecting
+     * to strip the token from the URL has to happen before any output, at
+     * template_redirect, not inside a the_content filter.
+     */
+    public static function resolve_course_visitor(): int {
+        if (empty($_COOKIE['ws_course_auth'])) return 0;
+        $parts = explode('|', (string) $_COOKIE['ws_course_auth'], 2);
+        if (count($parts) !== 2) return 0;
+        [$pid_str, $sig] = $parts;
+        $pid = (int) $pid_str;
+        if (!$pid || !hash_equals(self::partecipante_identity_token($pid), $sig)) return 0;
+        return $pid;
+    }
+
+    /**
+     * Builds the one-time access link and sends it via the same direct-SMTP
+     * channel conferma_iscrizione() uses (WS_Mail_Inbox::send_reply()),
+     * logging to wv_thread the same way. $iscrizione_id (if it already
+     * exists for this partecipante+corso) is only used to resolve a nicer
+     * {nome}/{corso_titolo} via render_template_corso() and to log the
+     * thread entry — the link itself is derived straight from the ids.
+     */
+    public static function send_course_access_email(int $partecipante_id, int $course_id): array {
+        $email = self::get_field('email', $partecipante_id);
+        if (!$email) {
+            return ['ok' => false, 'msg' => 'Email partecipante mancante'];
+        }
+
+        $token = self::course_access_token($partecipante_id, $course_id);
+        $link = add_query_arg(['wsat' => $token, 'wspid' => $partecipante_id], get_permalink($course_id));
+
+        $iscrizione_id = self::find_iscrizione_corso($partecipante_id, $course_id);
+        $default_subject = 'Il tuo accesso al corso "{corso_titolo}" è pronto';
+        $default_body = "Ciao {nome},\n\nil tuo accesso al corso \"{corso_titolo}\" è attivo.\n\nClicca qui per iniziare:\n{link_accesso}\n\nA presto,\n{instructor}";
+
+        $subject = self::render_template_corso($default_subject, $iscrizione_id, ['{link_accesso}' => $link]);
+        $body = self::render_template_corso($default_body, $iscrizione_id, ['{link_accesso}' => $link]);
+
+        $result = WS_Mail_Inbox::send_reply($email, $subject, $body);
+        if ($result['ok'] && $iscrizione_id) {
+            self::append_thread($iscrizione_id, 'out', $subject, $body);
+        }
+        return $result;
+    }
+
+    /**
+     * The one place any payment connector calls once a real payment has
+     * succeeded — gateway-agnostic on purpose, so Stripe (still just a
+     * stub) and WooCommerce (Fase 6) funnel into the exact same completion
+     * path instead of each duplicating "what happens when payment
+     * succeeds". Idempotent: webhooks can and do fire more than once for
+     * the same event, so a second call is a safe no-op.
+     */
+    public static function grant_course_access_after_payment(int $iscrizione_id, float $amount_paid): void {
+        if (get_post_type($iscrizione_id) !== 'iscrizione') return;
+        if (self::get_field('tipo_iscrizione', $iscrizione_id) !== 'corso') return;
+        if (self::get_field('stato', $iscrizione_id) === 'confermato') return;
+
+        self::update_field('stato', 'confermato', $iscrizione_id);
+        $anticipo = (float) self::get_field('anticipo', $iscrizione_id);
+        self::update_field('anticipo', $anticipo + $amount_paid, $iscrizione_id);
+
+        $partecipante_id = (int) self::get_field('partecipante', $iscrizione_id);
+        $course_id = (int) self::get_field('corso', $iscrizione_id);
+        if ($partecipante_id && $course_id) {
+            self::send_course_access_email($partecipante_id, $course_id);
+        }
+    }
 }
