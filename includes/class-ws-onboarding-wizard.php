@@ -85,8 +85,8 @@ final class WS_Onboarding_Wizard implements WS_Module {
             if (isset($_POST['ws_wizard_finish'])) {
                 update_option(self::OPTION_COMPLETED, 1);
                 $redirect = !empty($_POST['ws_go_to_mail'])
-                    ? admin_url('admin.php?page=fv-workshop-settings&tab=mail')
-                    : admin_url('admin.php?page=fv-workshop-settings');
+                    ? admin_url('admin.php?page=workshop-suite-settings&tab=mail')
+                    : admin_url('admin.php?page=workshop-suite-settings');
                 wp_safe_redirect($redirect);
                 exit;
             }

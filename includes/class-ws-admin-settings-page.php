@@ -41,7 +41,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 $current['active_modules'] = $updated_active;
                 WS_Settings::update_all($current);
 
-                wp_redirect(admin_url('admin.php?page=fv-workshop-settings&tab=modules&updated=1'));
+                wp_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=modules&updated=1'));
                 exit;
             }
         }
@@ -70,7 +70,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 $current['proponente_x']         = sanitize_text_field($data['proponente_x'] ?? '');
 
                 WS_Settings::update_all($current);
-                wp_redirect(admin_url('admin.php?page=fv-workshop-settings&tab=proponente&updated=1'));
+                wp_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=proponente&updated=1'));
                 exit;
             }
         }
@@ -92,7 +92,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     WS_Settings::update_all($current_settings);
                 }
 
-                wp_redirect(admin_url('admin.php?page=fv-workshop-settings&tab=mail&updated=1'));
+                wp_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=mail&updated=1'));
                 exit;
             }
         }
@@ -101,12 +101,12 @@ final class WS_Admin_Settings_Page implements WS_Module {
     public function inject_admin_menu_separator_css(): void {
         ?>
         <style id="ws-admin-menu-divider-css">
-            #adminmenu .toplevel_page_fv-workshop-dashboard .wp-submenu li.ws-menu-separator {
+            #adminmenu .toplevel_page_workshop-suite-dashboard .wp-submenu li.ws-menu-separator {
                 border-top: 1px solid rgba(240, 246, 252, 0.18) !important;
                 margin-top: 6px !important;
                 padding-top: 4px !important;
             }
-            #adminmenu .toplevel_page_fv-workshop-dashboard .wp-submenu li.ws-menu-separator a {
+            #adminmenu .toplevel_page_workshop-suite-dashboard .wp-submenu li.ws-menu-separator a {
                 font-weight: 600 !important;
             }
         </style>
@@ -119,7 +119,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
             __('Workshop Suite Dashboard', 'workshop-suite'),
             __('Workshop Suite', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             [$this, 'render_dashboard'],
             'dashicons-tickets-alt',
             30
@@ -127,17 +127,17 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         // Submenu 1: Dashboard
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Dashboard', 'workshop-suite'),
             __('Dashboard', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             [$this, 'render_dashboard']
         );
 
         // Submenu 2: Categories & Types
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Categories & Types', 'workshop-suite'),
             __('Categories & Types', 'workshop-suite'),
             'manage_options',
@@ -147,7 +147,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         // Submenu 3: Events & Registrations
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Events & Registrations', 'workshop-suite'),
             __('Events & Registrations', 'workshop-suite'),
             'manage_options',
@@ -158,7 +158,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu 4: Poster Templates (Conditional module)
         if (WS_Settings::is_module_active('poster_studio', true)) {
             add_submenu_page(
-                'fv-workshop-dashboard',
+                'workshop-suite-dashboard',
                 __('Poster Templates', 'workshop-suite'),
                 __('Poster Templates', 'workshop-suite'),
                 'manage_options',
@@ -169,7 +169,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         // Submenu 5: Contacts & Participants
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Contacts & Participants', 'workshop-suite'),
             __('Contacts & Participants', 'workshop-suite'),
             'manage_options',
@@ -179,7 +179,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         // Submenu 6: Mail Inbox
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Mail Inbox', 'workshop-suite'),
             __('Mail Inbox', 'workshop-suite'),
             'manage_options',
@@ -189,7 +189,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         // Submenu 7: Admin Calendar
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Admin Calendar', 'workshop-suite'),
             __('Admin Calendar', 'workshop-suite'),
             'manage_options',
@@ -199,7 +199,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         // Submenu 8: Events Archive
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Events Archive', 'workshop-suite'),
             __('Events Archive', 'workshop-suite'),
             'manage_options',
@@ -213,26 +213,26 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         // Submenu: Moduli & Add-on (con separatore visuale sopra)
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Moduli & Add-on', 'workshop-suite'),
             __('Moduli & Add-on', 'workshop-suite'),
             'manage_options',
-            'admin.php?page=fv-workshop-settings&tab=modules'
+            'admin.php?page=workshop-suite-settings&tab=modules'
         );
 
         // Submenu: Settings
         add_submenu_page(
-            'fv-workshop-dashboard',
+            'workshop-suite-dashboard',
             __('Settings', 'workshop-suite'),
             __('Settings', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-settings',
+            'workshop-suite-settings',
             [$this, 'render_page']
         );
 
         // Mark Moduli & Add-on item with a separator CSS class
-        if (isset($submenu['fv-workshop-dashboard'])) {
-            foreach ($submenu['fv-workshop-dashboard'] as &$item) {
+        if (isset($submenu['workshop-suite-dashboard'])) {
+            foreach ($submenu['workshop-suite-dashboard'] as &$item) {
                 if (isset($item[2]) && strpos($item[2], 'tab=modules') !== false) {
                     if (isset($item[4])) {
                         $item[4] .= ' ws-menu-separator';
@@ -475,13 +475,13 @@ final class WS_Admin_Settings_Page implements WS_Module {
             <hr class="wp-header-end">
             
             <nav class="nav-tab-wrapper wp-clearfix fvw-s9">
-                <a href="?page=fv-workshop-settings&tab=general" class="nav-tab <?php echo $tab === 'general' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('General', 'workshop-suite'); ?></a>
-                <a href="?page=fv-workshop-settings&tab=modules" class="nav-tab <?php echo $tab === 'modules' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Modules & Add-ons', 'workshop-suite'); ?></a>
-                <a href="?page=fv-workshop-settings&tab=proponente" class="nav-tab <?php echo $tab === 'proponente' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Trainer Profile / Bio', 'workshop-suite'); ?></a>
-                <a href="?page=fv-workshop-settings&tab=mail" class="nav-tab <?php echo $tab === 'mail' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Mail Configuration', 'workshop-suite'); ?></a>
-                <a href="?page=fv-workshop-settings&tab=custom_css" class="nav-tab <?php echo $tab === 'custom_css' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Custom CSS Code', 'workshop-suite'); ?></a>
-                <a href="?page=fv-workshop-settings&tab=shortcodes" class="nav-tab <?php echo $tab === 'shortcodes' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Shortcodes', 'workshop-suite'); ?></a>
-                <a href="?page=fv-workshop-settings&tab=license" class="nav-tab <?php echo $tab === 'license' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('License', 'workshop-suite'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=general" class="nav-tab <?php echo $tab === 'general' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('General', 'workshop-suite'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=modules" class="nav-tab <?php echo $tab === 'modules' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Modules & Add-ons', 'workshop-suite'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=proponente" class="nav-tab <?php echo $tab === 'proponente' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Trainer Profile / Bio', 'workshop-suite'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=mail" class="nav-tab <?php echo $tab === 'mail' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Mail Configuration', 'workshop-suite'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=custom_css" class="nav-tab <?php echo $tab === 'custom_css' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Custom CSS Code', 'workshop-suite'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=shortcodes" class="nav-tab <?php echo $tab === 'shortcodes' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Shortcodes', 'workshop-suite'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=license" class="nav-tab <?php echo $tab === 'license' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('License', 'workshop-suite'); ?></a>
             </nav>
 
             <?php if ($tab === 'general') : ?>
