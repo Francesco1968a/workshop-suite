@@ -494,6 +494,9 @@ final class WS_Rest_Admin implements WS_Module {
                     'mail_t15' => WS_Data::get_field('mail_t15', 'categoria_evento_' . $edit_cat) ?: '',
                     'prezzo' => (float) WS_Data::get_field('prezzo', 'categoria_evento_' . $edit_cat),
                     'acconto' => (float) WS_Data::get_field('acconto', 'categoria_evento_' . $edit_cat),
+                    'citta' => WS_Data::get_field('citta', 'categoria_evento_' . $edit_cat) ?: '',
+                    'nazione' => WS_Data::get_field('nazione', 'categoria_evento_' . $edit_cat) ?: '',
+                    'indirizzo' => WS_Data::get_field('indirizzo', 'categoria_evento_' . $edit_cat) ?: '',
                 ];
             }
         }
@@ -521,6 +524,7 @@ final class WS_Rest_Admin implements WS_Module {
                 'count' => (int) $t->count,
                 'prezzo' => (float) WS_Data::get_field('prezzo', 'categoria_evento_' . $t->term_id),
                 'acconto' => (float) WS_Data::get_field('acconto', 'categoria_evento_' . $t->term_id),
+                'citta' => WS_Data::get_field('citta', 'categoria_evento_' . $t->term_id) ?: '',
                 'prossimo_evento' => $prossimo,
             ];
         }
@@ -690,6 +694,9 @@ final class WS_Rest_Admin implements WS_Module {
         $mail_t15 = sanitize_textarea_field((string) $request->get_param('mail_t15'));
         $prezzo = (float) $request->get_param('prezzo');
         $acconto = (float) $request->get_param('acconto');
+        $citta = sanitize_text_field((string) $request->get_param('citta'));
+        $nazione = sanitize_text_field((string) $request->get_param('nazione'));
+        $indirizzo = sanitize_text_field((string) $request->get_param('indirizzo'));
 
         $t = wp_insert_term($nome, 'categoria_evento');
         if (is_wp_error($t)) return new WP_Error('failed', $t->get_error_message(), ['status' => 500]);
@@ -723,6 +730,9 @@ final class WS_Rest_Admin implements WS_Module {
         if ($mail_t15) WS_Data::update_field('mail_t15', $mail_t15, 'categoria_evento_' . $tid);
         WS_Data::update_field('prezzo', $prezzo, 'categoria_evento_' . $tid);
         WS_Data::update_field('acconto', $acconto, 'categoria_evento_' . $tid);
+        if ($citta) WS_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
+        if ($nazione) WS_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
+        if ($indirizzo) WS_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria creata.', 'id' => $tid]);
     }
@@ -743,6 +753,9 @@ final class WS_Rest_Admin implements WS_Module {
         $mail_t15 = sanitize_textarea_field((string) $request->get_param('mail_t15'));
         $prezzo = (float) $request->get_param('prezzo');
         $acconto = (float) $request->get_param('acconto');
+        $citta = sanitize_text_field((string) $request->get_param('citta'));
+        $nazione = sanitize_text_field((string) $request->get_param('nazione'));
+        $indirizzo = sanitize_text_field((string) $request->get_param('indirizzo'));
 
         wp_update_term($tid, 'categoria_evento', ['name' => $nome]);
         WS_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
@@ -767,6 +780,9 @@ final class WS_Rest_Admin implements WS_Module {
         WS_Data::update_field('mail_t15', $mail_t15, 'categoria_evento_' . $tid);
         WS_Data::update_field('prezzo', $prezzo, 'categoria_evento_' . $tid);
         WS_Data::update_field('acconto', $acconto, 'categoria_evento_' . $tid);
+        WS_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
+        WS_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
+        WS_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria aggiornata.']);
     }

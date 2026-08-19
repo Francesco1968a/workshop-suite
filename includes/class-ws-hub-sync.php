@@ -82,6 +82,20 @@ final class WS_Hub_Sync implements WS_Module {
         // Get category / type terms
         $terms = get_the_terms($post_id, 'categoria_evento');
         $cat_name = ($terms && !is_wp_error($terms)) ? $terms[0]->name : 'Workshop';
+        $cat_term_id = ($terms && !is_wp_error($terms)) ? $terms[0]->term_id : 0;
+
+        // Geo fields: event meta overrides category defaults, which override hardcoded fallbacks
+        $city = $meta['citta'][0] ?? $meta['_wv_citta'][0] ?? null;
+        $country = $meta['nazione'][0] ?? null;
+        $address = $meta['indirizzo'][0] ?? null;
+        if ($cat_term_id) {
+            $city = $city ?: (WS_Data::get_field('citta', 'categoria_evento_' . $cat_term_id) ?: null);
+            $country = $country ?: (WS_Data::get_field('nazione', 'categoria_evento_' . $cat_term_id) ?: null);
+            $address = $address ?: (WS_Data::get_field('indirizzo', 'categoria_evento_' . $cat_term_id) ?: null);
+        }
+        $city = $city ?: 'Napoli, Italy';
+        $country = $country ?: 'Italy';
+        $address = $address ?: '';
 
         // Resolve real public booking URL (prevent 404 on private CPTs)
         $booking_url = '';
@@ -112,9 +126,9 @@ final class WS_Hub_Sync implements WS_Module {
             'description'         => $post->post_content,
             'excerpt'             => $post->post_excerpt ?: wp_trim_words($post->post_content, 30),
             'category'            => $cat_name,
-            'city'                => $meta['citta'][0] ?? $meta['_wv_citta'][0] ?? 'Napoli, Italy',
-            'country'             => $meta['nazione'][0] ?? 'Italy',
-            'location_address'    => $meta['indirizzo'][0] ?? '',
+            'city'                => $city,
+            'country'             => $country,
+            'location_address'    => $address,
             'start_date'          => $meta['data_inizio'][0] ?? $meta['_wv_data_inizio'][0] ?? '',
             'end_date'            => $meta['data_fine'][0] ?? $meta['_wv_data_fine'][0] ?? '',
             'start_time'          => $meta['ora_inizio'][0] ?? '',
