@@ -82,18 +82,9 @@ final class WS_License_Manager implements WS_Module {
      * Can be hooked to Freemius SDK or EDD Software Licensing endpoint.
      */
     private static function validate_remote_key(string $key): array {
-        // Placeholders for development testing
-        if (str_starts_with($key, 'PRO-TEST-KEY')) {
-            return [
-                'status'  => 'active',
-                'expires' => date('Y-m-d', strtotime('+1 year')),
-                'type'    => 'agency',
-            ];
-        }
-
         // Real remote verification logic (EDD / Freemius / Custom Endpoint)
         $api_url = apply_filters('fvw_license_api_url', 'https://api.francescoverolino.com/v1/license/verify');
-        
+
         $response = wp_remote_post($api_url, [
             'timeout' => 15,
             'body'    => [
@@ -108,9 +99,17 @@ final class WS_License_Manager implements WS_Module {
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
+        // The remote endpoint's `license` field is documented as either
+        // 'valid' or 'active' depending on provider (EDD Software Licensing
+        // uses 'valid'; Freemius-style APIs tend to use 'active') — normalize
+        // both to 'active' here so is_pro_active() has a single value to
+        // check, instead of silently treating a real paid license as
+        // inactive just because the provider phrased it differently.
         if (!empty($body['success']) && !empty($body['license'])) {
+            $remote_status = $body['license'];
+            $status = in_array($remote_status, ['valid', 'active'], true) ? 'active' : 'invalid';
             return [
-                'status'  => $body['license'], // 'valid' / 'active'
+                'status'  => $status,
                 'expires' => $body['expires'] ?? '',
                 'type'    => $body['price_name'] ?? 'single',
             ];
