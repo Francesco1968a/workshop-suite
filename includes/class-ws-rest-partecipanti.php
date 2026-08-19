@@ -90,7 +90,7 @@ final class WS_Rest_Partecipanti implements WS_Module {
                     }
                     $stats_map[$pid]['totali']++;
                     $stato = WS_Data::get_field('stato', $isc->ID);
-                    if ($stato === 'Confermato') {
+                    if ($stato === 'confermato') {
                         $stats_map[$pid]['confermate']++;
                     }
                 }

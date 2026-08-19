@@ -107,7 +107,7 @@ final class WS_Data {
 
         foreach ($iscrizioni as $isc) {
             $stato = self::get_field('stato', $isc->ID);
-            if ($stato === 'Confermato')  $conf++; elseif ($stato === 'Richiesta') $ric++;
+            if ($stato === 'confermato')  $conf++; else $ric++;
             if (self::get_field('checkpoint_decision', $isc->ID) === 'abbandonato') $ab++;
             foreach (['mail_risposta_sent_at','mail_followup_sent_at','mail_welcome_sent_at'] as $k) {
                 $v = self::get_field($k, $isc->ID);

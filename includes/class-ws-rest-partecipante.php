@@ -124,9 +124,13 @@ final class WS_Rest_Partecipante implements WS_Module {
                 if (!in_array($stato_pagamento, ['in_attesa', 'acconto_pagato', 'saldato'], true)) {
                     $stato_pagamento = 'in_attesa';
                 }
+                $evento_url = $evento_id
+                    ? add_query_arg(['page' => 'workshop-suite-dashboard', 'evento_id' => $evento_id], admin_url('admin.php'))
+                    : '';
                 return [
                     'id'              => $isc_id,
                     'evento'          => $label,
+                    'evento_url'      => $evento_url,
                     'stato'           => $stato,
                     'stato_pagamento' => $stato_pagamento,
                     'data_fmt'        => get_the_date('d/m/Y', $isc_id),
