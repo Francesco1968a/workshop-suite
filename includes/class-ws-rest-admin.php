@@ -689,8 +689,21 @@ final class WS_Rest_Admin implements WS_Module {
         return new WP_REST_Response(['msg' => 'Categoria eliminata.', 'deleted' => true]);
     }
 
+    /** Reads the option, migrating silently from the legacy key on first access. */
+    private function get_modelli_locandine_option(): array {
+        $modelli = get_option('ws_modelli_locandine', false);
+        if ($modelli === false) {
+            $legacy = get_option('fvw_modelli_locandine', []);
+            if (!empty($legacy)) {
+                update_option('ws_modelli_locandine', $legacy);
+            }
+            $modelli = $legacy;
+        }
+        return is_array($modelli) ? $modelli : [];
+    }
+
     public function get_modelli_locandine(WP_REST_Request $request): WP_REST_Response {
-        $modelli = get_option('fvw_modelli_locandine', []);
+        $modelli = $this->get_modelli_locandine_option();
         return new WP_REST_Response(['modelli' => is_array($modelli) ? array_values($modelli) : []]);
     }
 
@@ -699,7 +712,7 @@ final class WS_Rest_Admin implements WS_Module {
         $id = !empty($params['id']) ? sanitize_key($params['id']) : 'mod_' . uniqid();
         $nome = !empty($params['nome']) ? sanitize_text_field($params['nome']) : 'Modello ' . date('d/m/Y H:i');
 
-        $modelli = get_option('fvw_modelli_locandine', []);
+        $modelli = $this->get_modelli_locandine_option();
         if (!is_array($modelli)) $modelli = [];
 
         $img_raw = !empty($params['imageUrl']) ? $params['imageUrl'] : (!empty($params['imageUrl1']) ? $params['imageUrl1'] : '');
@@ -758,7 +771,7 @@ final class WS_Rest_Admin implements WS_Module {
         ];
 
         $modelli[$id] = $item;
-        update_option('fvw_modelli_locandine', $modelli);
+        update_option('ws_modelli_locandine', $modelli);
 
         return new WP_REST_Response([
             'msg' => 'Modello salvato con successo!',
@@ -768,10 +781,10 @@ final class WS_Rest_Admin implements WS_Module {
 
     public function elimina_modello_locandina(WP_REST_Request $request): WP_REST_Response {
         $id = sanitize_key((string)$request['id']);
-        $modelli = get_option('fvw_modelli_locandine', []);
+        $modelli = $this->get_modelli_locandine_option();
         if (is_array($modelli) && isset($modelli[$id])) {
             unset($modelli[$id]);
-            update_option('fvw_modelli_locandine', $modelli);
+            update_option('ws_modelli_locandine', $modelli);
         }
         return new WP_REST_Response([
             'msg' => 'Modello eliminato.',

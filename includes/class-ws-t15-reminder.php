@@ -22,15 +22,24 @@ final class WS_T15_Reminder implements WS_Module {
     public const DAYS_OFFSET = 15;
     public const META_SENT = 'wv_t15_sent_at';
     public const META_THREAD = 'wv_thread';
-    public const CRON_HOOK = 'fvw_cron_t15_reminder';
+    public const CRON_HOOK = 'ws_cron_t15_reminder';
+    private const LEGACY_CRON_HOOK = 'fvw_cron_t15_reminder';
 
     public function should_load(): bool {
         return true;
     }
 
     public function register(): void {
+        add_action('init', [$this, 'migrate_legacy_cron']);
         add_action('init', [$this, 'ensure_scheduled']);
         add_action(self::CRON_HOOK, [$this, 'process']);
+    }
+
+    /** One-time cleanup of the orphaned pre-rename event. */
+    public function migrate_legacy_cron(): void {
+        if (wp_next_scheduled(self::LEGACY_CRON_HOOK)) {
+            wp_clear_scheduled_hook(self::LEGACY_CRON_HOOK);
+        }
     }
 
     public function ensure_scheduled(): void {

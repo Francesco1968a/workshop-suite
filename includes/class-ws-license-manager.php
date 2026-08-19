@@ -9,7 +9,8 @@ if (!defined('ABSPATH')) exit;
  */
 final class WS_License_Manager implements WS_Module {
 
-    public const LICENSE_OPTION_KEY = 'fvw_license_data';
+    public const LICENSE_OPTION_KEY = 'ws_license_data';
+    private const LEGACY_LICENSE_OPTION_KEY = 'fvw_license_data';
 
     public function should_load(): bool {
         return true;
@@ -28,7 +29,16 @@ final class WS_License_Manager implements WS_Module {
             'type'    => 'free',     // 'free', 'single', 'agency', 'unlimited'
         ];
 
-        $saved = get_option(self::LICENSE_OPTION_KEY, []);
+        $saved = get_option(self::LICENSE_OPTION_KEY, false);
+        if ($saved === false) {
+            // Migrate silently from the pre-rename option key so an already
+            // activated Pro license doesn't appear inactive after the rename.
+            $legacy = get_option(self::LEGACY_LICENSE_OPTION_KEY, []);
+            if (!empty($legacy)) {
+                update_option(self::LICENSE_OPTION_KEY, $legacy);
+            }
+            $saved = $legacy;
+        }
         if (!is_array($saved)) {
             $saved = [];
         }
@@ -42,7 +52,7 @@ final class WS_License_Manager implements WS_Module {
     }
 
     public function register_settings(): void {
-        register_setting('fvw_license_group', self::LICENSE_OPTION_KEY, [
+        register_setting('ws_license_group', self::LICENSE_OPTION_KEY, [
             'sanitize_callback' => [$this, 'sanitize_and_validate']
         ]);
     }
@@ -83,7 +93,7 @@ final class WS_License_Manager implements WS_Module {
      */
     private static function validate_remote_key(string $key): array {
         // Real remote verification logic (EDD / Freemius / Custom Endpoint)
-        $api_url = apply_filters('fvw_license_api_url', 'https://api.francescoverolino.com/v1/license/verify');
+        $api_url = apply_filters('ws_license_api_url', 'https://api.francescoverolino.com/v1/license/verify');
 
         $response = wp_remote_post($api_url, [
             'timeout' => 15,

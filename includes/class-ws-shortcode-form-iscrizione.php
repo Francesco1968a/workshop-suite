@@ -3,7 +3,9 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Shortcode [fv_form_iscrizione] or [fvw_form_iscrizione]
+ * Shortcode [ws_form_iscrizione] — [fv_form_iscrizione] and
+ * [fvw_form_iscrizione] remain registered as permanent aliases for
+ * backward compatibility with existing page content.
  * Renders a standalone, responsive registration form for workshops.
  */
 final class WS_Shortcode_Form_Iscrizione implements WS_Module {
@@ -13,6 +15,7 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
     }
 
     public function register(): void {
+        add_shortcode('ws_form_iscrizione', [$this, 'render_shortcode']);
         add_shortcode('fv_form_iscrizione', [$this, 'render_shortcode']);
         add_shortcode('fvw_form_iscrizione', [$this, 'render_shortcode']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);

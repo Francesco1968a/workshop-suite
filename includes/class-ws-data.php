@@ -306,10 +306,19 @@ final class WS_Data {
             return self::legacy_calendar_token();
         }
 
-        $secret = get_user_meta($user_id, 'fvw_ics_secret_key', true);
+        $secret = get_user_meta($user_id, 'ws_ics_secret_key', true);
+        if (!$secret) {
+            // Migrate silently from the pre-rename meta key so already-active
+            // .ics calendar subscriptions (which embed a token derived from
+            // this secret) don't get silently invalidated by the rename.
+            $secret = get_user_meta($user_id, 'fvw_ics_secret_key', true);
+            if ($secret) {
+                update_user_meta($user_id, 'ws_ics_secret_key', $secret);
+            }
+        }
         if (!$secret) {
             $secret = wp_generate_password(32, false);
-            update_user_meta($user_id, 'fvw_ics_secret_key', $secret);
+            update_user_meta($user_id, 'ws_ics_secret_key', $secret);
         }
 
         return substr(hash_hmac('sha256', 'wv_cal_user_' . $user_id . '_' . $secret, wp_salt('auth')), 0, 32);
@@ -327,7 +336,7 @@ final class WS_Data {
         }
         if ($user_id) {
             $new_secret = wp_generate_password(32, false);
-            update_user_meta($user_id, 'fvw_ics_secret_key', $new_secret);
+            update_user_meta($user_id, 'ws_ics_secret_key', $new_secret);
         }
         return self::calendar_token($user_id);
     }

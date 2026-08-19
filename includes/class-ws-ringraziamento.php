@@ -32,17 +32,26 @@ final class WS_Ringraziamento implements WS_Module {
     public const DAYS_OFFSET = 2;
     public const META_SENT = 'mail_ringraziamento_sent_at';
     public const META_THREAD = 'wv_thread';
-    public const CRON_HOOK = 'fvw_cron_ringraziamento_daily';
+    public const CRON_HOOK = 'ws_cron_ringraziamento_daily';
+    private const LEGACY_CRON_HOOK = 'fvw_cron_ringraziamento_daily';
 
     public function should_load(): bool {
         return true;
     }
 
     public function register(): void {
+        add_action('init', [$this, 'migrate_legacy_cron']);
         add_action('init', [$this, 'ensure_scheduled']);
         add_action(self::CRON_HOOK, [$this, 'process']);
         add_action('acf/init', [$this, 'register_fields']);
         add_action('rest_api_init', [$this, 'register_routes']);
+    }
+
+    /** One-time cleanup of the orphaned pre-rename event. */
+    public function migrate_legacy_cron(): void {
+        if (wp_next_scheduled(self::LEGACY_CRON_HOOK)) {
+            wp_clear_scheduled_hook(self::LEGACY_CRON_HOOK);
+        }
     }
 
     public function register_routes(): void {

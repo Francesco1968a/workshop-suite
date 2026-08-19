@@ -14,10 +14,12 @@ if (!defined('ABSPATH')) exit;
  */
 final class WS_Mail_Poller implements WS_Module {
 
-    public const CRON_HOOK = 'fvw_cron_mail_poll';
+    public const CRON_HOOK = 'ws_cron_mail_poll';
+    private const LEGACY_CRON_HOOK = 'fvw_cron_mail_poll';
     private const META_THREAD = 'wv_thread';
-    private const META_LAST_POLL = 'fvw_mail_poll_last';
-    public const META_LAST_ERROR = 'fvw_mail_poll_last_error';
+    private const META_LAST_POLL = 'ws_mail_poll_last';
+    private const LEGACY_META_LAST_POLL = 'fvw_mail_poll_last';
+    public const META_LAST_ERROR = 'ws_mail_poll_last_error';
 
     public function should_load(): bool {
         return true;
@@ -25,9 +27,17 @@ final class WS_Mail_Poller implements WS_Module {
 
     public function register(): void {
         add_filter('cron_schedules', [$this, 'add_schedule']);
+        add_action('init', [$this, 'migrate_legacy_cron']);
         add_action('init', [$this, 'ensure_scheduled']);
         add_action(self::CRON_HOOK, [$this, 'poll']);
         add_action('admin_notices', [$this, 'display_admin_notice']);
+    }
+
+    /** One-time cleanup of the orphaned pre-rename event, so it doesn't keep firing alongside the new one. */
+    public function migrate_legacy_cron(): void {
+        if (wp_next_scheduled(self::LEGACY_CRON_HOOK)) {
+            wp_clear_scheduled_hook(self::LEGACY_CRON_HOOK);
+        }
     }
 
     public function display_admin_notice(): void {
@@ -59,13 +69,13 @@ final class WS_Mail_Poller implements WS_Module {
     }
 
     public function add_schedule(array $schedules): array {
-        $schedules['fvw_15min'] = ['interval' => 15 * 60, 'display' => 'Ogni 15 minuti (Workshop Suite)'];
+        $schedules['ws_15min'] = ['interval' => 15 * 60, 'display' => 'Ogni 15 minuti (Workshop Suite)'];
         return $schedules;
     }
 
     public function ensure_scheduled(): void {
         if (!wp_next_scheduled(self::CRON_HOOK)) {
-            wp_schedule_event(time() + 60, 'fvw_15min', self::CRON_HOOK);
+            wp_schedule_event(time() + 60, 'ws_15min', self::CRON_HOOK);
         }
     }
 
@@ -120,7 +130,7 @@ final class WS_Mail_Poller implements WS_Module {
             return ['processed' => $processed, 'matched' => $matched];
         } catch (\Throwable $e) {
             $err_msg = $e->getMessage();
-            error_log('[FVW Mail Poller Error] ' . $err_msg);
+            error_log('[WS Mail Poller Error] ' . $err_msg);
             update_option(self::META_LAST_ERROR, [
                 'date' => current_time('mysql'),
                 'msg'  => $err_msg,
@@ -139,7 +149,11 @@ final class WS_Mail_Poller implements WS_Module {
     }
 
     public static function last_poll(): string {
-        return (string) get_option(self::META_LAST_POLL, '');
+        $val = get_option(self::META_LAST_POLL, '');
+        if ($val === '') {
+            $val = get_option(self::LEGACY_META_LAST_POLL, '');
+        }
+        return (string) $val;
     }
 
     /** @return array{date: string, msg: string}|null */

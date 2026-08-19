@@ -16,7 +16,21 @@ use Webklex\PHPIMAP\ClientManager;
  */
 final class WS_Mail_Inbox {
 
-    private const OPTION = 'fvw_imap_settings';
+    private const OPTION = 'ws_imap_settings';
+    private const LEGACY_OPTION = 'fvw_imap_settings';
+
+    /** Reads the option, migrating silently from the legacy key on first access. */
+    private static function get_stored(): array {
+        $stored = get_option(self::OPTION, false);
+        if ($stored === false) {
+            $legacy = get_option(self::LEGACY_OPTION, []);
+            if (!empty($legacy)) {
+                update_option(self::OPTION, $legacy, false);
+            }
+            $stored = $legacy;
+        }
+        return is_array($stored) ? $stored : [];
+    }
 
     public static function default_settings(): array {
         return [
@@ -35,7 +49,7 @@ final class WS_Mail_Inbox {
 
     /** Non-secret settings only — never includes the password. */
     public static function get_public_settings(): array {
-        $stored = get_option(self::OPTION, []);
+        $stored = self::get_stored();
         $settings = array_merge(self::default_settings(), array_intersect_key($stored, self::default_settings()));
         $settings['has_password'] = !empty($stored['password']);
         return $settings;
@@ -52,7 +66,7 @@ final class WS_Mail_Inbox {
 
     /** Decrypt password stored in options. Backward-compatible with unencrypted legacy passwords. */
     public static function get_decrypted_password(): string {
-        $stored = get_option(self::OPTION, []);
+        $stored = self::get_stored();
         $pass   = $stored['password'] ?? '';
         if (empty($pass)) return '';
         if (strpos($pass, 'enc:') !== 0) {
@@ -71,7 +85,7 @@ final class WS_Mail_Inbox {
      *   without retyping the password keeps the existing one).
      */
     public static function save_settings(array $data): void {
-        $stored = get_option(self::OPTION, []);
+        $stored = self::get_stored();
         $next = [
             'host' => sanitize_text_field($data['host'] ?? self::default_settings()['host']),
             'port' => (int) ($data['port'] ?? self::default_settings()['port']),
@@ -92,17 +106,17 @@ final class WS_Mail_Inbox {
     }
 
     public static function is_configured(): bool {
-        $stored = get_option(self::OPTION, []);
+        $stored = self::get_stored();
         return !empty($stored['host']) && !empty($stored['username']) && !empty(self::get_decrypted_password());
     }
 
     public static function configured_folder(): string {
-        $stored = get_option(self::OPTION, []);
+        $stored = self::get_stored();
         return $stored['folder'] ?? 'INBOX';
     }
 
     public static function build_client(): \Webklex\PHPIMAP\Client {
-        $stored = get_option(self::OPTION, []);
+        $stored = self::get_stored();
         $cm = new ClientManager();
         return $cm->make([
             'host'            => $stored['host'] ?? '',
@@ -132,7 +146,7 @@ final class WS_Mail_Inbox {
      * @return array{ok: bool, msg: string}
      */
     public static function send_reply(string $to, string $subject, string $body, array $attachments = []): array {
-        $stored = get_option(self::OPTION, []);
+        $stored = self::get_stored();
         $pass   = self::get_decrypted_password();
         if (empty($stored['username']) || empty($pass)) {
             return ['ok' => false, 'msg' => 'Credenziali casella mail non configurate.'];
@@ -179,7 +193,7 @@ final class WS_Mail_Inbox {
 
     /** @return array{ok: bool, msg: string, folders?: string[], unseen?: int} */
     public static function test_connection(): array {
-        $stored = get_option(self::OPTION, []);
+        $stored = self::get_stored();
         if (empty($stored['host']) || empty($stored['username']) || empty($stored['password'])) {
             return ['ok' => false, 'msg' => 'Host, utente e password sono obbligatori.'];
         }

@@ -86,7 +86,7 @@ final class WS_Rest_Intake implements WS_Module {
         if (!empty($settings['intake_rate_limit_enabled'])) {
             $ip = sanitize_text_field($_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
             $ip_clean = explode(',', $ip)[0];
-            $transient_key = 'fvw_rl_' . md5($ip_clean);
+            $transient_key = 'ws_rl_' . md5($ip_clean);
             $count = (int) get_transient($transient_key);
             $max_requests = (int) ($settings['intake_rate_limit_requests'] ?? 5);
             $window = (int) ($settings['intake_rate_limit_window'] ?? 60);

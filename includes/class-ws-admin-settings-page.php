@@ -77,13 +77,13 @@ final class WS_Admin_Settings_Page implements WS_Module {
     }
 
     public function handle_mail_settings_save(): void {
-        if (isset($_POST['fvw_save_mail_action']) && check_admin_referer('fvw_save_mail_nonce')) {
+        if (isset($_POST['ws_save_mail_action']) && check_admin_referer('ws_save_mail_nonce')) {
             if (current_user_can('manage_options')) {
-                WS_Mail_Inbox::save_settings($_POST['fvw_mail'] ?? []);
+                WS_Mail_Inbox::save_settings($_POST['ws_mail'] ?? []);
 
                 // Save anti-spam and rate limiting options
-                if (isset($_POST['fvw_security'])) {
-                    $sec = $_POST['fvw_security'];
+                if (isset($_POST['ws_security'])) {
+                    $sec = $_POST['ws_security'];
                     $current_settings = WS_Settings::get_all();
                     $current_settings['intake_rate_limit_enabled']  = !empty($sec['intake_rate_limit_enabled']) ? 1 : 0;
                     $current_settings['intake_rate_limit_requests'] = max(1, (int) ($sec['intake_rate_limit_requests'] ?? 5));
@@ -369,7 +369,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 </style>
 
                 <form method="post" action="options.php">
-                    <?php settings_fields('fvw_settings_group'); ?>
+                    <?php settings_fields('ws_settings_group'); ?>
                     
                     <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[site_brand_name]" value="<?php echo esc_attr($settings['site_brand_name']); ?>">
                     <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_name]" value="<?php echo esc_attr($settings['sender_name']); ?>">
@@ -424,10 +424,10 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 if (btnDark) btnDark.classList.add('active');
                 if (btnLight) btnLight.classList.remove('active');
             }
-            localStorage.setItem('fvw_user_theme', theme);
+            localStorage.setItem('ws_user_theme', theme);
         }
         (function() {
-            var saved = localStorage.getItem('fvw_user_theme');
+            var saved = localStorage.getItem('ws_user_theme');
             if (saved === 'light' || saved === 'dark') {
                 fvwSetTheme(saved);
             }
@@ -437,7 +437,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
     }
 
     public function register_settings(): void {
-        register_setting('fvw_settings_group', WS_Settings::OPTION_KEY, [
+        register_setting('ws_settings_group', WS_Settings::OPTION_KEY, [
             'sanitize_callback' => function ($input) {
                 if (!is_array($input)) return [];
                 $current = WS_Settings::get_all();
@@ -486,7 +486,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
             <?php if ($tab === 'general') : ?>
                 <form method="post" action="options.php">
-                    <?php settings_fields('fvw_settings_group'); ?>
+                    <?php settings_fields('ws_settings_group'); ?>
                     <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[custom_css]" value="<?php echo esc_attr($settings['custom_css'] ?? ''); ?>">
                     
                     <table class="form-table" role="presentation">
@@ -1055,8 +1055,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 <?php endif; ?>
 
                 <form method="post" action="">
-                    <?php wp_nonce_field('fvw_save_mail_nonce'); ?>
-                    <input type="hidden" name="fvw_save_mail_action" value="1">
+                    <?php wp_nonce_field('ws_save_mail_nonce'); ?>
+                    <input type="hidden" name="ws_save_mail_action" value="1">
 
                     <div class="ws-s44">
                         <!-- Column 1: IMAP (Reading) -->
@@ -1067,16 +1067,16 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                 <tbody>
                                     <tr>
                                         <th scope="row"><label for="imap_host"><?php esc_html_e('Host IMAP', 'workshop-suite'); ?></label></th>
-                                        <td><input name="fvw_mail[host]" type="text" id="imap_host" value="<?php echo esc_attr($mail_settings['host']); ?>" class="regular-text" placeholder="imap.zoho.com"></td>
+                                        <td><input name="ws_mail[host]" type="text" id="imap_host" value="<?php echo esc_attr($mail_settings['host']); ?>" class="regular-text" placeholder="imap.zoho.com"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><label for="imap_port"><?php esc_html_e('Porta IMAP', 'workshop-suite'); ?></label></th>
-                                        <td><input name="fvw_mail[port]" type="number" id="imap_port" value="<?php echo esc_attr($mail_settings['port']); ?>" class="small-text" placeholder="993"></td>
+                                        <td><input name="ws_mail[port]" type="number" id="imap_port" value="<?php echo esc_attr($mail_settings['port']); ?>" class="small-text" placeholder="993"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><label for="imap_enc"><?php esc_html_e('Crittografia', 'workshop-suite'); ?></label></th>
                                         <td>
-                                            <select name="fvw_mail[encryption]" id="imap_enc">
+                                            <select name="ws_mail[encryption]" id="imap_enc">
                                                 <option value="ssl" <?php selected('ssl', $mail_settings['encryption']); ?>>SSL</option>
                                                 <option value="tls" <?php selected('tls', $mail_settings['encryption']); ?>>TLS</option>
                                                 <option value="" <?php selected('', $mail_settings['encryption']); ?>>Nessuna</option>
@@ -1085,12 +1085,12 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     </tr>
                                     <tr>
                                         <th scope="row"><label for="imap_username"><?php esc_html_e('Utente IMAP', 'workshop-suite'); ?></label></th>
-                                        <td><input name="fvw_mail[username]" type="text" id="imap_username" value="<?php echo esc_attr($mail_settings['username']); ?>" class="regular-text" placeholder="info@domain.com"></td>
+                                        <td><input name="ws_mail[username]" type="text" id="imap_username" value="<?php echo esc_attr($mail_settings['username']); ?>" class="regular-text" placeholder="info@domain.com"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><label for="imap_password"><?php esc_html_e('Password Account', 'workshop-suite'); ?></label></th>
                                         <td>
-                                            <input name="fvw_mail[password]" type="password" id="imap_password" value="" class="regular-text" placeholder="<?php echo $has_password ? '•••••••• (Inalterata)' : 'Inserisci password'; ?>">
+                                            <input name="ws_mail[password]" type="password" id="imap_password" value="" class="regular-text" placeholder="<?php echo $has_password ? '•••••••• (Inalterata)' : 'Inserisci password'; ?>">
                                             <?php if ($has_password) : ?>
                                                 <p class="description ws-s45">🔒 <?php esc_html_e('Password protetta con cifratura OpenSSL AES-256.', 'workshop-suite'); ?></p>
                                             <?php endif; ?>
@@ -1108,24 +1108,24 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                 <tbody>
                                     <tr>
                                         <th scope="row"><label for="reply_from_name"><?php esc_html_e('Nome Mittente', 'workshop-suite'); ?></label></th>
-                                        <td><input name="fvw_mail[reply_from_name]" type="text" id="reply_from_name" value="<?php echo esc_attr($mail_settings['reply_from_name']); ?>" class="regular-text" placeholder="Francesco Verolino"></td>
+                                        <td><input name="ws_mail[reply_from_name]" type="text" id="reply_from_name" value="<?php echo esc_attr($mail_settings['reply_from_name']); ?>" class="regular-text" placeholder="Francesco Verolino"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><label for="reply_from_email"><?php esc_html_e('Email Mittente', 'workshop-suite'); ?></label></th>
-                                        <td><input name="fvw_mail[reply_from_email]" type="email" id="reply_from_email" value="<?php echo esc_attr($mail_settings['reply_from_email']); ?>" class="regular-text" placeholder="workshop@domain.com"></td>
+                                        <td><input name="ws_mail[reply_from_email]" type="email" id="reply_from_email" value="<?php echo esc_attr($mail_settings['reply_from_email']); ?>" class="regular-text" placeholder="workshop@domain.com"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><label for="smtp_host"><?php esc_html_e('Host SMTP', 'workshop-suite'); ?></label></th>
-                                        <td><input name="fvw_mail[smtp_host]" type="text" id="smtp_host" value="<?php echo esc_attr($mail_settings['smtp_host']); ?>" class="regular-text" placeholder="smtp.zoho.com"></td>
+                                        <td><input name="ws_mail[smtp_host]" type="text" id="smtp_host" value="<?php echo esc_attr($mail_settings['smtp_host']); ?>" class="regular-text" placeholder="smtp.zoho.com"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><label for="smtp_port"><?php esc_html_e('Porta SMTP', 'workshop-suite'); ?></label></th>
-                                        <td><input name="fvw_mail[smtp_port]" type="number" id="smtp_port" value="<?php echo esc_attr($mail_settings['smtp_port']); ?>" class="small-text" placeholder="587"></td>
+                                        <td><input name="ws_mail[smtp_port]" type="number" id="smtp_port" value="<?php echo esc_attr($mail_settings['smtp_port']); ?>" class="small-text" placeholder="587"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><label for="smtp_enc"><?php esc_html_e('Crittografia', 'workshop-suite'); ?></label></th>
                                         <td>
-                                            <select name="fvw_mail[smtp_encryption]" id="smtp_enc">
+                                            <select name="ws_mail[smtp_encryption]" id="smtp_enc">
                                                 <option value="tls" <?php selected('tls', $mail_settings['smtp_encryption']); ?>>TLS</option>
                                                 <option value="ssl" <?php selected('ssl', $mail_settings['smtp_encryption']); ?>>SSL</option>
                                                 <option value="" <?php selected('', $mail_settings['smtp_encryption']); ?>>Nessuna</option>
@@ -1148,7 +1148,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     <th scope="row"><?php esc_html_e('Rate Limiting IP', 'workshop-suite'); ?></th>
                                     <td>
                                         <label for="intake_rate_limit_enabled">
-                                            <input name="fvw_security[intake_rate_limit_enabled]" type="checkbox" id="intake_rate_limit_enabled" value="1" <?php checked(1, $settings['intake_rate_limit_enabled'] ?? 1); ?>>
+                                            <input name="ws_security[intake_rate_limit_enabled]" type="checkbox" id="intake_rate_limit_enabled" value="1" <?php checked(1, $settings['intake_rate_limit_enabled'] ?? 1); ?>>
                                             <?php esc_html_e('Attiva limitazione richieste per indirizzo IP', 'workshop-suite'); ?>
                                         </label>
                                     </td>
@@ -1156,14 +1156,14 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                 <tr>
                                     <th scope="row"><label for="intake_rate_limit_requests"><?php esc_html_e('Soglia Massima Richieste', 'workshop-suite'); ?></label></th>
                                     <td>
-                                        <input name="fvw_security[intake_rate_limit_requests]" type="number" id="intake_rate_limit_requests" value="<?php echo esc_attr($settings['intake_rate_limit_requests'] ?? 5); ?>" class="small-text" min="1" max="100">
+                                        <input name="ws_security[intake_rate_limit_requests]" type="number" id="intake_rate_limit_requests" value="<?php echo esc_attr($settings['intake_rate_limit_requests'] ?? 5); ?>" class="small-text" min="1" max="100">
                                         <span class="description"><?php esc_html_e('Numero massimo di iscrizioni consentite dallo stesso IP (default: 5).', 'workshop-suite'); ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th scope="row"><label for="intake_rate_limit_window"><?php esc_html_e('Finestra Temporale (secondi)', 'workshop-suite'); ?></label></th>
                                     <td>
-                                        <input name="fvw_security[intake_rate_limit_window]" type="number" id="intake_rate_limit_window" value="<?php echo esc_attr($settings['intake_rate_limit_window'] ?? 60); ?>" class="small-text" min="10" max="3600">
+                                        <input name="ws_security[intake_rate_limit_window]" type="number" id="intake_rate_limit_window" value="<?php echo esc_attr($settings['intake_rate_limit_window'] ?? 60); ?>" class="small-text" min="10" max="3600">
                                         <span class="description"><?php esc_html_e('Intervallo di tempo per il calcolo del limite (default: 60 secondi).', 'workshop-suite'); ?></span>
                                     </td>
                                 </tr>
@@ -1171,7 +1171,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     <th scope="row"><?php esc_html_e('Protezione Honeypot', 'workshop-suite'); ?></th>
                                     <td>
                                         <label for="intake_honeypot_enabled">
-                                            <input name="fvw_security[intake_honeypot_enabled]" type="checkbox" id="intake_honeypot_enabled" value="1" <?php checked(1, $settings['intake_honeypot_enabled'] ?? 1); ?>>
+                                            <input name="ws_security[intake_honeypot_enabled]" type="checkbox" id="intake_honeypot_enabled" value="1" <?php checked(1, $settings['intake_honeypot_enabled'] ?? 1); ?>>
                                             <?php esc_html_e('Blocca invii con campo trappola compilato (anti-bot invisibile)', 'workshop-suite'); ?>
                                         </label>
                                     </td>
@@ -1199,7 +1199,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         </div>
                         <div>
                             <form method="post" action="options.php">
-                                <?php settings_fields('fvw_settings_group'); ?>
+                                <?php settings_fields('ws_settings_group'); ?>
                                 <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[site_brand_name]" value="<?php echo esc_attr($settings['site_brand_name']); ?>">
                                 <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_name]" value="<?php echo esc_attr($settings['sender_name']); ?>">
                                 <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_email]" value="<?php echo esc_attr($settings['sender_email']); ?>">
@@ -1278,14 +1278,14 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 </div>
             <?php else : ?>
                 <form method="post" action="options.php">
-                    <?php settings_fields('fvw_license_group'); ?>
+                    <?php settings_fields('ws_license_group'); ?>
                     
                     <table class="form-table" role="presentation">
                         <tbody>
                             <tr>
-                                <th scope="row"><label for="fvw_license_key"><?php esc_html_e('Chiave di Licenza', 'workshop-suite'); ?></label></th>
+                                <th scope="row"><label for="ws_license_key"><?php esc_html_e('Chiave di Licenza', 'workshop-suite'); ?></label></th>
                                 <td>
-                                    <input name="<?php echo WS_License_Manager::LICENSE_OPTION_KEY; ?>[key]" type="password" id="fvw_license_key" value="<?php echo esc_attr($license['key']); ?>" class="regular-text">
+                                    <input name="<?php echo WS_License_Manager::LICENSE_OPTION_KEY; ?>[key]" type="password" id="ws_license_key" value="<?php echo esc_attr($license['key']); ?>" class="regular-text">
                                     <p class="description"><?php esc_html_e('Inserisci la chiave di licenza acquistata per abilitare il supporto e gli aggiornamenti automatici.', 'workshop-suite'); ?></p>
                                 </td>
                             </tr>

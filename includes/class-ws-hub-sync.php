@@ -67,7 +67,11 @@ final class WS_Hub_Sync implements WS_Module {
         if (empty($booking_url)) {
             $booking_page = WS_Data::find_page_url_containing('ws_form_iscrizione');
             if (!$booking_page) {
-                $booking_page = WS_Data::find_page_url_containing('fvw_iscrizione');
+                // 'fvw_iscrizione' was never a real substring of either
+                // registered shortcode tag (fv_form_iscrizione /
+                // fvw_form_iscrizione), so this search never matched
+                // anything — try the actual live tag instead.
+                $booking_page = WS_Data::find_page_url_containing('fv_form_iscrizione');
             }
             $booking_url = $booking_page ?: home_url();
         }
