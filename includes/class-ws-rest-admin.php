@@ -53,11 +53,20 @@ final class WS_Rest_Admin implements WS_Module {
 
     private function evento_option(int $id): array {
         $s = WS_Data::stato_posti($id);
+        $prezzo = 0.0;
+        $acconto = 0.0;
+        $terms = get_the_terms($id, 'categoria_evento');
+        if ($terms && !is_wp_error($terms)) {
+            $prezzo = (float) WS_Data::get_field('prezzo', 'categoria_evento_' . $terms[0]->term_id);
+            $acconto = (float) WS_Data::get_field('acconto', 'categoria_evento_' . $terms[0]->term_id);
+        }
         return [
             'id' => $id,
             'label' => WS_Data::evento_label($id),
             'disponibili' => $s['disponibili'],
             'sold_out' => $s['sold_out'],
+            'prezzo' => $prezzo,
+            'acconto' => $acconto,
         ];
     }
 
