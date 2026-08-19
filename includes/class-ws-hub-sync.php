@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) exit;
  */
 final class WS_Hub_Sync implements WS_Module {
 
-    const DEFAULT_HUB_API_URL = 'http://178.105.72.227/wp-json/woorkshoop-hub/v1/sync';
+    const DEFAULT_HUB_API_URL = 'https://workshopsuite.pro/wp-json/woorkshoop-hub/v1/sync';
 
     public function should_load(): bool {
         return WS_Settings::is_module_active('global_hub_pro', true);

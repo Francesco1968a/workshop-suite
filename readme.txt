@@ -33,6 +33,13 @@ Whether you run photography workshops, masterclasses, business seminars, art ret
 3. Navigate to **Workshop Suite > Impostazioni** to configure your brand name, email settings (IMAP/SMTP for replies), and anti-spam preferences.
 4. Create your first workshop under **Workshop Suite > Categoria e tipologia** and **Eventi | Partecipanti**.
 
+== Privacy Policy & Third-Party Services ==
+
+This plugin can optionally connect to an external cloud service:
+* **Workshop Suite Global Hub** (https://workshopsuite.pro): When the "Global Hub Sync" module is explicitly activated by the administrator, published workshop metadata (title, dates, venue location, category, and presentation URL) is syndicated to the Workshop Suite global directory to increase event discovery.
+* **Terms of Service**: https://workshopsuite.pro/terms/
+* **Privacy Policy**: https://workshopsuite.pro/privacy/
+
 == Frequently Asked Questions ==
 
 = Is this plugin only for photography workshops? =
