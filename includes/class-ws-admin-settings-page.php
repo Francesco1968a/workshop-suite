@@ -282,7 +282,6 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         $config = [
             'restUrl'       => esc_url_raw(rest_url('workshop-suite/v1/')),
-            'legacyRestUrl' => esc_url_raw(rest_url('fv-workshop/v1/')),
             'nonce'         => wp_create_nonce('wp_rest'),
             'brandName'     => WS_Settings::get('site_brand_name', 'Workshop Suite'),
         ];
@@ -791,7 +790,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             statusLabel.style.color = isActive ? '#10b981' : '#94a3b8';
                         }
 
-                        fetch('<?php echo esc_url_raw(rest_url('fvw/v1/modules/toggle')); ?>', {
+                        fetch('<?php echo esc_url_raw(rest_url('workshop-suite/v1/modules/toggle')); ?>', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

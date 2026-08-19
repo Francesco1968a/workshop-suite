@@ -48,19 +48,19 @@ final class WS_Ringraziamento implements WS_Module {
     public function register_routes(): void {
         $perm = fn() => current_user_can('manage_options');
 
-        register_rest_route('fv-workshop/v1', '/ringraziamento/pannello', [
+        register_rest_route('workshop-suite/v1', '/ringraziamento/pannello', [
             'methods' => 'GET', 'callback' => [$this, 'get_pannello'], 'permission_callback' => $perm,
         ]);
-        register_rest_route('fv-workshop/v1', '/ringraziamento/impostazioni', [
+        register_rest_route('workshop-suite/v1', '/ringraziamento/impostazioni', [
             'methods' => 'POST', 'callback' => [$this, 'save_impostazioni'], 'permission_callback' => $perm,
         ]);
-        register_rest_route('fv-workshop/v1', '/ringraziamento/iscrizione/(?P<id>\d+)/invia', [
+        register_rest_route('workshop-suite/v1', '/ringraziamento/iscrizione/(?P<id>\d+)/invia', [
             'methods' => 'POST', 'callback' => [$this, 'invia_una'], 'permission_callback' => $perm,
         ]);
-        register_rest_route('fv-workshop/v1', '/ringraziamento/iscrizione/(?P<id>\d+)/salta', [
+        register_rest_route('workshop-suite/v1', '/ringraziamento/iscrizione/(?P<id>\d+)/salta', [
             'methods' => 'POST', 'callback' => [$this, 'salta_una'], 'permission_callback' => $perm,
         ]);
-        register_rest_route('fv-workshop/v1', '/ringraziamento/invia-tutte', [
+        register_rest_route('workshop-suite/v1', '/ringraziamento/invia-tutte', [
             'methods' => 'POST', 'callback' => [$this, 'invia_tutte'], 'permission_callback' => $perm,
         ]);
     }

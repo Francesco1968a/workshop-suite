@@ -45,7 +45,7 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
         }
 
         wp_localize_script('fvw-ringraziamento', 'FVW_CONFIG', [
-            'restUrl' => esc_url_raw(rest_url('fv-workshop/v1/')),
+            'restUrl' => esc_url_raw(rest_url('workshop-suite/v1/')),
             'nonce'   => wp_create_nonce('wp_rest'),
         ]);
 

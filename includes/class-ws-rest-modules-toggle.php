@@ -12,7 +12,7 @@ final class WS_Rest_Modules_Toggle {
     }
 
     public static function register_routes(): void {
-        register_rest_route('fvw/v1', '/modules/toggle', [
+        register_rest_route('workshop-suite/v1', '/modules/toggle', [
             'methods'             => WP_REST_Server::CREATABLE,
             'callback'            => [__CLASS__, 'handle_toggle'],
             'permission_callback' => fn() => current_user_can('manage_options'),

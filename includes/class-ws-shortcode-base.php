@@ -127,7 +127,6 @@ abstract class WS_Shortcode_Base implements WS_Module {
 
         $config = array_merge([
             'restUrl' => esc_url_raw(rest_url('workshop-suite/v1/')),
-            'legacyRestUrl' => esc_url_raw(rest_url('fv-workshop/v1/')),
             'nonce'   => wp_create_nonce('wp_rest'),
         ], $this->extra_config());
 

@@ -19,7 +19,7 @@ final class WS_Taxonomy_Registry {
     }
 
     public static function register_local_endpoints(): void {
-        register_rest_route('fvw/v1', '/taxonomies', [
+        register_rest_route('workshop-suite/v1', '/taxonomies', [
             'methods'             => 'GET',
             'callback'            => [__CLASS__, 'get_taxonomies_response'],
             'permission_callback' => function() {

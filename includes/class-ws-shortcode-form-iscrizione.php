@@ -37,7 +37,7 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
         );
 
         wp_localize_script('fvw-form-iscrizione', 'FVW_Form_Vars', [
-            'restUrl' => esc_url_raw(rest_url('fv-workshop/v1/iscrizione/invia')),
+            'restUrl' => esc_url_raw(rest_url('workshop-suite/v1/iscrizione/invia')),
             'nonce'   => wp_create_nonce('wp_rest'),
             'i18n'    => [
                 'sending' => __('Invio in corso...', 'workshop-suite'),
