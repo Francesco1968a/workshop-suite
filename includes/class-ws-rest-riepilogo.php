@@ -44,10 +44,8 @@ final class WS_Rest_Riepilogo implements WS_Module {
 
     private function urls(): array {
         return [
-            'checkpoint' => home_url('/admin-checkpoint/'),
             'contatti'   => home_url('/admin-contatti/'),
             'ai'         => home_url('/admin-ai/'),
-            'apresto'    => home_url('/admin-apresto/'),
         ];
     }
 
@@ -102,13 +100,6 @@ final class WS_Rest_Riepilogo implements WS_Module {
         wp_reset_postdata();
 
         $tot_partecipanti = (int) (new WP_Query(['post_type' => 'partecipante', 'posts_per_page' => -1, 'fields' => 'ids', 'no_found_rows' => true]))->post_count;
-
-        // wv_checkpoint_pending() was never actually defined anywhere in the
-        // legacy codebase — the original also always evaluated this to 0 via
-        // its function_exists() guard. Preserved as-is (behavior-preserving
-        // port), not silently "fixed".
-        $chk_pending = function_exists('wv_checkpoint_pending') ? count(wv_checkpoint_pending()) : 0;
-        $ap_pending  = function_exists('wv_apresto_pending') ? count(wv_apresto_pending(10)) : 0;
 
         $delay_min = (int) get_option('wv_ai_delay_minutes', 60);
         $cutoff_gmt = gmdate('Y-m-d H:i:s', time() - ($delay_min * 60));
@@ -179,9 +170,7 @@ final class WS_Rest_Riepilogo implements WS_Module {
         return new WP_REST_Response([
             'urls' => $this->urls(),
             'todo' => [
-                'chk_pending' => $chk_pending,
                 'ai_coda' => $ai_coda,
-                'ap_pending' => $ap_pending,
                 'inbox_check' => $inbox_check,
                 'pagamenti_count' => $pagamenti_count,
             ],
