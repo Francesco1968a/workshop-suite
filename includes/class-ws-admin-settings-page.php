@@ -683,6 +683,14 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         'is_pro'      => false,
                         'default'     => 1,
                     ],
+                    'global_hub_pro' => [
+                        'icon'        => '🌐',
+                        'title'       => __('Woorkshoop Global Hub & World Map Sync', 'workshop-suite'),
+                        'desc'        => __('Sincronizza in automatico i tuoi workshop ed eventi sulla directory globale woorkshoop.space / workshopsuite.pro e sulla mappa interattiva mondiale.', 'workshop-suite'),
+                        'badge'       => 'GLOBAL HUB',
+                        'is_pro'      => false,
+                        'default'     => 1,
+                    ],
                 ];
             ?>
                 <?php if (!$is_pro_active) : ?>
@@ -800,6 +808,23 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     }
                     </style>
 
+                    <div class="ws-card-native" style="margin-top: 24px; padding: 20px; border-left: 4px solid #00d2b4; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                                <span>🌐</span> <?php esc_html_e('Sincronizzazione Manuale Global Hub & Mappa Mondiale', 'workshop-suite'); ?>
+                            </h4>
+                            <p style="margin: 0; font-size: 13px; color: #64748b;">
+                                <?php esc_html_e('Invia in un colpo solo tutti i tuoi workshop ed eventi pubblicati alla directory workshopsuite.pro e alla mappa interattiva.', 'workshop-suite'); ?>
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="ws-sync-hub-msg" style="font-size: 13px; font-weight: 600;"></span>
+                            <button type="button" class="button button-primary" id="btn-sync-hub-now" onclick="wsSyncHubNow(this)" style="background: linear-gradient(135deg, #0088ff, #00d2b4); border-color: transparent; color: #fff; font-weight: 600; padding: 4px 14px; height: 34px;">
+                                🚀 <?php esc_html_e('Sincronizza tutti i Workshop con l\'Hub adesso', 'workshop-suite'); ?>
+                            </button>
+                        </div>
+                    </div>
+
                     <script>
                     function wsToggleModuleLive(checkbox, modKey) {
                         const card = checkbox.closest('.ws-card-native');
@@ -828,6 +853,41 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             console.log('WS Module Toggled:', data);
                         })
                         .catch(err => console.error('Error toggling module:', err));
+                    }
+
+                    function wsSyncHubNow(btn) {
+                        const msgEl = document.getElementById('ws-sync-hub-msg');
+                        btn.disabled = true;
+                        btn.textContent = '⏳ Sincronizzazione in corso...';
+                        if (msgEl) {
+                            msgEl.textContent = '';
+                            msgEl.style.color = '#2271b1';
+                        }
+
+                        fetch('<?php echo esc_url_raw(rest_url('workshop-suite/v1/admin/sync-hub-now')); ?>', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            btn.disabled = false;
+                            btn.textContent = '🚀 Sincronizza tutti i Workshop con l\'Hub adesso';
+                            if (msgEl) {
+                                msgEl.textContent = data.msg || 'Sincronizzazione completata!';
+                                msgEl.style.color = data.success ? '#10b981' : '#ef4444';
+                            }
+                        })
+                        .catch(err => {
+                            btn.disabled = false;
+                            btn.textContent = '🚀 Sincronizza tutti i Workshop con l\'Hub adesso';
+                            if (msgEl) {
+                                msgEl.textContent = 'Errore di rete.';
+                                msgEl.style.color = '#ef4444';
+                            }
+                        });
                     }
                     </script>
 

@@ -47,6 +47,20 @@ final class WS_Rest_Admin implements WS_Module {
         register_rest_route($ns, '/admin/locandine-modelli', ['methods' => 'GET', 'callback' => [$this, 'get_modelli_locandine'], 'permission_callback' => $perm]);
         register_rest_route($ns, '/admin/locandine-modelli', ['methods' => 'POST', 'callback' => [$this, 'salva_modello_locandina'], 'permission_callback' => $perm]);
         register_rest_route($ns, '/admin/locandine-modelli/(?P<id>[a-zA-Z0-9_\-]+)', ['methods' => 'DELETE', 'callback' => [$this, 'elimina_modello_locandina'], 'permission_callback' => $perm]);
+        register_rest_route($ns, '/admin/sync-hub-now', ['methods' => 'POST', 'callback' => [$this, 'sync_hub_now'], 'permission_callback' => $perm]);
+    }
+
+    public function sync_hub_now(WP_REST_Request $request): WP_REST_Response {
+        if (!class_exists('WS_Hub_Sync')) {
+            require_once WS_PATH . 'includes/class-ws-hub-sync.php';
+        }
+        $results = WS_Hub_Sync::sync_all_published_events();
+        return new WP_REST_Response([
+            'success' => true,
+            'synced'  => $results['synced'] ?? 0,
+            'failed'  => $results['failed'] ?? 0,
+            'msg'     => sprintf(__('Sincronizzazione completata: %d workshop inviati all\'Hub con successo!', 'workshop-suite'), $results['synced'] ?? 0),
+        ], 200);
     }
 
     // ───────────────────────── shared read helpers ─────────────────────────
