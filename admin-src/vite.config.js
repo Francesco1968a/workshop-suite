@@ -15,6 +15,8 @@ const ENTRIES = {
   archivio: fileURLToPath(new URL('./src/archivio/main.js', import.meta.url)),
   messaggi: fileURLToPath(new URL('./src/messaggi/main.js', import.meta.url)),
   riepilogo: fileURLToPath(new URL('./src/riepilogo/main.js', import.meta.url)),
+  partecipante: fileURLToPath(new URL('./src/partecipante/main.js', import.meta.url)),
+  'partecipanti-lista': fileURLToPath(new URL('./src/partecipanti-lista/main.js', import.meta.url)),
 };
 
 const target = process.env.WS_BUNDLE || 'calendario';
