@@ -60,6 +60,13 @@ The poster builder operates entirely client-side using the HTML5 Canvas API. It 
 
 == Changelog ==
 
+= 1.1.0 =
+* Category price and deposit fields, with `[ws_prezzo]`/`[ws_acconto]` shortcodes.
+* Payment status tracking on registrations (pending / deposit paid / paid in full).
+* Category price/deposit prefill in the attendee intake form.
+* Category-scoped date filtering for the registration form shortcode.
+* Ongoing rebrand cleanup and internal hardening.
+
 = 1.0.0 =
 * Initial public release on WordPress.org.
 * All-in-one Event Manager with category and format configuration.

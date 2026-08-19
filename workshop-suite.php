@@ -3,7 +3,7 @@
  * Plugin Name: Workshop Suite — All-in-One Event Manager, CRM & Social Banner Builder
  * Plugin URI: https://francescoverolino.com/workshop-suite
  * Description: The complete all-in-one suite for WordPress to manage workshops, courses and events, participant CRM with timeline tracking, automatic T-15 email reminders, and social poster graphic builder.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Francesco Verolino
  * Author URI: https://francescoverolino.com
  * License: GPLv2 or later
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) exit;
 
 define('WS_PATH', plugin_dir_path(__FILE__));
 define('WS_URL', plugin_dir_url(__FILE__));
-define('WS_VERSION', '1.0.0');
+define('WS_VERSION', '1.1.0');
 
 add_action('init', function () {
     load_plugin_textdomain('workshop-suite', false, dirname(plugin_basename(__FILE__)) . '/languages');
