@@ -60,33 +60,57 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
 
         $atts = shortcode_atts([
             'evento_id' => 0,
+            'categoria' => '',
         ], $atts, 'fv_form_iscrizione');
 
         $evento_id = (int) $atts['evento_id'];
-        
-        // Se non specificato nello shortcode, prova a rilevare l'evento o la categoria dalla pagina corrente
+
+        // Categoria esplicita (attributo) o rilevata dalla pagina corrente.
+        $categoria_term = null;
+        if ($atts['categoria']) {
+            $categoria_term = get_term_by('slug', sanitize_title($atts['categoria']), 'categoria_evento');
+            if (is_wp_error($categoria_term)) $categoria_term = null;
+        }
+
         global $post;
-        if (!$evento_id && $post) {
+        if (!$categoria_term && !$evento_id && $post) {
             if ($post->post_type === 'evento') {
                 $evento_id = $post->ID;
             } else {
                 $url = get_permalink($post->ID);
-                $term = WS_Data::find_categoria_by_url($url);
-                if ($term) {
-                    $eventi = WS_Fluent_Forms_Intake::eventi_per_categoria_array($term->term_id);
-                    if (!empty($eventi)) {
-                        $evento_id = $eventi[0]['id'];
-                    }
-                }
+                $categoria_term = WS_Data::find_categoria_by_url($url);
             }
         }
+
+        // Se la pagina/attributo è legata a una categoria, filtra il dropdown
+        // "Data di interesse" solo sugli eventi di quella categoria.
+        $eventi_categoria = [];
+        if ($categoria_term) {
+            $eventi_categoria = WS_Fluent_Forms_Intake::eventi_per_categoria_array($categoria_term->term_id);
+            if (!$evento_id && !empty($eventi_categoria)) {
+                $evento_id = $eventi_categoria[0]['id'];
+            }
+        }
+        $show_dropdown = count($eventi_categoria) > 1;
 
         ob_start();
         ?>
         <div class="ws-form-wrapper" id="ws-form-container">
             <form id="ws-registration-form" class="ws-form">
-                <input type="hidden" name="evento_id" value="<?php echo esc_attr($evento_id); ?>">
-                
+                <?php if ($show_dropdown): ?>
+                    <div class="ws-form-group">
+                        <label for="ws-evento-id"><?php esc_html_e('Data di interesse', 'workshop-suite'); ?> <span class="req">*</span></label>
+                        <select id="ws-evento-id" name="evento_id" class="ws-select" required>
+                            <option value=""><?php esc_html_e('Seleziona una data', 'workshop-suite'); ?></option>
+                            <?php foreach ($eventi_categoria as $ev): ?>
+                                <option value="<?php echo esc_attr($ev['id']); ?>" <?php selected($evento_id, $ev['id']); ?>><?php echo esc_html($ev['label']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php else: ?>
+                    <input type="hidden" name="evento_id" value="<?php echo esc_attr($evento_id); ?>">
+                <?php endif; ?>
+
                 <!-- Honeypot anti-spam -->
                 <div class="ws-honeypot" aria-hidden="true">
                     <input type="text" name="website_url" tabindex="-1" autocomplete="off">

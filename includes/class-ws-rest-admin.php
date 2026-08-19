@@ -588,12 +588,11 @@ final class WS_Rest_Admin implements WS_Module {
 
         $add_shortcode = $request->get_param('add_shortcode');
         $add_shortcode = $add_shortcode === null ? true : (bool) $add_shortcode;
-        $content = $add_shortcode ? '[eventi_categoria slug="' . $term->slug . '"]' : '';
 
         $page_id = wp_insert_post([
             'post_type'    => 'page',
             'post_title'   => $title,
-            'post_content' => $content,
+            'post_content' => '',
             'post_status'  => 'publish',
         ], true);
 
@@ -601,11 +600,47 @@ final class WS_Rest_Admin implements WS_Module {
             return new WP_Error('failed', $page_id->get_error_message(), ['status' => 500]);
         }
 
+        if ($add_shortcode) {
+            $this->ensure_categoria_shortcodes($page_id, $term->slug);
+        }
+
         return new WP_REST_Response([
             'id'    => $page_id,
             'title' => $title,
             'url'   => get_permalink($page_id),
         ]);
+    }
+
+    /**
+     * Ensures a categoria's linked page carries both shortcodes
+     * ([eventi_categoria] and the registration form), without duplicating
+     * either one if already present — preserves any existing layout/text.
+     */
+    private function ensure_categoria_shortcodes(int $page_id, string $slug): void {
+        $page = get_post($page_id);
+        if (!$page || $page->post_type !== 'page') return;
+
+        $content = (string) $page->post_content;
+        $additions = [];
+
+        if (strpos($content, '[eventi_categoria') === false) {
+            $additions[] = '[eventi_categoria slug="' . $slug . '"]';
+        }
+
+        $has_form = strpos($content, '[ws_form_iscrizione') !== false
+            || strpos($content, '[fv_form_iscrizione') !== false
+            || strpos($content, '[fvw_form_iscrizione') !== false;
+        if (!$has_form) {
+            $additions[] = '[ws_form_iscrizione categoria="' . $slug . '"]';
+        }
+
+        if (empty($additions)) return;
+
+        $new_content = trim($content) !== ''
+            ? rtrim($content) . "\n\n" . implode("\n\n", $additions)
+            : implode("\n\n", $additions);
+
+        wp_update_post(['ID' => $page_id, 'post_content' => $new_content]);
     }
 
     public function crea_categoria(WP_REST_Request $request) {
@@ -629,6 +664,15 @@ final class WS_Rest_Admin implements WS_Module {
         if ($url) {
             WS_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
             update_term_meta($tid, 'url_pagina', $url);
+            $linked_page_id = url_to_postid($url);
+            if ($linked_page_id) {
+                // wp_insert_term()'s return array has no 'slug' key, only
+                // term_id/term_taxonomy_id — fetch the real term for it.
+                $fresh_term = get_term($tid, 'categoria_evento');
+                if ($fresh_term && !is_wp_error($fresh_term)) {
+                    $this->ensure_categoria_shortcodes($linked_page_id, $fresh_term->slug);
+                }
+            }
         }
         if ($foto) {
             WS_Data::update_field('foto_categoria', $foto, 'categoria_evento_' . $tid);
@@ -665,6 +709,15 @@ final class WS_Rest_Admin implements WS_Module {
         wp_update_term($tid, 'categoria_evento', ['name' => $nome]);
         WS_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
         update_term_meta($tid, 'url_pagina', $url);
+        if ($url) {
+            $linked_page_id = url_to_postid($url);
+            if ($linked_page_id) {
+                $fresh_term = get_term($tid, 'categoria_evento');
+                if ($fresh_term && !is_wp_error($fresh_term)) {
+                    $this->ensure_categoria_shortcodes($linked_page_id, $fresh_term->slug);
+                }
+            }
+        }
         WS_Data::update_field('foto_categoria', $foto, 'categoria_evento_' . $tid);
         update_term_meta($tid, 'foto_categoria', $foto);
         WS_Data::update_field('contesto_ai', $contesto_ai, 'categoria_evento_' . $tid);
