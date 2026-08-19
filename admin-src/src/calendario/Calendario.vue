@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { showToast } from '../shared/toast.js';
+import MonthCalendar from './MonthCalendar.vue';
 
 const url = ref('');
 const webcal = ref('');
+const eventi = ref([]);
 const urlInput = ref(null);
 
 async function load() {
@@ -13,6 +15,7 @@ async function load() {
   const data = await res.json();
   url.value = data.url;
   webcal.value = data.webcal;
+  eventi.value = data.eventi || [];
 }
 
 async function copyUrl() {
@@ -30,64 +33,73 @@ onMounted(load);
 
 <template>
   <div class="wvcal">
-    <h2>Calendario Workshop · Sottoscrizione</h2>
+    <h2>Calendario Workshop</h2>
 
-    <div class="card">
-      <h3>URL del calendario</h3>
-      <div class="url-box">
-        <input
-          ref="urlInput"
-          type="text"
-          class="url"
-          :value="url"
-          readonly
-          @click="($event) => $event.target.select()"
-        />
-        <button type="button" class="btn accent" @click="copyUrl">📋 Copia</button>
-        <a class="btn" :href="webcal">📅 Aggiungi</a>
+    <div class="wvcal-layout">
+      <div class="wvcal-col-main">
+        <MonthCalendar :eventi="eventi" />
       </div>
-      <div class="hint">
-        Il bottone <strong>Aggiungi</strong> apre il tuo calendario di sistema (su iPhone/Mac →
-        Apple Calendar, su Windows → Outlook).<br />
-        Per Google Calendar usa <strong>Copia</strong> + istruzioni sotto.
-      </div>
-    </div>
 
-    <div class="card">
-      <h3>📱 Apple Calendar (iPhone / Mac / iPad)</h3>
-      <ol>
-        <li>Clicca il bottone <strong>📅 Aggiungi</strong> qui sopra dal dispositivo Apple.</li>
-        <li>Si apre Calendario → click <strong>Iscriviti</strong>.</li>
-        <li>
-          Conferma. Imposta <strong>Aggiornamento automatico: Ogni 15 minuti</strong> (o orario).
-        </li>
-      </ol>
-      <div class="hint">
-        In alternativa: Calendario → File → Nuova sottoscrizione calendario → incolla l'URL.
-      </div>
-    </div>
+      <div class="wvcal-col-side">
+        <div class="card">
+          <h3>URL del calendario</h3>
+          <div class="url-box">
+            <input
+              ref="urlInput"
+              type="text"
+              class="url"
+              :value="url"
+              readonly
+              @click="($event) => $event.target.select()"
+            />
+            <button type="button" class="btn accent" @click="copyUrl">📋 Copia</button>
+            <a class="btn" :href="webcal">📅 Aggiungi</a>
+          </div>
+          <div class="hint">
+            Il bottone <strong>Aggiungi</strong> apre il tuo calendario di sistema (su iPhone/Mac →
+            Apple Calendar, su Windows → Outlook).<br />
+            Per Google Calendar usa <strong>Copia</strong> + istruzioni sotto.
+          </div>
+        </div>
 
-    <div class="card">
-      <h3>📧 Google Calendar (desktop)</h3>
-      <ol>
-        <li>
-          Apri
-          <a href="https://calendar.google.com" target="_blank" class="link-accent"
-            >calendar.google.com</a
-          >
-          sul computer.
-        </li>
-        <li>
-          Sidebar sinistra → <strong>Altri calendari</strong> → click sul <strong>+</strong> →
-          <strong>Da URL</strong>.
-        </li>
-        <li>Incolla l'URL → <strong>Aggiungi calendario</strong>.</li>
-      </ol>
-      <div class="hint">
-        ⚠ <strong>Importante</strong>: Google rinfresca i calendari sottoscritti ogni 8–24 ore (non
-        puoi cambiarlo). Per realtime su Google ci vuole l'integrazione API → un altro
-        snippet.<br />
-        Una volta aggiunto, lo vedi anche sull'app Google Calendar di telefono e tablet.
+        <div class="card">
+          <h3>📱 Apple Calendar (iPhone / Mac / iPad)</h3>
+          <ol>
+            <li>Clicca il bottone <strong>📅 Aggiungi</strong> qui sopra dal dispositivo Apple.</li>
+            <li>Si apre Calendario → click <strong>Iscriviti</strong>.</li>
+            <li>
+              Conferma. Imposta <strong>Aggiornamento automatico: Ogni 15 minuti</strong> (o
+              orario).
+            </li>
+          </ol>
+          <div class="hint">
+            In alternativa: Calendario → File → Nuova sottoscrizione calendario → incolla l'URL.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📧 Google Calendar (desktop)</h3>
+          <ol>
+            <li>
+              Apri
+              <a href="https://calendar.google.com" target="_blank" class="link-accent"
+                >calendar.google.com</a
+              >
+              sul computer.
+            </li>
+            <li>
+              Sidebar sinistra → <strong>Altri calendari</strong> → click sul <strong>+</strong> →
+              <strong>Da URL</strong>.
+            </li>
+            <li>Incolla l'URL → <strong>Aggiungi calendario</strong>.</li>
+          </ol>
+          <div class="hint">
+            ⚠ <strong>Importante</strong>: Google rinfresca i calendari sottoscritti ogni 8–24 ore
+            (non puoi cambiarlo). Per realtime su Google ci vuole l'integrazione API → un altro
+            snippet.<br />
+            Una volta aggiunto, lo vedi anche sull'app Google Calendar di telefono e tablet.
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -96,13 +108,26 @@ onMounted(load);
 <style scoped>
 .wvcal {
   color: #2c3338;
-  max-width: 720px;
+  max-width: 1200px;
   font-family:
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
     Roboto,
     sans-serif;
+}
+
+.wvcal-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .wvcal-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .wvcal h2 {
