@@ -24,10 +24,11 @@ final class WS_Shortcode_Eventi_Categoria implements WS_Module {
         $atts = shortcode_atts([
             'slug'      => '',
             'max_width' => '1100',
-            // 'light' (default): dark text, readable on a light/white page
-            // background. 'dark': the original white-text palette, for use
-            // on pages with a black/dark background.
-            'theme'     => 'light',
+            // 'dark' (default): white text, matches this site's original
+            // design — every real page using this shortcode has a black
+            // background. 'light': dark text, for pages with a light/white
+            // background instead.
+            'theme'     => 'dark',
         ], $atts);
         if (!$atts['slug']) return '<p>Specifica slug categoria.</p>';
 
