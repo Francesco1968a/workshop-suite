@@ -70,6 +70,7 @@ final class WS_Plugin {
             new WS_Shortcode_Riepilogo(),
             new WS_Rest_Admin(),
             new WS_Shortcode_Admin(),
+            new WS_Shortcode_Categorie(),
             new WS_Admin_Nav_Filter(),
             new WS_T15_Reminder(),
             new WS_Rest_Messaggi(),
@@ -123,6 +124,7 @@ require_once WS_PATH . 'includes/class-ws-rest-riepilogo.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-riepilogo.php';
 require_once WS_PATH . 'includes/class-ws-rest-admin.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-admin.php';
+require_once WS_PATH . 'includes/class-ws-shortcode-categorie.php';
 require_once WS_PATH . 'includes/class-ws-admin-nav-filter.php';
 require_once WS_PATH . 'includes/class-ws-t15-reminder.php';
 require_once WS_PATH . 'includes/class-ws-rest-messaggi.php';
