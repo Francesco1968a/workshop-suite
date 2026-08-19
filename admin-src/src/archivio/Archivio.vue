@@ -1,0 +1,211 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const eventi = ref([]);
+const anni = ref([]);
+const anno = ref(0);
+const loading = ref(false);
+
+function apiUrl(path) {
+  return window.WS_CONFIG.restUrl + path;
+}
+
+async function load() {
+  loading.value = true;
+  try {
+    const url = new URL(apiUrl('archivio'));
+    if (anno.value) url.searchParams.set('anno', anno.value);
+    const res = await fetch(url, { headers: { 'X-WP-Nonce': window.WS_CONFIG.nonce } });
+    const data = await res.json();
+    eventi.value = data.eventi;
+    anni.value = data.anni;
+  } finally {
+    loading.value = false;
+  }
+}
+
+function filtraAnno(a) {
+  anno.value = a;
+  const url = new URL(window.location.href);
+  if (a) {
+    url.searchParams.set('anno', a);
+  } else {
+    url.searchParams.delete('anno');
+  }
+  window.history.replaceState({}, '', url);
+  load();
+}
+
+onMounted(() => {
+  const url = new URL(window.location.href);
+  anno.value = parseInt(url.searchParams.get('anno') || '0', 10);
+  load();
+});
+</script>
+
+<template>
+  <div class="wva">
+    <h2>Archivio Workshop</h2>
+    <div class="wva-intro">Eventi conclusi · ordinati dal più recente</div>
+
+    <div v-if="anni.length" class="wva-anni">
+      <a href="#" :class="{ on: !anno }" @click.prevent="filtraAnno(0)">Tutti</a>
+      <a v-for="a in anni" :key="a" href="#" :class="{ on: a === anno }" @click.prevent="filtraAnno(a)">{{ a }}</a>
+    </div>
+
+    <div v-if="loading" class="wva-empty">Caricamento…</div>
+    <template v-else>
+      <div v-if="!eventi.length" class="wva-empty">Nessun evento in archivio.</div>
+      <div v-else class="wva-grid">
+        <div v-for="e in eventi" :key="e.id" class="wva-card">
+          <div class="wva-card-foto" :style="e.foto ? { backgroundImage: `url('${e.foto}')` } : {}"></div>
+          <div class="wva-card-body">
+            <div class="wva-card-cat">{{ e.cat_name }}</div>
+            <div class="wva-card-periodo">{{ e.periodo }}</div>
+            <div v-if="e.ora" class="wva-card-meta">ore {{ e.ora }}</div>
+            <div class="wva-card-stats">
+              Partecipanti finali
+              <strong>{{ e.occupati }}/{{ e.totali }}</strong>
+            </div>
+            <div class="wva-card-actions">
+              <a v-if="e.link_partecipanti" class="wva-link" :href="e.link_partecipanti">Partecipanti</a>
+              <a v-if="e.link_gestisci" class="wva-link" :href="e.link_gestisci">Apri</a>
+              <a v-if="e.link_pagina" class="wva-link" :href="e.link_pagina" target="_blank" rel="noopener">Pagina</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+</template>
+
+<style scoped>
+.wva {
+  color: #2c3338;
+  max-width: 100%;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+}
+
+.wva h2 {
+  color: #1d2327;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #dcdcde;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+}
+
+.wva-intro {
+  color: #646970;
+  font-size: 13px;
+  margin: -10px 0 16px;
+}
+
+.wva-anni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.wva-anni a {
+  padding: 4px 10px;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  color: #2c3338;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.wva-anni a.on {
+  background: #2271b1;
+  border-color: #2271b1;
+  color: #fff;
+}
+
+.wva-empty {
+  text-align: center;
+  color: #646970;
+  padding: 40px 0;
+  font-size: 14px;
+  background: #fff;
+  border: 1px dashed #c3c4c7;
+  border-radius: 4px;
+}
+
+.wva-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.wva-card {
+  background: #ffffff;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.15s ease-in-out;
+}
+
+.wva-card:hover {
+  border-color: #2271b1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.wva-card-foto {
+  height: 120px;
+  border-radius: 4px;
+  background-color: #f0f0f1;
+  background-size: cover;
+  background-position: center;
+}
+
+.wva-card-cat {
+  color: #1d2327;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.wva-card-periodo {
+  color: #2c3338;
+  font-size: 13px;
+}
+
+.wva-card-meta {
+  color: #646970;
+  font-size: 12px;
+}
+
+.wva-card-stats {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f1;
+  font-size: 13px;
+  color: #2c3338;
+}
+
+.wva-card-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.wva-link {
+  color: #2271b1;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.wva-link:hover {
+  text-decoration: underline;
+}
+</style>
