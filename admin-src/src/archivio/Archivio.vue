@@ -208,4 +208,70 @@ onMounted(() => {
 .wva-link:hover {
   text-decoration: underline;
 }
+
+/* Frontend dark theme — applied only when embedded via shortcode on the
+   public site with "Tema Frontend Predefinito" set to Dark (see
+   WS_Shortcode_Base::render(), which wraps output in .ws-theme-dark). */
+.ws-theme-dark .wva {
+  color: #fff;
+}
+
+.ws-theme-dark .wva h2 {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.ws-theme-dark .wva-intro {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wva-anni a {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  background: transparent;
+}
+
+.ws-theme-dark .wva-anni a.on {
+  background: #ff6608;
+  border-color: #ff6608;
+  color: #fff;
+}
+
+.ws-theme-dark .wva-empty {
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ws-theme-dark .wva-card {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.ws-theme-dark .wva-card:hover {
+  border-color: #ff6608;
+  box-shadow: none;
+}
+
+.ws-theme-dark .wva-card-cat {
+  color: #ff6608;
+}
+
+.ws-theme-dark .wva-card-periodo {
+  color: #fff;
+}
+
+.ws-theme-dark .wva-card-meta {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wva-card-stats {
+  color: #fff;
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.ws-theme-dark .wva-link {
+  color: #ff9a6f;
+}
 </style>

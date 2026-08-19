@@ -343,4 +343,105 @@ onMounted(load);
   padding: 6px 0;
   font-size: 13px;
 }
+
+/* Light variant — this panel's base style above is dark by default (it
+   never had a wp-admin-backend equivalent to match), so this is the one
+   panel needing a .ws-theme-light override instead of .ws-theme-dark.
+   See WS_Shortcode_Base::render(). */
+.ws-theme-light .wvring {
+  color: #1d2327;
+}
+
+.ws-theme-light .wvring h2 {
+  color: #1d2327;
+  border-bottom-color: #dcdcde;
+}
+
+.ws-theme-light .wvring h3 {
+  color: #646970;
+}
+
+.ws-theme-light .wvring .card {
+  border-color: #c3c4c7;
+  background: #fff;
+}
+
+.ws-theme-light .wvring label {
+  color: #646970;
+}
+
+.ws-theme-light .wvring button {
+  color: #2c3338;
+  border-color: #8c8f94;
+}
+
+.ws-theme-light .wvring button:hover:not(:disabled) {
+  color: #fff;
+  background: #2271b1;
+  border-color: #2271b1;
+}
+
+.ws-theme-light .wvring button.accent {
+  color: #008a20;
+  border-color: #008a20;
+}
+
+.ws-theme-light .wvring button.accent:hover:not(:disabled) {
+  color: #fff;
+  background: #008a20;
+}
+
+.ws-theme-light .wvring .btn-ghost {
+  color: #646970;
+  border-color: #c3c4c7;
+}
+
+.ws-theme-light .wvring .notice {
+  color: #008a20;
+  background: rgba(0, 138, 32, 0.06);
+  border-left-color: #008a20;
+}
+
+.ws-theme-light .wvring .hint {
+  color: #646970;
+}
+
+.ws-theme-light .wvring .item {
+  border-bottom-color: #f0f0f1;
+}
+
+.ws-theme-light .wvring .item strong {
+  color: #1d2327;
+}
+
+.ws-theme-light .wvring .meta {
+  color: #646970;
+}
+
+.ws-theme-light .wvring .empty {
+  color: #646970;
+}
+
+.ws-theme-light .wvring .info-box {
+  color: #2c3338;
+  background: #f6f7f7;
+  border-left-color: #2271b1;
+}
+
+.ws-theme-light .wvring .row-actions {
+  border-top-color: #f0f0f1;
+}
+
+.ws-theme-light .wvring .countdown {
+  color: #b32d2e;
+  background: #fcf0f1;
+}
+
+.ws-theme-light .wvring .prossimi-head {
+  color: #646970;
+}
+
+.ws-theme-light .wvring .prossimi-row {
+  color: #2c3338;
+}
 </style>

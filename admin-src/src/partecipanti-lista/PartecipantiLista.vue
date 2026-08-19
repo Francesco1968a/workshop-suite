@@ -170,4 +170,65 @@ onMounted(load);
   background: #edfaef;
   border-color: #c3e6cb;
 }
+
+/* Frontend dark theme — see WS_Shortcode_Base::render(). */
+.ws-theme-dark .wvpl {
+  color: #fff;
+}
+
+.ws-theme-dark .wvpl h2 {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.ws-theme-dark .wvpl-search {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  box-shadow: none;
+}
+
+.ws-theme-dark .wvpl-search:focus {
+  border-color: #ff6608;
+  box-shadow: 0 0 0 1px #ff6608;
+}
+
+.ws-theme-dark .wvpl-count {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvpl-row {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.ws-theme-dark .wvpl-row:hover {
+  border-color: #ff6608;
+  box-shadow: none;
+}
+
+.ws-theme-dark .wvpl-nome {
+  color: #ff9a6f;
+}
+
+.ws-theme-dark .wvpl-nome:hover {
+  color: #ff6608;
+}
+
+.ws-theme-dark .wvpl-meta {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvpl-badge {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ws-theme-dark .wvpl-badge--ok {
+  color: #7ddc8e;
+  background: rgba(125, 220, 142, 0.1);
+  border-color: #7ddc8e;
+}
 </style>

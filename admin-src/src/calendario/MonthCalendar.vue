@@ -235,4 +235,58 @@ function eventUrl(id) {
     font-size: 9px;
   }
 }
+
+/* Frontend dark theme — see WS_Shortcode_Base::render(). */
+.ws-theme-dark .wvcal-month {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.ws-theme-dark .wvcal-month-label {
+  color: #fff;
+}
+
+.ws-theme-dark .btn {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.ws-theme-dark .btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ws-theme-dark .wvcal-day-name {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvcal-cell {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.ws-theme-dark .wvcal-cell--empty {
+  border-color: transparent;
+}
+
+.ws-theme-dark .wvcal-cell--today {
+  border-color: #ff6608;
+  background: rgba(255, 102, 8, 0.08);
+}
+
+.ws-theme-dark .wvcal-daynum {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvcal-chip {
+  background: #ff6608;
+}
+
+.ws-theme-dark .wvcal-chip:hover {
+  background: #e05a00;
+}
+
+.ws-theme-dark .wvcal-chip--soldout {
+  background: #c9302c;
+}
 </style>

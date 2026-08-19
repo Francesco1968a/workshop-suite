@@ -227,4 +227,62 @@ onMounted(load);
 .link-accent {
   color: #2271b1;
 }
+
+/* Frontend dark theme — see WS_Shortcode_Base::render(). */
+.ws-theme-dark .wvcal {
+  color: #fff;
+}
+
+.ws-theme-dark .wvcal h2 {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.ws-theme-dark .card {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.ws-theme-dark .card h3 {
+  color: #fff;
+}
+
+.ws-theme-dark .card ol {
+  color: #fff;
+}
+
+.ws-theme-dark .url-box .url {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.ws-theme-dark .btn {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.ws-theme-dark .btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ws-theme-dark .btn.accent {
+  background: #ff6608;
+  border-color: #ff6608;
+  color: #fff;
+}
+
+.ws-theme-dark .btn.accent:hover {
+  background: #e05a00;
+}
+
+.ws-theme-dark .hint {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .link-accent {
+  color: #ff9a6f;
+}
 </style>

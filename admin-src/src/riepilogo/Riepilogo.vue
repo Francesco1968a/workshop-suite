@@ -698,4 +698,254 @@ a.wvr-stat-row:hover .val {
   gap: 8px;
   margin-top: 14px;
 }
+
+/* Frontend dark theme — see WS_Shortcode_Base::render(). */
+.ws-theme-dark .wvr {
+  color: #fff;
+}
+
+.ws-theme-dark .wvr h2,
+.ws-theme-dark .wvr h3 {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.ws-theme-dark .wvr-msg {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: #ff6608;
+}
+
+.ws-theme-dark .wvr-section {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+.ws-theme-dark .wvr-todo {
+  background: rgba(255, 102, 8, 0.04);
+  border-color: rgba(255, 102, 8, 0.4);
+}
+
+.ws-theme-dark .wvr-todo h3 {
+  color: #ff6608;
+}
+
+.ws-theme-dark .wvr-todo li strong {
+  color: #ff6608;
+}
+
+.ws-theme-dark .wvr-todo li a {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.ws-theme-dark .wvr-ring-wrap {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fff !important;
+}
+
+.ws-theme-dark a.wvr-ring-wrap:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #ff6608;
+}
+
+.ws-theme-dark .wvr-ring-center .v {
+  color: #fff !important;
+}
+
+.ws-theme-dark .wvr-ring-center .s {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.ws-theme-dark .wvr-ring-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvr-stat-row {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-stat-row .lbl {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ws-theme-dark .wvr-stat-row .val {
+  color: #fff;
+}
+
+.ws-theme-dark a.wvr-stat-row:hover .lbl,
+.ws-theme-dark a.wvr-stat-row:hover .val {
+  color: #ff6608;
+}
+
+.ws-theme-dark .wvr-filtro a {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-filtro a.on {
+  background: #ff6608;
+  border-color: #ff6608;
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-card {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+  color: inherit !important;
+}
+
+.ws-theme-dark .wvr-card:hover {
+  border-color: #ff6608;
+  box-shadow: none;
+}
+
+.ws-theme-dark .wvr-card-cat {
+  color: #ff9a6f;
+}
+
+.ws-theme-dark .wvr-card-date {
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-card-body {
+  color: rgba(255, 255, 255, 0.6);
+  background: transparent;
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.ws-theme-dark .wvr-card-body strong {
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-empty {
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ws-theme-dark .wvr-back {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.ws-theme-dark .wvr-back:hover {
+  color: #ff9a6f !important;
+}
+
+.ws-theme-dark .wvr-evento-ring-col .lbl,
+.ws-theme-dark .wvr-evento-ring-col .sub {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ws-theme-dark .wvr-evento-ring-col .big {
+  color: #fff;
+}
+
+.ws-theme-dark .empty-todo {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .wvr-altri-chip {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-altri-chip:hover {
+  border-color: #ff6608;
+  background: rgba(255, 102, 8, 0.05);
+}
+
+.ws-theme-dark .wvr-altri-chip .st {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ws-theme-dark .wvr-table {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-table th {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+.ws-theme-dark .wvr-table td {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-table td strong {
+  color: #fff !important;
+}
+
+.ws-theme-dark .wvr-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.ws-theme-dark .wvr-badge.wvr-confermato {
+  background: transparent;
+  color: #7ddc8e;
+  border-color: #7ddc8e;
+}
+
+.ws-theme-dark .wvr-badge.wvr-richiesta {
+  background: transparent;
+  color: #ff9a6f;
+  border-color: #ff6608;
+}
+
+.ws-theme-dark .wvr-link {
+  color: #fff !important;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.ws-theme-dark .wvr-link:hover {
+  background: #fff;
+  border-color: #fff;
+  color: #000 !important;
+}
+
+.ws-theme-dark .wvr-link-del {
+  color: #ff6608 !important;
+  border-color: rgba(255, 102, 8, 0.5);
+  background: transparent;
+}
+
+.ws-theme-dark .wvr-link-del:hover {
+  background: #ff6608;
+  border-color: #ff6608;
+  color: #fff !important;
+}
+
+.ws-theme-dark .wvr-dialog-mask {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.ws-theme-dark .wvr-dialog {
+  color: #fff;
+  background: #111;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.ws-theme-dark .wvr-dialog h4 {
+  color: #fff;
+}
+
+.ws-theme-dark .wvr-dialog textarea {
+  color: #fff;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ws-theme-dark .wvr-note-count {
+  color: rgba(255, 255, 255, 0.5);
+}
 </style>
