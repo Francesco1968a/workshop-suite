@@ -85,6 +85,67 @@
     margin-bottom: 20px;
 }
 
+.wv-categorie-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 1400px) {
+    .wv-categorie-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 1000px) {
+    .wv-categorie-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+    .wv-categorie-grid { grid-template-columns: 1fr; }
+}
+
+.wv-catcard-grid {
+    background: #ffffff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    padding: 0;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.wv-catcard-foto {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: #ececec;
+    background-position: center;
+    background-size: cover;
+}
+
+.wv-catcard-grid > span:first-of-type {
+    padding: 14px 14px 0;
+    display: block;
+    color: #1d2327;
+}
+
+.wv-catcard-prossimo {
+    padding: 8px 14px 14px;
+    font-size: 12px;
+    color: #2271b1;
+    font-weight: 600;
+}
+
+.wv-catcard-prossimo--none {
+    color: #646970;
+    font-weight: 400;
+}
+
+.wv-catcard-grid .wv-actions {
+    display: flex;
+    gap: 8px;
+    margin: 0 14px 14px;
+}
+
 .wv-eventi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

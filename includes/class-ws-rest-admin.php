@@ -500,15 +500,28 @@ final class WS_Rest_Admin implements WS_Module {
 
         $categorie = [];
         foreach (get_terms(['taxonomy' => 'categoria_evento', 'hide_empty' => false]) as $t) {
+            $prossimo = null;
+            $pq = new WP_Query([
+                'post_type' => 'evento', 'posts_per_page' => 1, 'no_found_rows' => true,
+                'tax_query' => [['taxonomy' => 'categoria_evento', 'field' => 'term_id', 'terms' => $t->term_id]],
+                'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
+                'meta_query' => [['key' => 'data_fine', 'value' => $this->oggi(), 'compare' => '>=', 'type' => 'DATE']],
+            ]);
+            if ($pq->have_posts()) {
+                $prossimo = WS_Data::format_periodo($pq->posts[0]->ID);
+            }
+
             $categorie[] = [
                 'id' => $t->term_id,
                 'nome' => $t->name,
                 'slug' => $t->slug,
                 'url' => WS_Data::get_field('url_pagina', 'categoria_evento_' . $t->term_id) ?: '',
+                'foto' => WS_Data::get_field('foto_categoria', 'categoria_evento_' . $t->term_id) ?: '',
                 'tipo' => $this->sanitize_tipo((string) WS_Data::get_field('tipo_categoria', 'categoria_evento_' . $t->term_id)),
                 'count' => (int) $t->count,
                 'prezzo' => (float) WS_Data::get_field('prezzo', 'categoria_evento_' . $t->term_id),
                 'acconto' => (float) WS_Data::get_field('acconto', 'categoria_evento_' . $t->term_id),
+                'prossimo_evento' => $prossimo,
             ];
         }
 
