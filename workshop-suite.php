@@ -77,6 +77,7 @@ final class WS_Plugin {
             new WS_Shortcode_Messaggi(),
             new WS_Mail_Poller(),
             new WS_Shortcode_Prossimo(),
+            new WS_Shortcode_Prezzo(),
             new WS_Shortcode_Eventi_Categoria(),
             new WS_Shortcode_Programma(),
             new WS_Fluent_Forms_Intake(),
@@ -130,6 +131,7 @@ require_once WS_PATH . 'includes/class-ws-rest-mail-inbox.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-messaggi.php';
 require_once WS_PATH . 'includes/class-ws-mail-poller.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-prossimo.php';
+require_once WS_PATH . 'includes/class-ws-shortcode-prezzo.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-eventi-categoria.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-programma.php';
 require_once WS_PATH . 'includes/class-ws-fluent-forms-intake.php';
