@@ -13,7 +13,7 @@ final class WS_Shortcode_Partecipante extends WS_Shortcode_Base {
         return !is_admin() || wp_doing_ajax();
     }
 
-    protected function handle(): string  { return 'fvw-partecipante'; }
+    protected function handle(): string  { return 'ws-partecipante'; }
     protected function js_file(): string  { return 'assets/dist/partecipante.js'; }
     protected function css_file(): string { return 'assets/dist/partecipante.css'; }
     protected function app_id(): string   { return 'fvw-partecipante-app'; }

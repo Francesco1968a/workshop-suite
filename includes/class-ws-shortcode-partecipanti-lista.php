@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) exit;
  */
 final class WS_Shortcode_Partecipanti_Lista extends WS_Shortcode_Base {
 
-    protected function handle(): string  { return 'fvw-partecipanti-lista'; }
+    protected function handle(): string  { return 'ws-partecipanti-lista'; }
     protected function js_file(): string  { return 'assets/dist/partecipanti-lista.js'; }
     protected function css_file(): string { return 'assets/dist/partecipanti-lista.css'; }
     protected function app_id(): string   { return 'fvw-partecipanti-lista-app'; }

@@ -22,14 +22,14 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
         if (is_admin()) return;
         
         wp_register_style(
-            'fvw-form-iscrizione',
+            'ws-form-iscrizione',
             WS_URL . 'assets/css/fvw-form-iscrizione.css',
             [],
             WS_VERSION
         );
 
         wp_register_script(
-            'fvw-form-iscrizione',
+            'ws-form-iscrizione',
             WS_URL . 'assets/js/fvw-form-iscrizione.js',
             [],
             WS_VERSION,
@@ -45,15 +45,15 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
                 'error'   => __('Si è verificato un errore. Riprova più tardi.', 'workshop-suite'),
             ],
         ];
-        wp_localize_script('fvw-form-iscrizione', 'WS_Form_Vars', $form_iscrizione_vars);
-        wp_localize_script('fvw-form-iscrizione', 'FVW_Form_Vars', $form_iscrizione_vars);
+        wp_localize_script('ws-form-iscrizione', 'WS_Form_Vars', $form_iscrizione_vars);
+        wp_localize_script('ws-form-iscrizione', 'FVW_Form_Vars', $form_iscrizione_vars);
     }
 
     public function render_shortcode($atts = []): string {
         $atts = is_array($atts) ? $atts : [];
 
-        wp_enqueue_style('fvw-form-iscrizione');
-        wp_enqueue_script('fvw-form-iscrizione');
+        wp_enqueue_style('ws-form-iscrizione');
+        wp_enqueue_script('ws-form-iscrizione');
 
         $atts = shortcode_atts([
             'evento_id' => 0,

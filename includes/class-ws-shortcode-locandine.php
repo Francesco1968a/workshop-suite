@@ -12,7 +12,7 @@ final class WS_Shortcode_Locandine extends WS_Shortcode_Base {
         return WS_Settings::is_module_active('poster_studio', true);
     }
 
-    protected function handle(): string  { return 'fvw-locandine'; }
+    protected function handle(): string  { return 'ws-locandine'; }
     protected function js_file(): string  { return 'assets/dist/locandine.js'; }
     protected function css_file(): string { return 'assets/dist/locandine.css'; }
     protected function app_id(): string   { return 'fvw-locandine-app'; }

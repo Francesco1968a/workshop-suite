@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit;
 /** Vue 3 + Element Plus rewrite of the legacy `workshop_riepilogo` shortcode. */
 final class WS_Shortcode_Riepilogo extends WS_Shortcode_Base {
 
-    protected function handle(): string  { return 'fvw-riepilogo'; }
+    protected function handle(): string  { return 'ws-riepilogo'; }
     protected function js_file(): string  { return 'assets/dist/riepilogo.js'; }
     protected function css_file(): string { return 'assets/dist/riepilogo.css'; }
     protected function app_id(): string   { return 'fvw-riepilogo-app'; }

@@ -94,7 +94,7 @@ final class WS_Onboarding_Wizard implements WS_Module {
 
         $asset_css = WS_PATH . 'assets/dist/admin.css';
         if (file_exists($asset_css)) {
-            wp_enqueue_style('fvw-admin-settings-css', WS_URL . 'assets/dist/admin.css', [], (string) filemtime($asset_css));
+            wp_enqueue_style('ws-admin-settings-css', WS_URL . 'assets/dist/admin.css', [], (string) filemtime($asset_css));
         }
 
         ?>

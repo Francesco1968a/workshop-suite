@@ -15,7 +15,7 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
     }
 
     public function add_module_type(string $tag, string $handle): string {
-        if ($handle !== 'fvw-ringraziamento') return $tag;
+        if ($handle !== 'ws-ringraziamento') return $tag;
         if (strpos($tag, 'type=') !== false) return $tag;
         return str_replace(' src=', ' type="module" src=', $tag);
     }
@@ -29,7 +29,7 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
         $asset_css = WS_PATH . 'assets/dist/ringraziamento.css';
 
         wp_enqueue_script(
-            'fvw-ringraziamento',
+            'ws-ringraziamento',
             WS_URL . 'assets/dist/ringraziamento.js',
             [],
             file_exists($asset_js) ? (string) filemtime($asset_js) : WS_VERSION,
@@ -37,7 +37,7 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
         );
         if (file_exists($asset_css)) {
             wp_enqueue_style(
-                'fvw-ringraziamento',
+                'ws-ringraziamento',
                 WS_URL . 'assets/dist/ringraziamento.css',
                 [],
                 (string) filemtime($asset_css)
@@ -48,8 +48,8 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
             'restUrl' => esc_url_raw(rest_url('workshop-suite/v1/')),
             'nonce'   => wp_create_nonce('wp_rest'),
         ];
-        wp_localize_script('fvw-ringraziamento', 'WS_CONFIG', $ringraziamento_config);
-        wp_localize_script('fvw-ringraziamento', 'FVW_CONFIG', $ringraziamento_config);
+        wp_localize_script('ws-ringraziamento', 'WS_CONFIG', $ringraziamento_config);
+        wp_localize_script('ws-ringraziamento', 'FVW_CONFIG', $ringraziamento_config);
 
         return '<div id="fvw-ringraziamento-app"></div>';
     }

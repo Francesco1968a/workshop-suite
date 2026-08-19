@@ -9,7 +9,7 @@ final class WS_Shortcode_Admin extends WS_Shortcode_Base {
         return !is_admin() || wp_doing_ajax();
     }
 
-    protected function handle(): string  { return 'fvw-admin'; }
+    protected function handle(): string  { return 'ws-admin'; }
     protected function js_file(): string  { return 'assets/dist/admin.js'; }
     protected function css_file(): string { return 'assets/dist/admin.css'; }
     protected function app_id(): string   { return 'fvw-admin-app'; }

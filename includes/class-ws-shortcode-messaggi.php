@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) exit;
  */
 final class WS_Shortcode_Messaggi extends WS_Shortcode_Base {
 
-    protected function handle(): string  { return 'fvw-messaggi'; }
+    protected function handle(): string  { return 'ws-messaggi'; }
     protected function js_file(): string  { return 'assets/dist/messaggi.js'; }
     protected function css_file(): string { return 'assets/dist/messaggi.css'; }
     protected function app_id(): string   { return 'fvw-messaggi-app'; }
