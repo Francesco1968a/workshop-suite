@@ -141,7 +141,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
             __('Categories & Types', 'workshop-suite'),
             __('Categories & Types', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-riepilogo',
+            'workshop-suite-categorie',
             [$this, 'render_riepilogo']
         );
 
@@ -151,7 +151,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
             __('Events & Registrations', 'workshop-suite'),
             __('Events & Registrations', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-eventi-partecipanti',
+            'workshop-suite-eventi',
             [$this, 'render_eventi_partecipanti']
         );
 
@@ -162,7 +162,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 __('Poster Templates', 'workshop-suite'),
                 __('Poster Templates', 'workshop-suite'),
                 'manage_options',
-                'fv-workshop-locandine',
+                'workshop-suite-locandine',
                 [$this, 'render_locandine']
             );
         }
@@ -173,7 +173,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
             __('Contacts & Participants', 'workshop-suite'),
             __('Contacts & Participants', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-partecipanti',
+            'workshop-suite-partecipanti',
             [$this, 'render_partecipanti']
         );
 
@@ -183,7 +183,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
             __('Mail Inbox', 'workshop-suite'),
             __('Mail Inbox', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-messaggi',
+            'workshop-suite-messaggi',
             [$this, 'render_messaggi']
         );
 
@@ -193,7 +193,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
             __('Admin Calendar', 'workshop-suite'),
             __('Admin Calendar', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-calendario',
+            'workshop-suite-calendario',
             [$this, 'render_calendario']
         );
 
@@ -203,7 +203,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
             __('Events Archive', 'workshop-suite'),
             __('Events Archive', 'workshop-suite'),
             'manage_options',
-            'fv-workshop-archivio',
+            'workshop-suite-archivio',
             [$this, 'render_archivio']
         );
     }
