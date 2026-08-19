@@ -109,6 +109,29 @@ final class WS_Rest_Partecipante implements WS_Module {
                 'prima_iscr_fmt'  => $stats['prima_iscr'] ? date_i18n('d/m/Y', strtotime($stats['prima_iscr'])) : null,
                 'giorni_ultimo'   => $stats['giorni_ultimo'],
             ],
+            'iscrizioni' => array_map(function ($isc_id) {
+                $evento_id = (int) WS_Data::get_field('evento', $isc_id);
+                $corso_id = (int) WS_Data::get_field('corso', $isc_id);
+                if ($evento_id) {
+                    $label = WS_Data::evento_label($evento_id);
+                } elseif ($corso_id) {
+                    $label = get_the_title($corso_id);
+                } else {
+                    $label = get_the_title($isc_id);
+                }
+                $stato = WS_Data::get_field('stato', $isc_id) === 'confermato' ? 'confermato' : 'richiesta';
+                $stato_pagamento = (string) WS_Data::get_field('stato_pagamento', $isc_id);
+                if (!in_array($stato_pagamento, ['in_attesa', 'acconto_pagato', 'saldato'], true)) {
+                    $stato_pagamento = 'in_attesa';
+                }
+                return [
+                    'id'              => $isc_id,
+                    'evento'          => $label,
+                    'stato'           => $stato,
+                    'stato_pagamento' => $stato_pagamento,
+                    'data_fmt'        => get_the_date('d/m/Y', $isc_id),
+                ];
+            }, WS_Data::iscrizioni_partecipante($pid)),
             'timeline' => array_map(function ($e) {
                 $when = strtotime($e['t']);
                 return [
