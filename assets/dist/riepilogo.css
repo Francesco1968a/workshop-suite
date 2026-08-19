@@ -287,6 +287,50 @@ a.wvr-stat-row:hover .val {
     transform: translateY(-1px);
 }
 
+/* Layout mai scritto in origine: la foto riempiva il contenitore senza
+   alcun vincolo di larghezza. Prima colonna = foto (360px), seconda
+   colonna = ring/todo/altri-eventi impilati. */
+.wvr-evento-grid {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 20px;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+.wvr-card-hero {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+}
+
+.wvr-evento-ring-col {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.wvr-evento-todo-col {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.wvr-evento-right {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+@media (max-width: 780px) {
+    .wvr-evento-grid {
+        grid-template-columns: 1fr;
+    }
+    .wvr-card-hero,
+    .wvr-evento-ring-col,
+    .wvr-evento-todo-col,
+    .wvr-evento-right {
+        grid-column: 1;
+        grid-row: auto;
+    }
+}
+
 .wvr-card-foto {
     aspect-ratio: 2;
     background-color: #f0f0f1;
