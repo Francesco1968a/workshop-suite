@@ -338,7 +338,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
         $settings = WS_Settings::get_all();
         $default_theme = WS_Settings::get('default_theme_mode', 'dark');
         ?>
-        <div class="wrap ws-theme-wrapper fvw-theme-<?php echo esc_attr($default_theme); ?> ws-dashboard-wrapper" id="ws-dashboard-wrapper">
+        <div class="wrap ws-theme-wrapper ws-theme-<?php echo esc_attr($default_theme); ?> ws-dashboard-wrapper" id="ws-dashboard-wrapper">
             
             <div class="ws-theme-switch-bar">
                 <span class="ws-s1"><?php esc_html_e('Tema:', 'workshop-suite'); ?></span>
