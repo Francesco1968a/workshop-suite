@@ -36,7 +36,7 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
             true
         );
 
-        wp_localize_script('fvw-form-iscrizione', 'FVW_Form_Vars', [
+        $form_iscrizione_vars = [
             'restUrl' => esc_url_raw(rest_url('workshop-suite/v1/iscrizione/invia')),
             'nonce'   => wp_create_nonce('wp_rest'),
             'i18n'    => [
@@ -44,7 +44,9 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
                 'success' => __('Richiesta inviata con successo!', 'workshop-suite'),
                 'error'   => __('Si è verificato un errore. Riprova più tardi.', 'workshop-suite'),
             ],
-        ]);
+        ];
+        wp_localize_script('fvw-form-iscrizione', 'WS_Form_Vars', $form_iscrizione_vars);
+        wp_localize_script('fvw-form-iscrizione', 'FVW_Form_Vars', $form_iscrizione_vars);
     }
 
     public function render_shortcode($atts = []): string {

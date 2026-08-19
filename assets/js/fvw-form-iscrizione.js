@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
         submitBtn.disabled = true;
         const btnText = submitBtn.querySelector('span');
         const originalText = btnText ? btnText.textContent : '';
-        if (btnText) btnText.textContent = FVW_Form_Vars.i18n.sending;
+        if (btnText) btnText.textContent = WS_Form_Vars.i18n.sending;
 
         msgContainer.style.display = 'none';
         msgContainer.className = 'fvw-form-response';
@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const data = Object.fromEntries(formData.entries());
 
         try {
-            const response = await fetch(FVW_Form_Vars.restUrl, {
+            const response = await fetch(WS_Form_Vars.restUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': FVW_Form_Vars.nonce
+                    'X-WP-Nonce': WS_Form_Vars.nonce
                 },
                 body: JSON.stringify(data)
             });
@@ -34,16 +34,16 @@ document.addEventListener('DOMContentLoaded', function () {
             msgContainer.style.display = 'block';
             if (response.ok && result.success) {
                 msgContainer.classList.add('success');
-                msgContainer.textContent = result.message || FVW_Form_Vars.i18n.success;
+                msgContainer.textContent = result.message || WS_Form_Vars.i18n.success;
                 form.reset();
             } else {
                 msgContainer.classList.add('error');
-                msgContainer.textContent = result.message || FVW_Form_Vars.i18n.error;
+                msgContainer.textContent = result.message || WS_Form_Vars.i18n.error;
             }
         } catch (err) {
             msgContainer.style.display = 'block';
             msgContainer.classList.add('error');
-            msgContainer.textContent = FVW_Form_Vars.i18n.error;
+            msgContainer.textContent = WS_Form_Vars.i18n.error;
         } finally {
             submitBtn.disabled = false;
             if (btnText) btnText.textContent = originalText;

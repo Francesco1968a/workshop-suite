@@ -44,10 +44,12 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
             );
         }
 
-        wp_localize_script('fvw-ringraziamento', 'FVW_CONFIG', [
+        $ringraziamento_config = [
             'restUrl' => esc_url_raw(rest_url('workshop-suite/v1/')),
             'nonce'   => wp_create_nonce('wp_rest'),
-        ]);
+        ];
+        wp_localize_script('fvw-ringraziamento', 'WS_CONFIG', $ringraziamento_config);
+        wp_localize_script('fvw-ringraziamento', 'FVW_CONFIG', $ringraziamento_config);
 
         return '<div id="fvw-ringraziamento-app"></div>';
     }
