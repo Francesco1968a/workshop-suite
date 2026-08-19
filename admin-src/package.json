@@ -1,0 +1,17 @@
+{
+  "name": "workshop-suite-admin-src",
+  "private": true,
+  "version": "1.1.0",
+  "description": "Vue 3 source for Workshop Suite's WP-admin panels, built with Vite. Output is written directly into ../assets/dist/, same filenames the PHP backend already enqueues — no PHP changes needed when rebuilding.",
+  "type": "module",
+  "scripts": {
+    "build:calendario": "WS_BUNDLE=calendario vite build"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.7"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  }
+}
