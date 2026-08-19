@@ -542,3 +542,17 @@
 .fvw-sc-badge { display:inline-block;margin-top:4px;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:600;text-transform:uppercase; }
 .fvw-sc-badge--admin { background:#fff8e5;color:#8c5b00;border:1px solid #f0c33c; }
 .fvw-sc-badge--default { background:#edfaef;color:#008a20;border:1px solid #c3e6cb; }
+
+/* Onboarding wizard */
+.fvw-wizard-wrap { display:flex; justify-content:center; padding-top:40px; }
+.fvw-wizard-box { max-width:640px; width:100%; background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:40px; box-shadow:0 4px 20px rgba(0,0,0,0.04); }
+.fvw-wizard-steps { display:flex; gap:24px; margin-bottom:28px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#94a3b8; }
+.fvw-wizard-step--active { color:#2563eb; }
+.fvw-wizard-lead { font-size:15px; color:#475569; line-height:1.6; margin-bottom:20px; }
+.fvw-wizard-disclosure { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px 18px; margin-bottom:24px; font-size:13px; color:#475569; line-height:1.6; }
+.fvw-wizard-disclosure p { margin:0 0 8px 0; }
+.fvw-wizard-disclosure p:last-child { margin-bottom:0; }
+.fvw-wizard-choice { display:block; padding:14px 16px; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:12px; cursor:pointer; font-size:14px; color:#334155; }
+.fvw-wizard-choice:has(input:checked) { border-color:#2563eb; background:#eff6ff; }
+.fvw-wizard-choice input { margin-right:10px; }
+.fvw-wizard-actions { margin-top:24px; display:flex; gap:10px; justify-content:flex-end; }

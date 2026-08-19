@@ -101,6 +101,7 @@ final class WS_Plugin {
             new WS_Admin_Settings_Page(),
             new WS_License_Manager(),
             new WS_Hub_Sync(),
+            new WS_Onboarding_Wizard(),
         ];
         foreach ($this->modules as $module) {
             if ($module->should_load()) {
@@ -152,8 +153,11 @@ require_once WS_PATH . 'includes/class-ws-mail-templates.php';
 require_once WS_PATH . 'includes/class-ws-hub-sync.php';
 require_once WS_PATH . 'includes/class-ws-taxonomy-registry.php';
 require_once WS_PATH . 'includes/class-ws-rest-modules-toggle.php';
+require_once WS_PATH . 'includes/class-ws-onboarding-wizard.php';
 
 WS_Rest_Modules_Toggle::init();
+
+register_activation_hook(__FILE__, ['WS_Onboarding_Wizard', 'on_activate']);
 
 // Class Aliases for full backward compatibility
 class_alias('WS_Data', 'FVW_Data');
