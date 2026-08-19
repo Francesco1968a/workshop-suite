@@ -292,7 +292,7 @@ a.wvr-stat-row:hover .val {
    colonna = ring/todo/altri-eventi impilati. */
 .wvr-evento-grid {
     display: grid;
-    grid-template-columns: 360px 1fr;
+    grid-template-columns: 360px 1fr 280px;
     gap: 20px;
     align-items: start;
     margin-bottom: 20px;
@@ -300,7 +300,7 @@ a.wvr-stat-row:hover .val {
 
 .wvr-card-hero {
     grid-column: 1;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 2;
 }
 
 .wvr-evento-ring-col {
@@ -314,8 +314,18 @@ a.wvr-stat-row:hover .val {
 }
 
 .wvr-evento-right {
-    grid-column: 2;
-    grid-row: 3;
+    grid-column: 3;
+    grid-row: 1 / span 2;
+}
+
+@media (max-width: 1100px) {
+    .wvr-evento-grid {
+        grid-template-columns: 360px 1fr;
+    }
+    .wvr-evento-right {
+        grid-column: 1 / span 2;
+        grid-row: 3;
+    }
 }
 
 @media (max-width: 780px) {
@@ -329,6 +339,42 @@ a.wvr-stat-row:hover .val {
         grid-column: 1;
         grid-row: auto;
     }
+}
+
+.wvr-altri-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wvr-altri-chip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 8px 12px;
+    text-decoration: none;
+    font-size: 13px;
+    color: #1d2327;
+    transition: border-color 0.15s;
+}
+
+.wvr-altri-chip:hover {
+    border-color: #2271b1;
+}
+
+.wvr-altri-chip .d {
+    font-weight: 600;
+}
+
+.wvr-altri-chip .st {
+    font-size: 11px;
+    color: #646970;
+    text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .wvr-card-foto {

@@ -261,6 +261,7 @@ final class WS_Rest_Riepilogo implements WS_Module {
                     'email' => WS_Data::get_field('email', $p) ?: '',
                     'citta' => WS_Data::get_field('citta', $p) ?: '',
                     'telefono' => WS_Data::get_field('telefono', $p) ?: '',
+                    'num_persone' => max(1, (int) get_post_meta($isc, 'num_persone', true) ?: 1),
                     'stato' => WS_Data::get_field('stato', $isc) === 'confermato' ? 'confermato' : 'richiesta',
                     'stato_pagamento' => in_array($stato_pagamento, self::STATI_PAGAMENTO, true) ? $stato_pagamento : 'in_attesa',
                     'anticipo' => (float) WS_Data::get_field('anticipo', $isc),
