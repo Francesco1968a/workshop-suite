@@ -49,7 +49,14 @@ final class WS_Settings {
                 'stripe_payments'  => 0,
                 'woocommerce'      => 0,
                 'webhooks'         => 0,
-                'global_hub_pro'   => 1,
+                // Off by default: syncs event data (title, description,
+                // location, price, organizer bio/photo) to an external
+                // directory at workshopsuite.pro on every publish/update.
+                // Must stay opt-in — sending site data to a third-party
+                // service without explicit consent is undisclosed by
+                // default otherwise. See readme.txt's "External services"
+                // section.
+                'global_hub_pro'   => 0,
                 'poster_studio'    => 1,
                 'pdf_receipts'     => 0,
                 'whatsapp_widget'  => 1,

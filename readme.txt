@@ -36,7 +36,7 @@ Whether you run photography workshops, masterclasses, business seminars, art ret
 == Privacy Policy & Third-Party Services ==
 
 This plugin can optionally connect to an external cloud service:
-* **Workshop Suite Global Hub** (https://workshopsuite.pro): When the "Global Hub Sync" module is explicitly activated by the administrator, published workshop metadata (title, dates, venue location, category, and presentation URL) is syndicated to the Workshop Suite global directory to increase event discovery.
+* **Workshop Suite Global Hub** (https://workshopsuite.pro): Off by default. Only when the administrator explicitly activates the "Global Hub Sync" module, published workshop data is sent to the Workshop Suite global directory to increase event discovery, on every publish/update of an event. This includes: title, description/excerpt, dates and location (city, country, address), category, price and deposit, seat availability, the featured image, the booking page URL, and the organizer's public profile (name, role, bio, photo, website, languages) as configured in the plugin's own settings.
 * **Terms of Service**: https://workshopsuite.pro/terms/
 * **Privacy Policy**: https://workshopsuite.pro/privacy/
 
