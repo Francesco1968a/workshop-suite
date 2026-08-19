@@ -1,67 +1,215 @@
-/* FV Workshop — Scheda Partecipante (Native WP Style / FluentCRM Pattern) */
+/* Workshop Suite — Scheda Partecipante (Native WP Admin style) */
 
-.wvp {
+.wvpx {
     color: #2c3338;
-    max-width: 100%;
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    max-width: 900px;
+    margin: 0 0 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.wvp h2 {
-    color: #1d2327;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid #dcdcde;
-    margin: 0 0 16px;
-    padding-bottom: 8px;
-}
-
-.wvp-card {
-    background: #ffffff;
+.head {
+    background: #fff;
     border: 1px solid #c3c4c7;
     border-radius: 4px;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
     padding: 20px;
-    margin-bottom: 20px;
-}
-
-.wvp-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #f0f0f1;
-    padding-bottom: 12px;
     margin-bottom: 16px;
 }
 
-.wvp-title {
-    font-size: 18px;
+.head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.head-row h2 {
+    margin: 0;
+    font-size: 20px;
     font-weight: 600;
     color: #1d2327;
 }
 
-.wvp-meta-grid {
+.meta {
+    color: #50575e;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.meta a {
+    color: #2271b1;
+    text-decoration: none;
+}
+
+.meta a:hover {
+    text-decoration: underline;
+}
+
+.wvpx-grid2 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 14px;
+    margin-bottom: 16px;
 }
 
-.wvp-meta-item {
-    font-size: 13px;
-}
-
-.wvp-meta-label {
-    color: #646970;
+.wvpx-grid2 label {
+    display: block;
     font-size: 12px;
     font-weight: 600;
-    text-transform: uppercase;
+    color: #1d2327;
+    margin-bottom: 4px;
 }
 
-.wvp-meta-val {
+.wvpx-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.wvpx-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f6f7f7;
+    border: 1px solid #8c8f94;
+    color: #2c3338;
+    padding: 6px 14px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.wvpx-btn:hover {
+    background: #f0f0f1;
+}
+
+.wvpx-btn--accent {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+}
+
+.wvpx-btn--accent:hover {
+    background: #135e96;
+}
+
+.wvpx-btn--ghost {
+    background: transparent;
+}
+
+.wvpx-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.wvpx-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.wvpx-stat {
+    flex: 1;
+    min-width: 100px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    padding: 14px;
+    text-align: center;
+}
+
+.wvpx-stat .n {
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
     color: #1d2327;
-    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.wvpx-stat span:last-child {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #646970;
+}
+
+.wvpx-stat--accent .n {
+    color: #2271b1;
+}
+
+.wvpx-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.wvpx-card textarea {
+    width: 100%;
+    min-height: 80px;
+    background: #f6f7f7;
+    border: 1px solid #8c8f94;
+    color: #2c3338;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit;
+    margin-bottom: 10px;
+}
+
+.wvpx-empty {
+    color: #646970;
+    font-size: 13px;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.wvpx-tl {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.wvpx-tl > div {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.wvpx-tl > div:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.wvpx-tl .icon {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.wvpx-tl .titolo {
+    font-size: 13px;
+    color: #1d2327;
+    font-weight: 600;
+}
+
+.wvpx-tl .sub {
+    font-size: 12px;
+    color: #646970;
     margin-top: 2px;
+}
+
+.wvpx-tl .extra {
+    font-size: 12px;
+    color: #50575e;
+    margin-top: 4px;
+    white-space: pre-wrap;
 }

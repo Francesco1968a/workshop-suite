@@ -244,9 +244,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         }
     }
 
-    private function render_panel_wrapper(string $app_id, string $handle, string $js_file, string $css_file): void {
-        if (!current_user_can('manage_options')) return;
-
+    /** Enqueues one Vue bundle's JS/CSS + WS_CONFIG, without emitting any markup. */
+    private function enqueue_panel_assets(string $handle, string $js_file, string $css_file): void {
         $asset_js  = WS_PATH . $js_file;
         $asset_css = WS_PATH . $css_file;
 
@@ -287,7 +286,12 @@ final class WS_Admin_Settings_Page implements WS_Module {
         ];
         wp_localize_script($handle, 'WS_CONFIG', $config);
         wp_localize_script($handle, 'FVW_CONFIG', $config);
+    }
 
+    private function render_panel_wrapper(string $app_id, string $handle, string $js_file, string $css_file): void {
+        if (!current_user_can('manage_options')) return;
+
+        $this->enqueue_panel_assets($handle, $js_file, $css_file);
         ?>
         <div class="wrap ws-admin-wrap">
             <div id="<?php echo esc_attr($app_id); ?>"></div>
@@ -317,8 +321,26 @@ final class WS_Admin_Settings_Page implements WS_Module {
         $this->render_panel_wrapper('ws-locandine-app', 'ws-locandine', 'assets/dist/locandine.js', 'assets/dist/locandine.css');
     }
 
+    /**
+     * The list (partecipanti-lista.js) and the single-record detail card
+     * (partecipante.js) are two separate bundles — on the legacy
+     * shortcode-embedded page ("Admin Contatti") both were placed on the
+     * same page, and clicking a name in the list just reloads the same
+     * URL with ?pid=X#wvpx-scheda, which the detail bundle reads itself
+     * and scrolls to. Mount both here too so the wp-admin menu page has
+     * the same click-to-open-scheda behavior as that original page.
+     */
     public function render_partecipanti(): void {
-        $this->render_panel_wrapper('ws-partecipanti-lista-app', 'ws-partecipanti-lista', 'assets/dist/partecipanti-lista.js', 'assets/dist/partecipanti-lista.css');
+        if (!current_user_can('manage_options')) return;
+
+        $this->enqueue_panel_assets('ws-partecipante', 'assets/dist/partecipante.js', 'assets/dist/partecipante.css');
+        $this->enqueue_panel_assets('ws-partecipanti-lista', 'assets/dist/partecipanti-lista.js', 'assets/dist/partecipanti-lista.css');
+        ?>
+        <div class="wrap ws-admin-wrap">
+            <div id="ws-partecipante-app"></div>
+            <div id="ws-partecipanti-lista-app"></div>
+        </div>
+        <?php
     }
 
     public function render_messaggi(): void {
