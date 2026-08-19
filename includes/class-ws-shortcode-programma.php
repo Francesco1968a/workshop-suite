@@ -32,7 +32,7 @@ final class WS_Shortcode_Programma implements WS_Module {
         ]);
 
         if (!$q->have_posts()) {
-            return '<p style="text-align:center;color:#888;padding:30px 0;">Nessun evento in programma al momento.</p>';
+            return '<style>.wv-prog-empty-msg{text-align:center;color:#888;padding:30px 0;}</style><p class="wv-prog-empty-msg">Nessun evento in programma al momento.</p>';
         }
 
         $gap = 14;

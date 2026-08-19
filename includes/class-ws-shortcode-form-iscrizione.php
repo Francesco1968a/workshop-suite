@@ -83,7 +83,7 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
                 <input type="hidden" name="evento_id" value="<?php echo esc_attr($evento_id); ?>">
                 
                 <!-- Honeypot anti-spam -->
-                <div style="display:none !important;" aria-hidden="true">
+                <div class="fvw-honeypot" aria-hidden="true">
                     <input type="text" name="website_url" tabindex="-1" autocomplete="off">
                 </div>
 
@@ -136,7 +136,7 @@ final class WS_Shortcode_Form_Iscrizione implements WS_Module {
                     </button>
                 </div>
 
-                <div id="fvw-form-message" class="fvw-form-response" style="display:none;"></div>
+                <div id="fvw-form-message" class="fvw-form-response"></div>
             </form>
         </div>
         <?php

@@ -83,10 +83,15 @@
 }
 
 .fvw-form-response {
+    display: none;
     padding: 12px 16px;
     border-radius: 8px;
     font-size: 14px;
     margin-top: 8px;
+}
+
+.fvw-honeypot {
+    display: none !important;
 }
 
 .fvw-form-response.success {
