@@ -1296,7 +1296,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                         <span class="dashicons dashicons-yes-alt fvw-s60"></span>
                                         <strong class="fvw-s45"><?php esc_html_e('ATTIVA', 'workshop-suite'); ?></strong> (Piano: <?php echo esc_html(strtoupper($license['type'])); ?>)
                                         <?php if ($license['expires']) : ?>
-                                            — <?php printf(esc_html__('Scade il: %s', 'workshop-suite'), esc_html($license['expires'])); ?>
+                                            — <?php /* translators: %s: license expiration date */ printf(esc_html__('Scade il: %s', 'workshop-suite'), esc_html($license['expires'])); ?>
                                         <?php endif; ?>
                                     <?php else : ?>
                                         <span class="dashicons dashicons-dismiss fvw-s61"></span>

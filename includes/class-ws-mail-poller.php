@@ -51,7 +51,7 @@ final class WS_Mail_Poller implements WS_Module {
         </style>
         <div class="notice notice-error is-dismissible fvw-mail-poll-error">
             <p>
-                ⚠️ <?php printf(esc_html__('Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:', 'workshop-suite'), esc_html($error['date'] ?? '')); ?>
+                ⚠️ <?php /* translators: %s: date and time of the last failed poll */ printf(esc_html__('Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:', 'workshop-suite'), esc_html($error['date'] ?? '')); ?>
                 <code><?php echo esc_html($error['msg'] ?? ''); ?></code>
             </p>
         </div>

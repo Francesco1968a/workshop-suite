@@ -2,431 +2,791 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Workshop Suite 1.0.0
-"
-"Report-Msgid-Bugs-To: https://francescoverolino.com/workshop-suite
-"
-"Last-Translator: Francesco Verolino <francescoverolino@gmail.com>
-"
-"Language-Team: Workshop Suite Team
-"
-"MIME-Version: 1.0
-"
-"Content-Type: text/plain; charset=UTF-8
-"
-"Content-Transfer-Encoding: 8bit
-"
-"POT-Creation-Date: 2026-08-18T08:23:00+00:00
-"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE
-"
-"X-Generator: Workshop Suite i18n Tool
-"
-"X-Domain: workshop-suite
-"
+"Project-Id-Version: Workshop Suite — All-in-One Event Manager, CRM & Social Banner Builder 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/workshop-suite\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-19T09:26:19+02:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: workshop-suite\n"
 
-msgid "A destra puoi aggiungere regole CSS personalizzate che sovrascriveranno lo stile dell\'applicazione. A sinistra è visibile il codice CSS predefinito di riferimento."
+#. Plugin Name of the plugin
+#: workshop-suite.php
+msgid "Workshop Suite — All-in-One Event Manager, CRM & Social Banner Builder"
 msgstr ""
 
-msgid "ATTIVA"
+#. Plugin URI of the plugin
+#: workshop-suite.php
+msgid "https://francescoverolino.com/workshop-suite"
 msgstr ""
 
-msgid "Abbiamo già una tua richiesta per questo evento. Abbiamo aggiornato il tuo messaggio!"
+#. Description of the plugin
+#: workshop-suite.php
+msgid "The complete all-in-one suite for WordPress to manage workshops, courses and events, participant CRM with timeline tracking, automatic T-15 email reminders, and social poster graphic builder."
 msgstr ""
 
-msgid "Abilita invio automatico promemoria a 15 giorni dall\'evento (T-15)"
+#. Author of the plugin
+#: workshop-suite.php
+msgid "Francesco Verolino"
 msgstr ""
 
-msgid "Admin Calendar"
+#. Author URI of the plugin
+#: workshop-suite.php
+msgid "https://francescoverolino.com"
 msgstr ""
 
-msgid "Aggiungi Tipo Evento"
-msgstr ""
-
-msgid "Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:"
-msgstr ""
-
-msgid "Attiva limitazione richieste per indirizzo IP"
-msgstr ""
-
-msgid "Automazioni Promemoria"
-msgstr ""
-
-msgid "Azione"
-msgstr ""
-
-msgid "Biografia / Presentazione"
-msgstr ""
-
-msgid "Blocca invii con campo trappola compilato (anti-bot invisibile)"
-msgstr ""
-
-msgid "Canali Social"
-msgstr ""
-
-msgid "Carica / Scegli Foto"
-msgstr ""
-
-msgid "Categoria"
-msgstr ""
-
-msgid "Categorie Workshop"
-msgstr ""
-
-msgid "Categories & Types"
-msgstr ""
-
-msgid "Chiave di Licenza"
-msgstr ""
-
-msgid "Città di provenienza"
-msgstr ""
-
-msgid "Codice CSS Personalizzato"
-msgstr ""
-
-msgid "Codice Custom (CSS Personalizzato)"
-msgstr ""
-
-msgid "Codice Esistente (CSS Predefinito)"
-msgstr ""
-
-msgid "Cognome"
-msgstr ""
-
-msgid "Consigliata immagine quadrata ad alta risoluzione (min. 400x400 px)."
-msgstr ""
-
-msgid "Contacts & Participants"
-msgstr ""
-
-msgid "Contatti & Presenza Web"
-msgstr ""
-
-msgid "Copia"
-msgstr ""
-
-msgid "Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di FV Workshop."
-msgstr ""
-
-msgid "Crittografia"
-msgstr ""
-
-msgid "Custom CSS Code"
-msgstr ""
-
-msgid "Dashboard"
-msgstr ""
-
-msgid "Dati Docente / Proponente"
-msgstr ""
-
-msgid "Descrivi la tua esperienza, il tuo approccio didattico e i traguardi raggiunti..."
-msgstr ""
-
-msgid "Descrizione"
-msgstr ""
-
-msgid "Elenco Shortcode Disponibili"
-msgstr ""
-
-msgid "Email"
-msgstr ""
-
-msgid "Email Mittente"
-msgstr ""
-
-msgid "Email Mittente Risposte"
-msgstr ""
-
-msgid "Email Pubblica"
-msgstr ""
-
-msgid "Errore durante il salvataggio dei dati."
-msgstr ""
-
-msgid "Errore durante la creazione dell\'iscrizione."
-msgstr ""
-
-msgid "Eventi"
-msgstr ""
-
-msgid "Evento"
-msgstr ""
-
-msgid "Evento selezionato non valido."
-msgstr ""
-
-msgid "Events & Registrations"
-msgstr ""
-
-msgid "Events Archive"
-msgstr ""
-
-msgid "Finestra Temporale (secondi)"
-msgstr ""
-
-msgid "Foto Profilo / Avatar"
-msgstr ""
-
-msgid "Funzionalità"
-msgstr ""
-
-msgid "General"
-msgstr ""
-
-msgid "Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi."
-msgstr ""
-
-msgid "Hai inviato troppe richieste in poco tempo. Attendi qualche minuto prima di riprovare."
-msgstr ""
-
-msgid "Host IMAP"
-msgstr ""
-
-msgid "Host SMTP"
-msgstr ""
-
-msgid "Impostazioni della casella mail salvate e protette con crittografia AES-256."
-msgstr ""
-
-msgid "Incolla questo shortcode in qualsiasi pagina, articolo o footer:"
-msgstr ""
-
-msgid "Indica le lingue in cui puoi condurre i workshop o comunicare con i corsisti."
-msgstr ""
-
-msgid "Indirizzo predefinito da cui partiranno le mail di risposta e promemoria."
-msgstr ""
-
-msgid "Inserisci la chiave di licenza acquistata per abilitare il supporto e gli aggiornamenti automatici."
-msgstr ""
-
-msgid "Intervallo di tempo per il calcolo del limite (default: 60 secondi)."
-msgstr ""
-
-msgid "Invia Richiesta Iscrizione"
-msgstr ""
-
-msgid "Invia in automatico una mail riassuntiva ai partecipanti confermati 15 giorni prima della data inizio."
-msgstr ""
-
-msgid "Invio Mail (SMTP / Mittente)"
-msgstr ""
-
-msgid "Invio in corso..."
-msgstr ""
-
-msgid "Iscrizione"
-msgstr ""
-
-msgid "Iscrizioni"
-msgstr ""
-
-msgid "Iscrizioni aperte"
-msgstr ""
-
-msgid "Lettura Mail (IMAP)"
-msgstr ""
-
-msgid "License"
-msgstr ""
-
-msgid "Lingue Parlate"
-msgstr ""
-
-msgid "Mail Configuration"
-msgstr ""
-
-msgid "Mail Inbox"
-msgstr ""
-
-msgid "Messaggio / Richiesta informazioni"
-msgstr ""
-
-msgid "NON ATTIVA / NON VALIDA"
-msgstr ""
-
-msgid "Nome"
-msgstr ""
-
-msgid "Nome & Cognome"
-msgstr ""
-
-msgid "Nome Brand / Organizzazione"
-msgstr ""
-
-msgid "Nome Mittente"
-msgstr ""
-
-msgid "Nome Mittente Email"
-msgstr ""
-
-msgid "Nome ed email sono obbligatori."
-msgstr ""
-
-msgid "Nome visualizzato dal destinatario come mittente delle notifiche."
-msgstr ""
-
-msgid "Numero massimo di iscrizioni consentite dallo stesso IP (default: 5)."
-msgstr ""
-
-msgid "Numero persone"
-msgstr ""
-
-msgid "Partecipante"
-msgstr ""
-
-msgid "Partecipanti"
-msgstr ""
-
-msgid "Password Account"
-msgstr ""
-
-msgid "Password protetta con cifratura OpenSSL AES-256."
-msgstr ""
-
-msgid "Porta IMAP"
-msgstr ""
-
-msgid "Porta SMTP"
-msgstr ""
-
-msgid "Poster Templates"
-msgstr ""
-
-msgid "Profilo del proponente e scheda Bio salvati con successo."
-msgstr ""
-
-msgid "Proteggi il server e l\'endpoint delle iscrizioni da invii automatici di bot e attacchi flood."
-msgstr ""
-
-msgid "Protezione Anti-Spam & Rate Limit Iscrizioni"
-msgstr ""
-
-msgid "Protezione Honeypot"
-msgstr ""
-
-msgid "Questa biografia verrà mostrata nella scheda docente sul tuo sito e sul portale mondiale Workshop Hub."
-msgstr ""
-
-msgid "Questo evento si è già concluso."
-msgstr ""
-
-msgid "Rate Limiting IP"
-msgstr ""
-
-msgid "Richiesta di iscrizione inviata con successo! Ti abbiamo inviato un\'email di conferma."
-msgstr ""
-
-msgid "Richiesta inviata con successo!"
-msgstr ""
-
-msgid "Richiesta ricevuta."
-msgstr ""
-
-msgid "Rimuovi"
-msgstr ""
-
-msgid "Salva Codice Custom"
-msgstr ""
-
-msgid "Salva Configurazione Posta & Sicurezza"
-msgstr ""
-
-msgid "Salva Impostazioni"
-msgstr ""
-
-msgid "Salva Profilo Proponente"
-msgstr ""
-
-msgid "Salva Tipi Evento"
-msgstr ""
-
-msgid "Salva e Verifica Licenza"
-msgstr ""
-
-msgid "Scade il: %s"
-msgstr ""
-
-msgid "Scrivi qui le tue domande o note particolari..."
-msgstr ""
-
-msgid "Sede / Città Base"
-msgstr ""
-
-msgid "Settings"
-msgstr ""
-
-msgid "Shortcode Tag"
-msgstr ""
-
-msgid "Shortcodes"
-msgstr ""
-
-msgid "Si è verificato un errore. Riprova più tardi."
-msgstr ""
-
-msgid "Simbolo Valuta"
-msgstr ""
-
-msgid "Simbolo valuta mostrato nei form di iscrizione (es. €)."
-msgstr ""
-
-msgid "Sito Ufficiale"
-msgstr ""
-
-msgid "Sito Web Ufficiale"
-msgstr ""
-
-msgid "Soglia Massima Richieste"
-msgstr ""
-
-msgid "Stato Licenza"
-msgstr ""
-
-msgid "Stile grafico applicato agli shortcode e ai moduli pubblici nel frontend del sito."
-msgstr ""
-
-msgid "Telefono / WhatsApp"
-msgstr ""
-
-msgid "Tema Dark (Scuro)"
-msgstr ""
-
-msgid "Tema Frontend Predefinito"
-msgstr ""
-
-msgid "Tema Light (Chiaro)"
-msgstr ""
-
-msgid "Tema:"
-msgstr ""
-
-msgid "Titolo / Ruolo"
-msgstr ""
-
-msgid "Trainer Profile / Bio"
-msgstr ""
-
-msgid "Usato nelle firme email automatiche e nei calendari ICS."
-msgstr ""
-
-msgid "Utente IMAP"
-msgstr ""
-
-msgid "Workshop Suite"
-msgstr ""
-
+#: includes/class-ws-admin-settings-page.php:119
 msgid "Workshop Suite Dashboard"
 msgstr ""
 
-msgid "Workshop Suite Settings"
+#: includes/class-ws-admin-settings-page.php:120
+msgid "Workshop Suite"
 msgstr ""
 
+#: includes/class-ws-admin-settings-page.php:131
+#: includes/class-ws-admin-settings-page.php:132
+msgid "Dashboard"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:141
+#: includes/class-ws-admin-settings-page.php:142
+msgid "Categories & Types"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:151
+#: includes/class-ws-admin-settings-page.php:152
+msgid "Events & Registrations"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:162
+#: includes/class-ws-admin-settings-page.php:163
+msgid "Poster Templates"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:173
+#: includes/class-ws-admin-settings-page.php:174
+msgid "Contacts & Participants"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:183
+#: includes/class-ws-admin-settings-page.php:184
+msgid "Mail Inbox"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:193
+#: includes/class-ws-admin-settings-page.php:194
+msgid "Admin Calendar"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:203
+#: includes/class-ws-admin-settings-page.php:204
+msgid "Events Archive"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:217
+#: includes/class-ws-admin-settings-page.php:218
+msgid "Moduli & Add-on"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:226
+#: includes/class-ws-admin-settings-page.php:227
+msgid "Settings"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:344
+msgid "Tema:"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:350
 msgid "🏷️ Tipi di Evento"
 msgstr ""
 
+#: includes/class-ws-admin-settings-page.php:351
+msgid "Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:394
+msgid "Aggiungi Tipo Evento"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:395
+msgid "Salva Tipi Evento"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:474
+msgid "Workshop Suite Settings"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:478
+msgid "General"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:479
+msgid "Modules & Add-ons"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:480
+msgid "Trainer Profile / Bio"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:481
+msgid "Mail Configuration"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:482
+msgid "Custom CSS Code"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:483
+msgid "Shortcodes"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:484
+msgid "License"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:496
+msgid "Nome Brand / Organizzazione"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:500
+msgid "Usato nelle firme email automatiche e nei calendari ICS."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:506
+msgid "Nome Mittente Email"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:510
+msgid "Nome visualizzato dal destinatario come mittente delle notifiche."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:516
+msgid "Email Mittente Risposte"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:520
+msgid "Indirizzo predefinito da cui partiranno le mail di risposta e promemoria."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:526
+msgid "Simbolo Valuta"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:530
+msgid "Simbolo valuta mostrato nei form di iscrizione (es. €)."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:536
+msgid "Tema Frontend Predefinito"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:540
+msgid "Tema Dark (Scuro)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:541
+msgid "Tema Light (Chiaro)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:543
+msgid "Stile grafico applicato agli shortcode e ai moduli pubblici nel frontend del sito."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:548
+msgid "Automazioni Promemoria"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:553
+msgid "Abilita invio automatico promemoria a 15 giorni dall'evento (T-15)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:555
+msgid "Invia in automatico una mail riassuntiva ai partecipanti confermati 15 giorni prima della data inizio."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:562
+msgid "Salva Impostazioni"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:570
+msgid "Courses & Video Academy (LMS)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:571
+msgid "Piattaforma videocorsi on-demand, masterclass registrate, gestione moduli/lezioni con player video avanzato e streaming Zoom/Meet."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:578
+msgid "Voucher di Partecipazione & PDF Pass"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:579
+msgid "Genera e invia in automatico all'email di conferma il Voucher/Pass PDF personalizzato con QR-code e dettagli logistici per il corsista."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:586
+msgid "AI Workshop Assistant & Copywriter"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:587
+msgid "Assistente AI per generare descrizioni accattivanti dei corsi, programmi didattici, testi per i post di Instagram e risposte email agli allievi."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:594
+msgid "Pagamenti Nativi Stripe & Apple Pay"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:595
+msgid "Incasso istantaneo di anticipi o saldi tramite carta di credito, Apple Pay e Google Pay con zero plugin intermedi."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:602
+msgid "Multi-Docente & Faculty Mode (Scuole)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:603
+msgid "Permette di assegnare workshop a docenti o istruttori specifici, con schede bio dedicate e gestione faculty per scuole e accademie."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:610
+msgid "SMS & WhatsApp Automation Gateway"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:611
+msgid "Invio automatico di conferme immediate e promemoria urgenti tramite SMS o WhatsApp API (Twilio / Meta Gateway)."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:618
+msgid "Google Calendar & Apple iCal Auto-Sync"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:619
+msgid "Feed ICS dinamico che sincronizza in tempo reale le date dei workshop sul calendario personale del docente e dei partecipanti."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:626
+msgid "FluentCRM & Email Marketing Bridge"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:627
+msgid "Sincronizza in automatico i partecipanti nei funnel e nelle liste email di FluentCRM o Mailchimp per newsletter e promozioni."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:634
+msgid "Webhook & Connettori Zapier / Make"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:635
+msgid "Invia payload JSON in tempo reale a Make.com, Zapier, Zoho CRM o Google Sheets ad ogni nuova iscrizione o conferma pagamento."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:642
+msgid "Poster Studio & Social Banner Builder"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:643
+msgid "Generatore grafico in-browser di locandine pronte per Instagram Feed (1:1), Stories (9:16) e Facebook con rendering HTML5 Canvas."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:650
+msgid "Integrazione Carrello WooCommerce"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:651
+msgid "Sincronizza i workshop come prodotti nel carrello WooCommerce per utilizzare i tuoi gateway e la fatturazione elettronica."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:658
+msgid "WhatsApp Floating Quick Chat"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:659
+msgid "Pulsante galleggiante moderno e leggero per permettere ai visitatori di fare domande dirette sul workshop via WhatsApp."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:727
+msgid "Richiede PRO"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:727
+msgid "Attivo"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:727
+msgid "Disattivato"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:813
+msgid "Salva Stato Moduli"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:829
+msgid "Profilo del proponente e scheda Bio salvati con successo."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:842
+msgid "Dati Docente / Proponente"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:847
+msgid "Foto Profilo / Avatar"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:859
+msgid "Carica / Scegli Foto"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:860
+msgid "Rimuovi"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:861
+msgid "Consigliata immagine quadrata ad alta risoluzione (min. 400x400 px)."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:869
+msgid "Nome & Cognome"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:875
+msgid "Titolo / Ruolo"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:881
+msgid "Sede / Città Base"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:887
+msgid "Biografia / Presentazione"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:889
+msgid "Descrivi la tua esperienza, il tuo approccio didattico e i traguardi raggiunti..."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:890
+msgid "Questa biografia verrà mostrata nella scheda docente sul tuo sito e sul portale mondiale Workshop Hub."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:894
+msgid "Lingue Parlate"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:904
+msgid "Indica le lingue in cui puoi condurre i workshop o comunicare con i corsisti."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:917
+msgid "Contatti & Presenza Web"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:922
+msgid "Sito Web Ufficiale"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:928
+msgid "Email Pubblica"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:934
+#: includes/class-ws-shortcode-form-iscrizione.php:107
+msgid "Telefono / WhatsApp"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:946
+msgid "Canali Social"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:992
 msgid "💡 Come mostrare la Bio nel sito"
 msgstr ""
 
+#: includes/class-ws-admin-settings-page.php:993
+msgid "Incolla questo shortcode in qualsiasi pagina, articolo o footer:"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1000
+msgid "Salva Profilo Proponente"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1053
+msgid "Impostazioni della casella mail salvate e protette con crittografia AES-256."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1064
+msgid "Lettura Mail (IMAP)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1069
+msgid "Host IMAP"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1073
+msgid "Porta IMAP"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1077
+#: includes/class-ws-admin-settings-page.php:1126
+msgid "Crittografia"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1087
+msgid "Utente IMAP"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1091
+msgid "Password Account"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1095
+msgid "Password protetta con cifratura OpenSSL AES-256."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1105
+msgid "Invio Mail (SMTP / Mittente)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1110
+msgid "Nome Mittente"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1114
+msgid "Email Mittente"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1118
+msgid "Host SMTP"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1122
+msgid "Porta SMTP"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1142
+msgid "Protezione Anti-Spam & Rate Limit Iscrizioni"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1143
+msgid "Proteggi il server e l'endpoint delle iscrizioni da invii automatici di bot e attacchi flood."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1148
+msgid "Rate Limiting IP"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1152
+msgid "Attiva limitazione richieste per indirizzo IP"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1157
+msgid "Soglia Massima Richieste"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1160
+msgid "Numero massimo di iscrizioni consentite dallo stesso IP (default: 5)."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1164
+msgid "Finestra Temporale (secondi)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1167
+msgid "Intervallo di tempo per il calcolo del limite (default: 60 secondi)."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1171
+msgid "Protezione Honeypot"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1175
+msgid "Blocca invii con campo trappola compilato (anti-bot invisibile)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1183
+msgid "Salva Configurazione Posta & Sicurezza"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1187
+msgid "Codice CSS Personalizzato"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1189
+msgid "A destra puoi aggiungere regole CSS personalizzate che sovrascriveranno lo stile dell'applicazione. A sinistra è visibile il codice CSS predefinito di riferimento."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1194
+msgid "Codice Esistente (CSS Predefinito)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1210
+msgid "Codice Custom (CSS Personalizzato)"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1214
+msgid "Salva Codice Custom"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1222
+msgid "Elenco Shortcode Disponibili"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1224
+msgid "Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di FV Workshop."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1246
+msgid "Funzionalità"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1247
+msgid "Descrizione"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1248
+msgid "Shortcode Tag"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1249
+msgid "Azione"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1271
+msgid "Copia"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1286
+msgid "Chiave di Licenza"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1289
+msgid "Inserisci la chiave di licenza acquistata per abilitare il supporto e gli aggiornamenti automatici."
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1293
+msgid "Stato Licenza"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1297
+msgid "ATTIVA"
+msgstr ""
+
+#. translators: %s: license expiration date
+#: includes/class-ws-admin-settings-page.php:1299
+#, php-format
+msgid "Scade il: %s"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1303
+msgid "NON ATTIVA / NON VALIDA"
+msgstr ""
+
+#: includes/class-ws-admin-settings-page.php:1310
+msgid "Salva e Verifica Licenza"
+msgstr ""
+
+#. translators: %s: date and time of the last failed poll
+#: includes/class-ws-mail-poller.php:54
+#, php-format
+msgid "Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:59
+msgid "Configurazione guidata"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:74
+msgid "Richiesta non valida, riprova."
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:104
+msgid "Condivisione dati"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:105
+msgid "Casella mail"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:116
+msgid "Benvenuto in Workshop Suite 👋"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:117
+msgid "Prima di iniziare, una scelta che riguarda solo te: vuoi condividere i tuoi eventi pubblicati con la directory pubblica di Workshop Suite?"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:120
+msgid "Cosa viene inviato, se accetti:"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:121
+msgid "Titolo, descrizione, date e luogo, categoria, prezzo e acconto, posti disponibili, immagine in evidenza, URL della pagina di prenotazione, e il tuo profilo pubblico da proponente (nome, ruolo, bio, foto, sito, lingue) come lo configurerai nelle impostazioni."
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:122
+msgid "Va a workshopsuite.pro, la directory pubblica del progetto Workshop Suite — serve a farti trovare da chi cerca corsi come i tuoi. Puoi cambiare questa scelta in qualsiasi momento da Impostazioni → Moduli & Add-ons."
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:129
+msgid "Sì, condividi i miei eventi"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:129
+msgid "aumenta la visibilità, aiuta anche la bio proponente ad avere uno scopo"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:133
+msgid "No, resta tutto sul mio sito"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:133
+msgid "nessun dato lascia il tuo sito"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:137
+msgid "Continua →"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:145
+msgid "Casella mail per la messaggistica"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:146
+msgid "Workshop Suite può inviare conferme, promemoria e rispondere ai partecipanti direttamente dalla tua casella mail. Puoi configurarla ora, oppure più tardi da Impostazioni → Mail."
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:151
+msgid "Configura dopo"
+msgstr ""
+
+#: includes/class-ws-onboarding-wizard.php:152
+msgid "Configura ora →"
+msgstr ""
+
+#: includes/class-ws-post-types.php:28
+msgid "Eventi"
+msgstr ""
+
+#: includes/class-ws-post-types.php:29
+msgid "Evento"
+msgstr ""
+
+#: includes/class-ws-post-types.php:36
+msgid "Partecipanti"
+msgstr ""
+
+#: includes/class-ws-post-types.php:37
+msgid "Partecipante"
+msgstr ""
+
+#: includes/class-ws-post-types.php:44
+msgid "Iscrizioni"
+msgstr ""
+
+#: includes/class-ws-post-types.php:45
+msgid "Iscrizione"
+msgstr ""
+
+#: includes/class-ws-post-types.php:52
+msgid "Categorie Workshop"
+msgstr ""
+
+#: includes/class-ws-post-types.php:53
+msgid "Categoria"
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:81
+msgid "Richiesta ricevuta."
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:97
+msgid "Hai inviato troppe richieste in poco tempo. Attendi qualche minuto prima di riprovare."
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:106
+msgid "Evento selezionato non valido."
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:110
+msgid "Questo evento si è già concluso."
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:122
+msgid "Nome ed email sono obbligatori."
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:135
+msgid "Errore durante il salvataggio dei dati."
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:156
+msgid "Abbiamo già una tua richiesta per questo evento. Abbiamo aggiornato il tuo messaggio!"
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:167
+msgid "Errore durante la creazione dell'iscrizione."
+msgstr ""
+
+#: includes/class-ws-rest-intake.php:184
+msgid "Richiesta di iscrizione inviata con successo! Ti abbiamo inviato un'email di conferma."
+msgstr ""
+
+#: includes/class-ws-rest-modules-toggle.php:43
+msgid "Modulo attivato con successo"
+msgstr ""
+
+#: includes/class-ws-rest-modules-toggle.php:43
+msgid "Modulo disattivato"
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:43
+msgid "Invio in corso..."
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:44
+msgid "Richiesta inviata con successo!"
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:45
+msgid "Si è verificato un errore. Riprova più tardi."
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:92
+msgid "Nome"
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:96
+msgid "Cognome"
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:103
+msgid "Email"
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:114
+msgid "Città di provenienza"
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:118
+msgid "Numero persone"
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:129
+msgid "Messaggio / Richiesta informazioni"
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:130
+msgid "Scrivi qui le tue domande o note particolari..."
+msgstr ""
+
+#: includes/class-ws-shortcode-form-iscrizione.php:135
+msgid "Invia Richiesta Iscrizione"
+msgstr ""
+
+#: includes/class-ws-shortcode-proponente.php:133
+msgid "Sito Ufficiale"
+msgstr ""
