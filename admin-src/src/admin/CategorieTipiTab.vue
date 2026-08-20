@@ -14,6 +14,42 @@ function headers(extra = {}) {
   return { 'X-WP-Nonce': window.WS_CONFIG.nonce, ...extra };
 }
 
+// ───────────────────────── AI draft (optional — inert unless the PRO
+// AI Assistant module + copy_categoria_corso flag + a connector are all
+// configured; the REST call itself returns a clear message otherwise) ─────────────────────────
+const aiNotes = ref('');
+const aiLoading = ref(false);
+const aiError = ref('');
+
+async function generateAiDraft() {
+  if (!catForm.nome || !aiNotes.value) {
+    aiError.value = 'Inserisci il nome della categoria e almeno un punto chiave.';
+    return;
+  }
+  aiLoading.value = true;
+  aiError.value = '';
+  try {
+    const res = await fetch(apiUrl('ai/generate-copy'), {
+      method: 'POST',
+      headers: headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ name: catForm.nome, notes: aiNotes.value }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      aiError.value = data.message || 'Errore nella generazione.';
+      return;
+    }
+    catForm.intro = data.intro || catForm.intro;
+    catForm.program = data.program || catForm.program;
+    catForm.requirements = data.requirements || catForm.requirements;
+    catForm.important_notes = data.important_notes || catForm.important_notes;
+  } catch (e) {
+    aiError.value = 'Errore di rete.';
+  } finally {
+    aiLoading.value = false;
+  }
+}
+
 function navigate(params) {
   const url = new URL(window.location.href);
   url.searchParams.delete('edit_cat');
@@ -253,6 +289,14 @@ onMounted(() => {
         </div>
 
         <div class="hint" style="margin: 0 0 4px">Questi campi compaiono nella pagina generata con [ws_workshop_page] — non sull'Aula virtuale, che resta puramente funzionale. Puoi anche incollare ogni singolo blocco altrove con lo shortcode indicato in etichetta (aggiungi <code>slug="{{ editingCategoria ? editingCategoria.slug : '...' }}"</code>).</div>
+
+        <div style="background: rgba(255,102,8,0.06); border: 1px solid rgba(255,102,8,0.3); border-radius: 6px; padding: 14px 16px; margin: 4px 0 18px">
+          <label style="display:block; font-weight:600; margin-bottom:6px;">✨ Genera bozza con AI (opzionale)</label>
+          <textarea v-model="aiNotes" rows="2" placeholder="Punti chiave, es: 3 giorni, street photography, Napoli, gruppo piccolo max 6 persone..." style="width:100%; margin-bottom:8px"></textarea>
+          <button type="button" class="wv-btn wv-btn-sm" :disabled="aiLoading" @click="generateAiDraft">{{ aiLoading ? 'Generazione…' : '✨ Genera bozza (Intro/Programma/Requisiti/Note)' }}</button>
+          <div v-if="aiError" style="color:#ff6b6b; font-size:13px; margin-top:6px">{{ aiError }}</div>
+          <div class="hint" style="margin-top:6px">Compila i campi qui sotto con una proposta — resta sempre da rivedere prima di salvare. Richiede un connettore AI configurato e la funzione attiva in AI Assistant.</div>
+        </div>
         <div class="wv-field"><label>Introduzione <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="intro"]</code></label><textarea v-model="catForm.intro" rows="3" placeholder="Uno o due paragrafi di presentazione del workshop..."></textarea></div>
         <div class="wv-field"><label>Programma <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="program"]</code></label><textarea v-model="catForm.program" rows="6" placeholder="Giorno 1: ...&#10;Giorno 2: ..."></textarea></div>
         <div class="wv-field"><label>Requisiti <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="requirements"]</code></label><textarea v-model="catForm.requirements" rows="3" placeholder="Es. Fotocamera reflex o mirrorless, nessuna esperienza richiesta..."></textarea></div>
