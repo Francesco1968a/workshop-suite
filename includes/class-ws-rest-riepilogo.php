@@ -321,6 +321,10 @@ final class WS_Rest_Riepilogo implements WS_Module {
             $attachments[] = ['content' => $ics, 'filename' => 'evento-' . $eid . '.ics', 'type' => 'text/calendar'];
         }
 
+        // Lets add-ons (e.g. the PRO voucher/PDF pass) attach to this same
+        // confirmation email instead of sending a separate one.
+        $attachments = apply_filters('ws_confirmation_email_attachments', $attachments, $isc_id);
+
         $result = WS_Mail_Inbox::send_reply($email, $subject, $body, $attachments);
         if (!$result['ok']) {
             return new WP_Error('send_failed', $result['msg'], ['status' => 500]);
