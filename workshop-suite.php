@@ -80,6 +80,7 @@ final class WS_Plugin {
             new WS_Rest_Mail_Inbox(),
             new WS_Shortcode_Messaggi(),
             new WS_Mail_Poller(),
+            new WS_Webhooks(),
             new WS_Shortcode_Prossimo(),
             new WS_Shortcode_Prezzo(),
             new WS_Shortcode_Eventi_Categoria(),
@@ -131,6 +132,7 @@ require_once WS_PATH . 'includes/class-ws-shortcode-categorie.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-aula-virtuale.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-workshop-page.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-workshop-text.php';
+require_once WS_PATH . 'includes/class-ws-webhooks.php';
 require_once WS_PATH . 'includes/class-ws-admin-nav-filter.php';
 require_once WS_PATH . 'includes/class-ws-t15-reminder.php';
 require_once WS_PATH . 'includes/class-ws-rest-messaggi.php';
