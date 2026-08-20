@@ -585,6 +585,10 @@ final class WS_Rest_Admin implements WS_Module {
                     'citta' => WS_Data::get_field('citta', 'categoria_evento_' . $edit_cat) ?: '',
                     'nazione' => WS_Data::get_field('nazione', 'categoria_evento_' . $edit_cat) ?: '',
                     'indirizzo' => WS_Data::get_field('indirizzo', 'categoria_evento_' . $edit_cat) ?: '',
+                    'intro' => WS_Data::get_field('intro', 'categoria_evento_' . $edit_cat) ?: '',
+                    'programma_testo' => WS_Data::get_field('programma_testo', 'categoria_evento_' . $edit_cat) ?: '',
+                    'requisiti' => WS_Data::get_field('requisiti', 'categoria_evento_' . $edit_cat) ?: '',
+                    'note_importanti' => WS_Data::get_field('note_importanti', 'categoria_evento_' . $edit_cat) ?: '',
                 ];
             }
         }
@@ -725,7 +729,13 @@ final class WS_Rest_Admin implements WS_Module {
         }
 
         if ($add_shortcode) {
-            $this->ensure_categoria_shortcodes($page_id, $term->slug);
+            // The "+ Crea Pagina" button builds a brand-new blank page, so it
+            // gets the new all-in-one shortcode (hero + intro/programma/
+            // requisiti/note + eventi + form) as the predefined default.
+            // ensure_categoria_shortcodes() (old eventi_categoria + ws_form_iscrizione
+            // combo) is untouched and still runs for organizers linking an
+            // existing, manually-built page instead — see crea_categoria/modifica_categoria.
+            wp_update_post(['ID' => $page_id, 'post_content' => '[ws_workshop_page slug="' . $term->slug . '"]']);
         }
 
         return new WP_REST_Response([
@@ -785,6 +795,10 @@ final class WS_Rest_Admin implements WS_Module {
         $citta = sanitize_text_field((string) $request->get_param('citta'));
         $nazione = sanitize_text_field((string) $request->get_param('nazione'));
         $indirizzo = sanitize_text_field((string) $request->get_param('indirizzo'));
+        $intro = sanitize_textarea_field((string) $request->get_param('intro'));
+        $programma_testo = sanitize_textarea_field((string) $request->get_param('programma_testo'));
+        $requisiti = sanitize_textarea_field((string) $request->get_param('requisiti'));
+        $note_importanti = sanitize_textarea_field((string) $request->get_param('note_importanti'));
 
         $t = wp_insert_term($nome, 'categoria_evento');
         if (is_wp_error($t)) return new WP_Error('failed', $t->get_error_message(), ['status' => 500]);
@@ -821,6 +835,10 @@ final class WS_Rest_Admin implements WS_Module {
         if ($citta) WS_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
         if ($nazione) WS_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
         if ($indirizzo) WS_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
+        if ($intro) WS_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
+        if ($programma_testo) WS_Data::update_field('programma_testo', $programma_testo, 'categoria_evento_' . $tid);
+        if ($requisiti) WS_Data::update_field('requisiti', $requisiti, 'categoria_evento_' . $tid);
+        if ($note_importanti) WS_Data::update_field('note_importanti', $note_importanti, 'categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria creata.', 'id' => $tid]);
     }
@@ -844,6 +862,10 @@ final class WS_Rest_Admin implements WS_Module {
         $citta = sanitize_text_field((string) $request->get_param('citta'));
         $nazione = sanitize_text_field((string) $request->get_param('nazione'));
         $indirizzo = sanitize_text_field((string) $request->get_param('indirizzo'));
+        $intro = sanitize_textarea_field((string) $request->get_param('intro'));
+        $programma_testo = sanitize_textarea_field((string) $request->get_param('programma_testo'));
+        $requisiti = sanitize_textarea_field((string) $request->get_param('requisiti'));
+        $note_importanti = sanitize_textarea_field((string) $request->get_param('note_importanti'));
 
         wp_update_term($tid, 'categoria_evento', ['name' => $nome]);
         WS_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
@@ -871,6 +893,10 @@ final class WS_Rest_Admin implements WS_Module {
         WS_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
         WS_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
         WS_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
+        WS_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
+        WS_Data::update_field('programma_testo', $programma_testo, 'categoria_evento_' . $tid);
+        WS_Data::update_field('requisiti', $requisiti, 'categoria_evento_' . $tid);
+        WS_Data::update_field('note_importanti', $note_importanti, 'categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria aggiornata.']);
     }
