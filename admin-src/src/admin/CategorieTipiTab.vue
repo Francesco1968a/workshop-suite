@@ -50,6 +50,41 @@ async function generateAiDraft() {
   }
 }
 
+const translateLanguage = ref('Inglese');
+const translateLoading = ref(false);
+const translateError = ref('');
+
+async function translateFields() {
+  translateLoading.value = true;
+  translateError.value = '';
+  try {
+    const res = await fetch(apiUrl('ai/translate-copy'), {
+      method: 'POST',
+      headers: headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        language: translateLanguage.value,
+        intro: catForm.intro,
+        program: catForm.program,
+        requirements: catForm.requirements,
+        important_notes: catForm.important_notes,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      translateError.value = data.message || 'Errore nella traduzione.';
+      return;
+    }
+    catForm.intro = data.intro || catForm.intro;
+    catForm.program = data.program || catForm.program;
+    catForm.requirements = data.requirements || catForm.requirements;
+    catForm.important_notes = data.important_notes || catForm.important_notes;
+  } catch (e) {
+    translateError.value = 'Errore di rete.';
+  } finally {
+    translateLoading.value = false;
+  }
+}
+
 function navigate(params) {
   const url = new URL(window.location.href);
   url.searchParams.delete('edit_cat');
@@ -301,6 +336,16 @@ onMounted(() => {
         <div class="wv-field"><label>Programma <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="program"]</code></label><textarea v-model="catForm.program" rows="6" placeholder="Giorno 1: ...&#10;Giorno 2: ..."></textarea></div>
         <div class="wv-field"><label>Requisiti <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="requirements"]</code></label><textarea v-model="catForm.requirements" rows="3" placeholder="Es. Fotocamera reflex o mirrorless, nessuna esperienza richiesta..."></textarea></div>
         <div class="wv-field"><label>Note importanti <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="important_notes"]</code></label><textarea v-model="catForm.important_notes" rows="3" placeholder="Es. Punto di ritrovo, cosa portare, condizioni meteo..."></textarea></div>
+
+        <div style="background: rgba(255,102,8,0.06); border: 1px solid rgba(255,102,8,0.3); border-radius: 6px; padding: 14px 16px; margin: 4px 0 18px">
+          <label style="display:block; font-weight:600; margin-bottom:6px;">🌐 Traduci con AI (opzionale)</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input type="text" v-model="translateLanguage" placeholder="Es. Inglese, Francese..." style="flex:1" />
+            <button type="button" class="wv-btn wv-btn-sm" :disabled="translateLoading" @click="translateFields">{{ translateLoading ? 'Traduzione…' : 'Traduci i 4 campi sopra' }}</button>
+          </div>
+          <div v-if="translateError" style="color:#ff6b6b; font-size:13px; margin-top:6px">{{ translateError }}</div>
+          <div class="hint" style="margin-top:6px">Sostituisce Intro/Programma/Requisiti/Note con la traduzione — salva solo dopo aver controllato il risultato (o annulla senza salvare).</div>
+        </div>
 
         <div class="wv-field">
           <label>Oggetto mail di conferma</label>
