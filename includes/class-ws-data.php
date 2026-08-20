@@ -413,6 +413,12 @@ final class WS_Data {
         $saldo = (float) get_field('saldo', $iscrizione_id);
         $msg_orig = get_field('messaggio_originale', $iscrizione_id) ?: get_field('note', $iscrizione_id);
 
+        // {luogo} resolves to the meeting link for virtual events and the
+        // physical address otherwise — same placeholder, different content,
+        // so mail templates don't need a modalità-specific variant.
+        $modalita = $eid ? (get_field('modalita', $eid) ?: 'fisico') : 'fisico';
+        $luogo = $modalita === 'virtuale' ? (string) get_field('link_virtuale', $eid) : (string) get_field('indirizzo_geocoding', $eid);
+
         $placeholders = [
             '{nome}' => $nome, '{cognome}' => $cognome, '{nome_completo}' => trim($nome . ' ' . $cognome),
             '{email}' => $email, '{telefono}' => $telefono, '{citta}' => $citta,
@@ -423,6 +429,7 @@ final class WS_Data {
             '{anticipo}' => '€ ' . number_format($anticipo, 2, ',', '.'),
             '{saldo}' => '€ ' . number_format($saldo, 2, ',', '.'),
             '{messaggio_originale}' => $msg_orig,
+            '{luogo}' => $luogo,
         ];
 
         return strtr($template, $placeholders);

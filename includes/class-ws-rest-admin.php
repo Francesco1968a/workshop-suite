@@ -215,6 +215,8 @@ final class WS_Rest_Admin implements WS_Module {
                 'ora_inizio' => WS_Data::get_field('ora_inizio', $edit_ev) ?: '',
                 'ora_fine' => WS_Data::get_field('ora_fine', $edit_ev) ?: '',
                 'posti_totali' => (int) WS_Data::get_field('posti_totali', $edit_ev) ?: 5,
+                'modalita' => WS_Data::get_field('modalita', $edit_ev) ?: 'fisico',
+                'link_virtuale' => WS_Data::get_field('link_virtuale', $edit_ev) ?: '',
                 'enable_hub_sync' => (bool) WS_Data::get_field('enable_hub_sync', $edit_ev),
                 'indirizzo_geocoding' => (string) WS_Data::get_field('indirizzo_geocoding', $edit_ev) ?: '',
                 'event_latitude' => (string) WS_Data::get_field('event_latitude', $edit_ev) ?: '',
@@ -295,6 +297,8 @@ final class WS_Rest_Admin implements WS_Module {
                 'nascosto' => (bool) get_post_meta($id, 'nascondi_dal_frontend', true),
                 'enable_hub_sync' => (bool) WS_Data::get_field('enable_hub_sync', $id),
                 'hub_status' => (string) WS_Data::get_field('hub_status', $id) ?: 'non_sincronizzato',
+                'modalita' => (string) WS_Data::get_field('modalita', $id) ?: 'fisico',
+                'link_virtuale' => (string) WS_Data::get_field('link_virtuale', $id) ?: '',
             ];
         }
 
@@ -318,6 +322,8 @@ final class WS_Rest_Admin implements WS_Module {
         $indirizzo_geocoding = sanitize_text_field((string) $request->get_param('indirizzo_geocoding'));
         $lat = sanitize_text_field((string) $request->get_param('event_latitude'));
         $lng = sanitize_text_field((string) $request->get_param('event_longitude'));
+        $modalita = sanitize_text_field((string) $request->get_param('modalita')) === 'virtuale' ? 'virtuale' : 'fisico';
+        $link_virtuale = esc_url_raw((string) $request->get_param('link_virtuale'));
 
         $term = get_term($cat, 'categoria_evento');
         if (!$cat || !$data || !$term || is_wp_error($term)) {
@@ -335,6 +341,8 @@ final class WS_Rest_Admin implements WS_Module {
         WS_Data::update_field('ora_fine', $of, $id);
         WS_Data::update_field('posti_totali', $posti, $id);
         WS_Data::update_field('enable_hub_sync', $enable_hub_sync, $id);
+        WS_Data::update_field('modalita', $modalita, $id);
+        WS_Data::update_field('link_virtuale', $link_virtuale, $id);
         WS_Data::update_field('indirizzo_geocoding', $indirizzo_geocoding, $id);
         WS_Data::update_field('event_latitude', $lat, $id);
         WS_Data::update_field('event_longitude', $lng, $id);
@@ -356,6 +364,8 @@ final class WS_Rest_Admin implements WS_Module {
         $indirizzo_geocoding = sanitize_text_field((string) $request->get_param('indirizzo_geocoding'));
         $lat = sanitize_text_field((string) $request->get_param('event_latitude'));
         $lng = sanitize_text_field((string) $request->get_param('event_longitude'));
+        $modalita = sanitize_text_field((string) $request->get_param('modalita')) === 'virtuale' ? 'virtuale' : 'fisico';
+        $link_virtuale = esc_url_raw((string) $request->get_param('link_virtuale'));
 
         if (!$eid || !$data) return new WP_Error('invalid', 'Data obbligatoria.', ['status' => 400]);
         if (!$data_fine || $data_fine < $data) $data_fine = $data;
@@ -366,6 +376,8 @@ final class WS_Rest_Admin implements WS_Module {
         WS_Data::update_field('ora_fine', $of, $eid);
         WS_Data::update_field('posti_totali', $posti, $eid);
         WS_Data::update_field('enable_hub_sync', $enable_hub_sync, $eid);
+        WS_Data::update_field('modalita', $modalita, $eid);
+        WS_Data::update_field('link_virtuale', $link_virtuale, $eid);
         WS_Data::update_field('indirizzo_geocoding', $indirizzo_geocoding, $eid);
         WS_Data::update_field('event_latitude', $lat, $eid);
         WS_Data::update_field('event_longitude', $lng, $eid);
@@ -485,6 +497,7 @@ final class WS_Rest_Admin implements WS_Module {
         '{periodo}' => 'Periodo evento (es. 9 – 12 Lug 2026)', '{data_inizio}' => 'Data inizio per esteso',
         '{data_fine}' => 'Data fine per esteso', '{ora_inizio}' => 'Ora inizio (HH:MM)', '{ora_fine}' => 'Ora fine (HH:MM)',
         '{posti_totali}' => 'Numero posti totali', '{posti_disponibili}' => 'Posti ancora disponibili',
+        '{luogo}' => 'Link Aula virtuale (se online) o indirizzo (se in presenza)',
         '{anticipo}' => 'Anticipo pagato (es. € 200,00)', '{saldo}' => 'Saldo pagato',
     ];
 

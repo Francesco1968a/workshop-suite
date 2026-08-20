@@ -144,6 +144,11 @@ final class WS_Ics_Feed implements WS_Module {
             $cat_name = $terms ? $terms[0]->name : 'Workshop';
             $cat_url  = $terms ? WS_Data::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id) : '';
 
+            $modalita = WS_Data::get_field('modalita', $ev->ID) ?: 'fisico';
+            $location = $modalita === 'virtuale'
+                ? (string) WS_Data::get_field('link_virtuale', $ev->ID)
+                : (string) WS_Data::get_field('indirizzo_geocoding', $ev->ID);
+
             $iscrizioni = WS_Data::iscrizioni_evento($ev->ID);
             $confermati = [];
             $richieste = [];
@@ -202,6 +207,7 @@ final class WS_Ics_Feed implements WS_Module {
             $out .= $this->ics_fold('DTEND;TZID=Europe/Rome:' . $dtend);
             $out .= $this->ics_fold('SUMMARY:' . $this->ics_escape($summary));
             $out .= $this->ics_fold('DESCRIPTION:' . $this->ics_escape($description));
+            if ($location) $out .= $this->ics_fold('LOCATION:' . $this->ics_escape($location));
             if ($cat_url) $out .= $this->ics_fold('URL:' . $this->ics_escape($cat_url));
             $out .= $this->ics_fold('STATUS:CONFIRMED');
             $out .= $this->ics_fold('END:VEVENT');

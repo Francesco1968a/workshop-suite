@@ -14,7 +14,7 @@ const savingEvento = ref(false);
 const savingIscrizione = ref(false);
 const toggling = ref(0);
 
-const eventoForm = reactive({ categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5 });
+const eventoForm = reactive({ categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: 'fisico', link_virtuale: '' });
 const iscrizioneForm = reactive({ evento: 0, stato: 'richiesta', stato_pagamento: 'in_attesa', num_persone: 1, anticipo: 0, saldo: 0, note: '' });
 
 function apiUrl(path) {
@@ -67,9 +67,11 @@ async function load() {
       ora_inizio: editingEvento.value.ora_inizio,
       ora_fine: editingEvento.value.ora_fine,
       posti_totali: editingEvento.value.posti_totali,
+      modalita: editingEvento.value.modalita || 'fisico',
+      link_virtuale: editingEvento.value.link_virtuale || '',
     });
   } else {
-    Object.assign(eventoForm, { categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5 });
+    Object.assign(eventoForm, { categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: 'fisico', link_virtuale: '' });
   }
 
   if (editingIscrizione.value) {
@@ -173,6 +175,17 @@ onMounted(() => {
           <label>Posti totali</label>
           <input type="number" min="1" v-model.number="eventoForm.posti_totali" required />
         </div>
+        <div class="wv-field">
+          <label>Modalità</label>
+          <select v-model="eventoForm.modalita">
+            <option value="fisico">In presenza</option>
+            <option value="virtuale">Aula virtuale</option>
+          </select>
+        </div>
+        <div class="wv-field" v-if="eventoForm.modalita === 'virtuale'">
+          <label>Link Aula virtuale</label>
+          <input type="url" v-model="eventoForm.link_virtuale" placeholder="https://zoom.us/j/..." />
+        </div>
         <div class="wv-form-actions">
           <button type="submit" :disabled="savingEvento">{{ editingEvento ? 'Salva modifiche' : 'Crea evento' }}</button>
           <a v-if="editingEvento" class="wv-btn wv-btn-ghost" @click="navigate({ vista: 'eventi' })">Annulla</a>
@@ -186,7 +199,7 @@ onMounted(() => {
         <div class="wv-evcard-foto" :style="e.categoria_foto ? { backgroundImage: `url('${e.categoria_foto}')` } : {}"></div>
         <div class="wv-evento-head">
           <div>
-            <h4>{{ e.label }} <span v-if="e.nascosto" class="wv-badge-hidden">Non pubblicato</span></h4>
+            <h4>{{ e.label }} <span v-if="e.nascosto" class="wv-badge-hidden">Non pubblicato</span> <span v-if="e.modalita === 'virtuale'" style="color:#ff6608;border:1px solid #ff6608;border-radius:3px;font-size:11px;padding:1px 6px;font-weight:700;">💻 Aula virtuale</span></h4>
             <span style="color: #999; font-size: 13px">
               <strong v-if="e.sold_out" style="color: #ff6b6b">SOLD OUT</strong>
               <template v-else>Posti confermati: <strong style="color: #fff">{{ e.occupati }}/{{ e.totali }}</strong></template>
