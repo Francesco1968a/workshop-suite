@@ -10,6 +10,7 @@ import CategorieTipiTab from './CategorieTipiTab.vue';
 // — see includes/class-ws-shortcode-categorie.php.
 const page = new URL(window.location.href).searchParams.get('page');
 const isCatPage = page === 'workshop-suite-categorie' || window.WS_CONFIG?.panelMode === 'categorie';
+const isVirtualPage = window.WS_CONFIG?.panelMode === 'virtuale';
 const tabs = isCatPage ? { categorie: 'Categorie', tipologia: 'Tipologia' } : { eventi: 'Eventi', partecipanti: 'Aggiungi Partecipante' };
 
 const initVista = new URL(window.location.href).searchParams.get('vista') || Object.keys(tabs)[0];
@@ -55,7 +56,7 @@ onMounted(() => {
     </nav>
 
     <PartecipantiTab v-if="vista === 'partecipanti'" @message="flash" />
-    <EventiTab v-else-if="vista === 'eventi'" @message="flash" />
+    <EventiTab v-else-if="vista === 'eventi'" :filter-modalita="isVirtualPage ? 'virtuale' : ''" @message="flash" />
     <CategorieTipiTab v-else-if="vista === 'categorie'" sub="categorie" @message="flash" />
     <CategorieTipiTab v-else-if="vista === 'tipologia'" sub="tipologia" @message="flash" />
   </div>

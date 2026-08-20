@@ -254,12 +254,21 @@ final class WS_Rest_Admin implements WS_Module {
             ];
         }
 
+        // Filters the evento list to a single Modalità — used by the
+        // "Aula Virtuale" admin entry point, which reuses this exact tab
+        // pre-filtered instead of duplicating a separate panel.
+        $modalita_filter = sanitize_text_field((string) $request->get_param('modalita'));
+
         if ($edit_isc) {
             $isc_eid = (int) WS_Data::get_field('evento', $edit_isc);
             $eq = new WP_Query(['post_type' => 'evento', 'posts_per_page' => 1, 'post__in' => [$isc_eid]]);
         } else {
+            $meta_query = [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']];
+            if (in_array($modalita_filter, ['fisico', 'virtuale'], true)) {
+                $meta_query[] = ['key' => 'modalita', 'value' => $modalita_filter];
+            }
             $eq = new WP_Query(['post_type' => 'evento', 'posts_per_page' => -1, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
-                'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']]]);
+                'meta_query' => $meta_query]);
         }
         $eventi = [];
         foreach ($eq->posts as $ev) {
