@@ -118,9 +118,9 @@ final class WS_Post_Types implements WS_Module {
                 ['key' => 'field_cat_url', 'label' => 'URL pagina presentazione', 'name' => 'url_pagina', 'type' => 'url'],
                 ['key' => 'field_cat_foto', 'label' => 'Foto categoria (URL immagine)', 'name' => 'foto_categoria', 'type' => 'url'],
                 ['key' => 'field_cat_intro', 'label' => 'Introduzione', 'name' => 'intro', 'type' => 'textarea', 'rows' => 4, 'instructions' => 'Usata nella pagina di presentazione generata automaticamente (shortcode [ws_workshop_page]).'],
-                ['key' => 'field_cat_programma', 'label' => 'Programma', 'name' => 'programma_testo', 'type' => 'textarea', 'rows' => 8],
-                ['key' => 'field_cat_requisiti', 'label' => 'Requisiti', 'name' => 'requisiti', 'type' => 'textarea', 'rows' => 4],
-                ['key' => 'field_cat_note_importanti', 'label' => 'Note importanti', 'name' => 'note_importanti', 'type' => 'textarea', 'rows' => 4],
+                ['key' => 'field_cat_programma', 'label' => 'Programma', 'name' => 'program', 'type' => 'textarea', 'rows' => 8],
+                ['key' => 'field_cat_requisiti', 'label' => 'Requisiti', 'name' => 'requirements', 'type' => 'textarea', 'rows' => 4],
+                ['key' => 'field_cat_note_importanti', 'label' => 'Note importanti', 'name' => 'important_notes', 'type' => 'textarea', 'rows' => 4],
             ],
             'location' => [[['param' => 'taxonomy', 'operator' => '==', 'value' => 'categoria_evento']]],
         ]);

@@ -41,7 +41,7 @@ const editCat = ref(0);
 const savingCategoria = ref(false);
 
 function emptyCatForm() {
-  return { nome: '', url: '', foto: '', tipo: '', oggetto_conferma: '', mail_conferma: '', oggetto_t15: '', mail_t15: '', prezzo: 0, acconto: 0, citta: '', nazione: '', indirizzo: '', intro: '', programma_testo: '', requisiti: '', note_importanti: '' };
+  return { nome: '', url: '', foto: '', tipo: '', oggetto_conferma: '', mail_conferma: '', oggetto_t15: '', mail_t15: '', prezzo: 0, acconto: 0, citta: '', nazione: '', indirizzo: '', intro: '', program: '', requirements: '', important_notes: '' };
 }
 const catForm = reactive(emptyCatForm());
 
@@ -252,11 +252,11 @@ onMounted(() => {
           <div class="hint">Usata anche come Hero image in testa alla pagina generata dallo shortcode [ws_workshop_page].</div>
         </div>
 
-        <div class="wv-field"><label>Introduzione</label><textarea v-model="catForm.intro" rows="3" placeholder="Uno o due paragrafi di presentazione del workshop..."></textarea></div>
-        <div class="wv-field"><label>Programma</label><textarea v-model="catForm.programma_testo" rows="6" placeholder="Giorno 1: ...&#10;Giorno 2: ..."></textarea></div>
-        <div class="wv-field"><label>Requisiti</label><textarea v-model="catForm.requisiti" rows="3" placeholder="Es. Fotocamera reflex o mirrorless, nessuna esperienza richiesta..."></textarea></div>
-        <div class="wv-field"><label>Note importanti</label><textarea v-model="catForm.note_importanti" rows="3" placeholder="Es. Punto di ritrovo, cosa portare, condizioni meteo..."></textarea></div>
-        <div class="hint" style="margin: -8px 0 16px">Questi campi compaiono solo nella pagina generata con [ws_workshop_page] — non sull'Aula virtuale, che resta puramente funzionale.</div>
+        <div class="hint" style="margin: 0 0 4px">Questi campi compaiono nella pagina generata con [ws_workshop_page] — non sull'Aula virtuale, che resta puramente funzionale. Puoi anche incollare ogni singolo blocco altrove con lo shortcode indicato in etichetta (aggiungi <code>slug="{{ editingCategoria ? editingCategoria.slug : '...' }}"</code>).</div>
+        <div class="wv-field"><label>Introduzione <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="intro"]</code></label><textarea v-model="catForm.intro" rows="3" placeholder="Uno o due paragrafi di presentazione del workshop..."></textarea></div>
+        <div class="wv-field"><label>Programma <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="program"]</code></label><textarea v-model="catForm.program" rows="6" placeholder="Giorno 1: ...&#10;Giorno 2: ..."></textarea></div>
+        <div class="wv-field"><label>Requisiti <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="requirements"]</code></label><textarea v-model="catForm.requirements" rows="3" placeholder="Es. Fotocamera reflex o mirrorless, nessuna esperienza richiesta..."></textarea></div>
+        <div class="wv-field"><label>Note importanti <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="important_notes"]</code></label><textarea v-model="catForm.important_notes" rows="3" placeholder="Es. Punto di ritrovo, cosa portare, condizioni meteo..."></textarea></div>
 
         <div class="wv-field">
           <label>Oggetto mail di conferma</label>
