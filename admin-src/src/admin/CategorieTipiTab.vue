@@ -41,7 +41,7 @@ const editCat = ref(0);
 const savingCategoria = ref(false);
 
 function emptyCatForm() {
-  return { nome: '', url: '', foto: '', tipo: '', oggetto_conferma: '', mail_conferma: '', oggetto_t15: '', mail_t15: '', prezzo: 0, acconto: 0, citta: '', nazione: '', indirizzo: '' };
+  return { nome: '', url: '', foto: '', tipo: '', oggetto_conferma: '', mail_conferma: '', oggetto_t15: '', mail_t15: '', prezzo: 0, acconto: 0, citta: '', nazione: '', indirizzo: '', intro: '', programma_testo: '', requisiti: '', note_importanti: '' };
 }
 const catForm = reactive(emptyCatForm());
 
@@ -249,7 +249,14 @@ onMounted(() => {
             <img :src="catForm.foto" style="height: 65px; width: 100px; object-fit: cover; border-radius: 4px" />
             <button type="button" class="wv-btn wv-btn-sm wv-btn-del" @click="catForm.foto = ''">✕ Rimuovi foto</button>
           </div>
+          <div class="hint">Usata anche come Hero image in testa alla pagina generata dallo shortcode [ws_workshop_page].</div>
         </div>
+
+        <div class="wv-field"><label>Introduzione</label><textarea v-model="catForm.intro" rows="3" placeholder="Uno o due paragrafi di presentazione del workshop..."></textarea></div>
+        <div class="wv-field"><label>Programma</label><textarea v-model="catForm.programma_testo" rows="6" placeholder="Giorno 1: ...&#10;Giorno 2: ..."></textarea></div>
+        <div class="wv-field"><label>Requisiti</label><textarea v-model="catForm.requisiti" rows="3" placeholder="Es. Fotocamera reflex o mirrorless, nessuna esperienza richiesta..."></textarea></div>
+        <div class="wv-field"><label>Note importanti</label><textarea v-model="catForm.note_importanti" rows="3" placeholder="Es. Punto di ritrovo, cosa portare, condizioni meteo..."></textarea></div>
+        <div class="hint" style="margin: -8px 0 16px">Questi campi compaiono solo nella pagina generata con [ws_workshop_page] — non sull'Aula virtuale, che resta puramente funzionale.</div>
 
         <div class="wv-field">
           <label>Oggetto mail di conferma</label>
