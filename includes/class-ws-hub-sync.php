@@ -15,6 +15,7 @@ final class WS_Hub_Sync implements WS_Module {
     }
 
     public function register(): void {
+        add_action('init', [__CLASS__, 'migrate_legacy_synced_events']);
         add_action('save_post_evento', [__CLASS__, 'on_event_save'], 20, 2);
         add_action('save_post_wv_eventi', [__CLASS__, 'on_event_save'], 20, 2);
         add_action('wp_trash_post', [__CLASS__, 'on_event_trash']);
@@ -24,12 +25,24 @@ final class WS_Hub_Sync implements WS_Module {
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
         if (wp_is_post_revision($post_id)) return;
         if ($post->post_status !== 'publish') return;
-
-        // Check if sync is disabled for this specific event
-        $disabled = get_post_meta($post_id, '_ws_hub_sync_disabled', true);
-        if ($disabled) return;
+        if (!self::should_sync($post_id)) return;
 
         self::sync_single_event($post_id);
+    }
+
+    /**
+     * The real per-event gate is the "Pubblica su Hub" checkbox
+     * (enable_hub_sync, shown on the Evento form) — this used to be
+     * ignored entirely (the code checked a different, never-written meta
+     * key, '_ws_hub_sync_disabled'), so every published event synced
+     * regardless of the checkbox. Opt-in matches the field's own label
+     * and default value (unchecked); events that were already syndicated
+     * under the old always-on behavior are backfilled to enable_hub_sync=1
+     * once (see migrate_legacy_enable_hub_sync()) so nothing already
+     * listed on the Hub silently stops updating because of this fix.
+     */
+    public static function should_sync(int $post_id): bool {
+        return (bool) get_post_meta($post_id, 'enable_hub_sync', true);
     }
 
     public static function on_event_trash(int $post_id): void {
@@ -38,7 +51,32 @@ final class WS_Hub_Sync implements WS_Module {
     }
 
     /**
-     * Batch syndicates all currently published events to the Global Hub.
+     * One-time backfill (init hook): any event that already has a
+     * _ws_hub_syndicated_url (proof it was synced under the old
+     * always-on logic) but enable_hub_sync not set gets it turned on,
+     * so should_sync()'s new opt-in gate doesn't retroactively orphan
+     * listings already live on the Hub.
+     */
+    public static function migrate_legacy_synced_events(): void {
+        if (get_option('ws_hub_legacy_backfill_done')) return;
+
+        $ids = get_posts([
+            'post_type' => ['evento', 'wv_eventi'], 'post_status' => 'publish',
+            'posts_per_page' => -1, 'fields' => 'ids', 'no_found_rows' => true,
+            'meta_query' => [
+                ['key' => '_ws_hub_syndicated_url', 'compare' => 'EXISTS'],
+                ['key' => 'enable_hub_sync', 'compare' => 'NOT EXISTS'],
+            ],
+        ]);
+        foreach ($ids as $id) {
+            update_post_meta($id, 'enable_hub_sync', 1);
+        }
+        update_option('ws_hub_legacy_backfill_done', 1);
+    }
+
+    /**
+     * Batch syndicates all currently published, opted-in events to the
+     * Global Hub.
      */
     public static function sync_all_published_events(): array {
         $query = new WP_Query([
@@ -47,6 +85,7 @@ final class WS_Hub_Sync implements WS_Module {
             'posts_per_page' => -1,
             'fields'         => 'ids',
             'no_found_rows'  => true,
+            'meta_query'     => [['key' => 'enable_hub_sync', 'value' => '1']],
         ]);
 
         $results = ['synced' => 0, 'failed' => 0, 'details' => []];
