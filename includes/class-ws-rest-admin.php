@@ -88,6 +88,45 @@ final class WS_Rest_Admin implements WS_Module {
         return date('Y-m-d');
     }
 
+    /**
+     * Only fills in link_virtuale when it's empty and the chosen platform
+     * is Jitsi — never overwrites a link the organizer already set or
+     * pasted (Zoom/Meet/altro stay fully manual, as they always were).
+     */
+    private function maybe_generate_jitsi_room(string $piattaforma, string $link_virtuale, int $post_id): string {
+        if ($link_virtuale || $piattaforma !== 'jitsi') return $link_virtuale;
+        $slug = sanitize_title(parse_url(home_url(), PHP_URL_HOST) ?: 'workshop');
+        $room = $slug . '-' . $post_id . '-' . substr(md5(wp_generate_password(12, false)), 0, 8);
+        return 'https://meet.jit.si/' . $room;
+    }
+
+    /**
+     * Creates the [ws_aula_virtuale] page once per evento (only for
+     * Jitsi — Zoom/Meet/altro keep using the raw external link directly,
+     * no page needed). {luogo} then points here instead of the bare
+     * meet.jit.si URL, so the emailed link opens our branding-free
+     * embedded room instead of jitsi's own site.
+     */
+    private function maybe_create_aula_page(int $evento_id, string $piattaforma, string $link_virtuale): void {
+        if ($piattaforma !== 'jitsi' || !$link_virtuale) return;
+
+        $existing_page_id = (int) get_post_meta($evento_id, '_ws_aula_page_id', true);
+        if ($existing_page_id && get_post_status($existing_page_id) && get_post_status($existing_page_id) !== 'trash') {
+            return;
+        }
+
+        $page_id = wp_insert_post([
+            'post_type' => 'page',
+            'post_title' => WS_Data::evento_label($evento_id) ?: __('Aula virtuale', 'workshop-suite'),
+            'post_content' => '[ws_aula_virtuale evento_id="' . $evento_id . '"]',
+            'post_status' => 'publish',
+        ], true);
+        if (is_wp_error($page_id)) return;
+
+        update_post_meta($evento_id, '_ws_aula_page_id', $page_id);
+        update_post_meta($page_id, '_ws_aula_page_for', $evento_id);
+    }
+
     // ───────────────────────── TAB: Partecipanti ─────────────────────────
 
     public function get_partecipanti_tab(): WP_REST_Response {
@@ -216,6 +255,7 @@ final class WS_Rest_Admin implements WS_Module {
                 'ora_fine' => WS_Data::get_field('ora_fine', $edit_ev) ?: '',
                 'posti_totali' => (int) WS_Data::get_field('posti_totali', $edit_ev) ?: 5,
                 'modalita' => WS_Data::get_field('modalita', $edit_ev) ?: 'fisico',
+                'piattaforma_virtuale' => WS_Data::get_field('piattaforma_virtuale', $edit_ev) ?: 'jitsi',
                 'link_virtuale' => WS_Data::get_field('link_virtuale', $edit_ev) ?: '',
                 'enable_hub_sync' => (bool) WS_Data::get_field('enable_hub_sync', $edit_ev),
                 'indirizzo_geocoding' => (string) WS_Data::get_field('indirizzo_geocoding', $edit_ev) ?: '',
@@ -332,6 +372,8 @@ final class WS_Rest_Admin implements WS_Module {
         $lat = sanitize_text_field((string) $request->get_param('event_latitude'));
         $lng = sanitize_text_field((string) $request->get_param('event_longitude'));
         $modalita = sanitize_text_field((string) $request->get_param('modalita')) === 'virtuale' ? 'virtuale' : 'fisico';
+        $piattaforma_virtuale = sanitize_text_field((string) $request->get_param('piattaforma_virtuale'));
+        if (!in_array($piattaforma_virtuale, ['jitsi', 'zoom', 'meet', 'altro'], true)) $piattaforma_virtuale = 'jitsi';
         $link_virtuale = esc_url_raw((string) $request->get_param('link_virtuale'));
 
         $term = get_term($cat, 'categoria_evento');
@@ -344,6 +386,8 @@ final class WS_Rest_Admin implements WS_Module {
             'post_title' => $term->name . ' – ' . date_i18n('d/m/Y', strtotime($data))]);
         if (!$id) return new WP_Error('failed', 'Creazione evento fallita.', ['status' => 500]);
 
+        if ($modalita === 'virtuale') $link_virtuale = $this->maybe_generate_jitsi_room($piattaforma_virtuale, $link_virtuale, $id);
+
         WS_Data::update_field('data_evento', $data, $id);
         WS_Data::update_field('data_fine', $data_fine, $id);
         WS_Data::update_field('ora_inizio', $oi, $id);
@@ -351,12 +395,14 @@ final class WS_Rest_Admin implements WS_Module {
         WS_Data::update_field('posti_totali', $posti, $id);
         WS_Data::update_field('enable_hub_sync', $enable_hub_sync, $id);
         WS_Data::update_field('modalita', $modalita, $id);
+        WS_Data::update_field('piattaforma_virtuale', $piattaforma_virtuale, $id);
         WS_Data::update_field('link_virtuale', $link_virtuale, $id);
         WS_Data::update_field('indirizzo_geocoding', $indirizzo_geocoding, $id);
         WS_Data::update_field('event_latitude', $lat, $id);
         WS_Data::update_field('event_longitude', $lng, $id);
         WS_Data::update_field('hub_status', 'non_sincronizzato', $id);
         wp_set_object_terms($id, $cat, 'categoria_evento');
+        if ($modalita === 'virtuale') $this->maybe_create_aula_page($id, $piattaforma_virtuale, $link_virtuale);
 
         return new WP_REST_Response(['msg' => 'Evento creato.', 'id' => $id]);
     }
@@ -374,10 +420,14 @@ final class WS_Rest_Admin implements WS_Module {
         $lat = sanitize_text_field((string) $request->get_param('event_latitude'));
         $lng = sanitize_text_field((string) $request->get_param('event_longitude'));
         $modalita = sanitize_text_field((string) $request->get_param('modalita')) === 'virtuale' ? 'virtuale' : 'fisico';
+        $piattaforma_virtuale = sanitize_text_field((string) $request->get_param('piattaforma_virtuale'));
+        if (!in_array($piattaforma_virtuale, ['jitsi', 'zoom', 'meet', 'altro'], true)) $piattaforma_virtuale = 'jitsi';
         $link_virtuale = esc_url_raw((string) $request->get_param('link_virtuale'));
 
         if (!$eid || !$data) return new WP_Error('invalid', 'Data obbligatoria.', ['status' => 400]);
         if (!$data_fine || $data_fine < $data) $data_fine = $data;
+
+        if ($modalita === 'virtuale') $link_virtuale = $this->maybe_generate_jitsi_room($piattaforma_virtuale, $link_virtuale, $eid);
 
         WS_Data::update_field('data_evento', $data, $eid);
         WS_Data::update_field('data_fine', $data_fine, $eid);
@@ -386,6 +436,7 @@ final class WS_Rest_Admin implements WS_Module {
         WS_Data::update_field('posti_totali', $posti, $eid);
         WS_Data::update_field('enable_hub_sync', $enable_hub_sync, $eid);
         WS_Data::update_field('modalita', $modalita, $eid);
+        WS_Data::update_field('piattaforma_virtuale', $piattaforma_virtuale, $eid);
         WS_Data::update_field('link_virtuale', $link_virtuale, $eid);
         WS_Data::update_field('indirizzo_geocoding', $indirizzo_geocoding, $eid);
         WS_Data::update_field('event_latitude', $lat, $eid);
@@ -394,6 +445,7 @@ final class WS_Rest_Admin implements WS_Module {
         $term = $cat ? get_term($cat, 'categoria_evento') : null;
         $tcat = ($term && !is_wp_error($term)) ? $term->name : get_the_title($eid);
         wp_update_post(['ID' => $eid, 'post_title' => $tcat . ' – ' . date_i18n('d/m/Y', strtotime($data))]);
+        if ($modalita === 'virtuale') $this->maybe_create_aula_page($eid, $piattaforma_virtuale, $link_virtuale);
 
         return new WP_REST_Response(['msg' => 'Evento aggiornato.']);
     }
