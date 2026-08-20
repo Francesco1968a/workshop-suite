@@ -11,7 +11,11 @@ import CategorieTipiTab from './CategorieTipiTab.vue';
 const page = new URL(window.location.href).searchParams.get('page');
 const isCatPage = page === 'workshop-suite-categorie' || window.WS_CONFIG?.panelMode === 'categorie';
 const isVirtualPage = window.WS_CONFIG?.panelMode === 'virtuale';
-const tabs = isCatPage ? { categorie: 'Categorie', tipologia: 'Tipologia' } : { eventi: 'Eventi', partecipanti: 'Aggiungi Partecipante' };
+const tabs = isCatPage
+  ? { categorie: 'Categorie', tipologia: 'Tipologia' }
+  : isVirtualPage
+    ? { categorie: 'Categoria', eventi: 'Eventi', partecipanti: 'Partecipanti' }
+    : { eventi: 'Eventi', partecipanti: 'Aggiungi Partecipante' };
 
 const initVista = new URL(window.location.href).searchParams.get('vista') || Object.keys(tabs)[0];
 const vista = ref(initVista);
@@ -49,7 +53,7 @@ onMounted(() => {
 
 <template>
   <div class="wv-dash">
-    <h2>Dashboard</h2>
+    <h2>{{ isVirtualPage ? '💻 Aula Virtuale' : isCatPage ? 'Categoria e tipologia' : 'Dashboard' }}</h2>
     <div v-if="msg" class="msg">{{ msg }}</div>
     <nav>
       <a v-for="(label, key) in tabs" :key="key" :class="{ active: vista === key }" @click="goTo(key)">{{ label }}</a>
