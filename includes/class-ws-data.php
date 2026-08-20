@@ -417,7 +417,19 @@ final class WS_Data {
         // physical address otherwise — same placeholder, different content,
         // so mail templates don't need a modalità-specific variant.
         $modalita = $eid ? (get_field('modalita', $eid) ?: 'fisico') : 'fisico';
-        $luogo = $modalita === 'virtuale' ? (string) get_field('link_virtuale', $eid) : (string) get_field('indirizzo_geocoding', $eid);
+        if ($modalita === 'virtuale') {
+            // For Jitsi (embedded), point to our own [ws_aula_virtuale] page
+            // instead of the raw meet.jit.si URL — same "no visible YouTube/
+            // Jitsi branding" preference already applied to lesson videos.
+            // Zoom/Meet/altro keep going straight to the external link, same
+            // as before this feature existed.
+            $aula_page_id = $eid ? (int) get_post_meta($eid, '_ws_aula_page_id', true) : 0;
+            $luogo = ($aula_page_id && get_post_status($aula_page_id) === 'publish')
+                ? get_permalink($aula_page_id)
+                : (string) get_field('link_virtuale', $eid);
+        } else {
+            $luogo = (string) get_field('indirizzo_geocoding', $eid);
+        }
 
         $placeholders = [
             '{nome}' => $nome, '{cognome}' => $cognome, '{nome_completo}' => trim($nome . ' ' . $cognome),

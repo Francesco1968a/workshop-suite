@@ -15,7 +15,7 @@ const savingEvento = ref(false);
 const savingIscrizione = ref(false);
 const toggling = ref(0);
 
-const eventoForm = reactive({ categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: 'fisico', link_virtuale: '' });
+const eventoForm = reactive({ categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: 'fisico', piattaforma_virtuale: 'jitsi', link_virtuale: '' });
 const iscrizioneForm = reactive({ evento: 0, stato: 'richiesta', stato_pagamento: 'in_attesa', num_persone: 1, anticipo: 0, saldo: 0, note: '' });
 
 function apiUrl(path) {
@@ -70,10 +70,11 @@ async function load() {
       ora_fine: editingEvento.value.ora_fine,
       posti_totali: editingEvento.value.posti_totali,
       modalita: editingEvento.value.modalita || 'fisico',
+      piattaforma_virtuale: editingEvento.value.piattaforma_virtuale || 'jitsi',
       link_virtuale: editingEvento.value.link_virtuale || '',
     });
   } else {
-    Object.assign(eventoForm, { categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: props.filterModalita || 'fisico', link_virtuale: '' });
+    Object.assign(eventoForm, { categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: props.filterModalita || 'fisico', piattaforma_virtuale: 'jitsi', link_virtuale: '' });
   }
 
   if (editingIscrizione.value) {
@@ -184,10 +185,24 @@ onMounted(() => {
             <option value="virtuale">Aula virtuale</option>
           </select>
         </div>
-        <div class="wv-field" v-if="eventoForm.modalita === 'virtuale'">
-          <label>Link Aula virtuale</label>
-          <input type="url" v-model="eventoForm.link_virtuale" placeholder="https://zoom.us/j/..." />
-        </div>
+        <template v-if="eventoForm.modalita === 'virtuale'">
+          <div class="wv-field">
+            <label>Piattaforma</label>
+            <select v-model="eventoForm.piattaforma_virtuale">
+              <option value="jitsi">Jitsi Meet (integrato nella pagina)</option>
+              <option value="zoom">Zoom</option>
+              <option value="meet">Google Meet</option>
+              <option value="altro">Altro (link esterno)</option>
+            </select>
+          </div>
+          <div class="wv-field">
+            <label>Link Aula virtuale</label>
+            <input type="url" v-model="eventoForm.link_virtuale" placeholder="https://zoom.us/j/..." />
+            <div v-if="eventoForm.piattaforma_virtuale === 'jitsi'" style="color: #999; font-size: 13px; margin-top: 4px;">
+              Lascia vuoto: alla creazione verrà generata automaticamente una stanza Jitsi.
+            </div>
+          </div>
+        </template>
         <div class="wv-form-actions">
           <button type="submit" :disabled="savingEvento">{{ editingEvento ? 'Salva modifiche' : 'Crea evento' }}</button>
           <a v-if="editingEvento" class="wv-btn wv-btn-ghost" @click="navigate({ vista: 'eventi' })">Annulla</a>
