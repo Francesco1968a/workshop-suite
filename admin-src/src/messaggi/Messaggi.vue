@@ -121,6 +121,32 @@ async function inviaRisposta() {
   }
 }
 
+// Optional — inert unless the PRO AI Assistant's mail_reply_draft flag
+// + a connector are both configured; the endpoint returns a clear
+// message otherwise. Never sends by itself: only fills replyBody, the
+// organizer still reviews and clicks Invia.
+const aiDraftLoading = ref(false);
+async function generateAiReplyDraft() {
+  const c = selected.value;
+  if (!c) return;
+  aiDraftLoading.value = true;
+  try {
+    const res = await fetch(apiUrl('ai/generate-mail-reply'), {
+      method: 'POST',
+      headers: headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ isc_id: c.isc_id }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      flash(data.message || 'Errore nella generazione.');
+      return;
+    }
+    replyBody.value = data.reply;
+  } finally {
+    aiDraftLoading.value = false;
+  }
+}
+
 onMounted(load);
 </script>
 
@@ -191,6 +217,11 @@ onMounted(load);
           </div>
           <div class="wv-field">
             <textarea v-model="replyBody" rows="8" placeholder="Scrivi la risposta…"></textarea>
+          </div>
+          <div v-if="selected.thread && selected.thread.length" style="margin: -6px 0 12px">
+            <button type="button" class="wv-btn wv-btn-ghost wv-btn-sm" :disabled="aiDraftLoading" @click="generateAiReplyDraft">
+              {{ aiDraftLoading ? '✨ Generazione…' : '✨ Bozza con AI' }}
+            </button>
           </div>
           <div class="wvm-detail-actions">
             <button class="wv-btn wv-btn-ghost" :disabled="savingBozza" @click="salvaBozza">Bozza</button>
