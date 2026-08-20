@@ -155,15 +155,11 @@ final class WS_Admin_Settings_Page implements WS_Module {
             [$this, 'render_eventi_partecipanti']
         );
 
-        // Submenu 3b: Aula Virtuale (same Eventi tab, filtered to Modalità = virtuale)
-        add_submenu_page(
-            'workshop-suite-dashboard',
-            __('Aula Virtuale', 'workshop-suite'),
-            __('💻 Aula Virtuale', 'workshop-suite'),
-            'manage_options',
-            'workshop-suite-aula-virtuale',
-            [$this, 'render_aula_virtuale']
-        );
+        // Note: the "Aula Virtuale" menu entry itself is registered by the
+        // PRO plugin (positioned between its own Corsi/Studenti items) —
+        // see WS_Pro_Course_Builder_Page::add_menu_page(). render_aula_virtuale()
+        // below stays here since the panel it renders (Eventi/Categoria/
+        // Partecipanti, filtered to Modalità=virtuale) is core functionality.
 
         // Submenu 4: Poster Templates (Conditional module)
         if (WS_Settings::is_module_active('poster_studio', true)) {
