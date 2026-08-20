@@ -218,9 +218,9 @@ onMounted(() => {
           </select>
         </div>
 
-        <div class="wv-field"><label>Città</label><input type="text" v-model="catForm.citta" placeholder="Napoli" /></div>
-        <div class="wv-field"><label>Nazione</label><input type="text" v-model="catForm.nazione" placeholder="Italia" /></div>
-        <div class="wv-field"><label>Indirizzo (opzionale)</label><input type="text" v-model="catForm.indirizzo" placeholder="Via/Piazza..." /></div>
+        <div class="wv-field"><label>Città <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="city"]</code></label><input type="text" v-model="catForm.citta" placeholder="Napoli" /></div>
+        <div class="wv-field"><label>Nazione <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="country"]</code></label><input type="text" v-model="catForm.nazione" placeholder="Italia" /></div>
+        <div class="wv-field"><label>Indirizzo (opzionale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="address"]</code></label><input type="text" v-model="catForm.indirizzo" placeholder="Via/Piazza..." /></div>
 
         <div class="wv-field">
           <label>Pagina di presentazione (Seleziona pagina o inserisci URL)</label>
@@ -236,7 +236,7 @@ onMounted(() => {
         </div>
 
         <div class="wv-field">
-          <label>Foto Categoria (URL / Libreria Media / Upload locale)</label>
+          <label>Foto Categoria (URL / Libreria Media / Upload locale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="photo"]</code></label>
           <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px">
             <input type="text" v-model="catForm.foto" placeholder="URL immagine o carica..." style="flex: 1" />
             <button type="button" class="wv-btn wv-btn-sm" @click="openCatMedia">Media</button>
@@ -249,7 +249,7 @@ onMounted(() => {
             <img :src="catForm.foto" style="height: 65px; width: 100px; object-fit: cover; border-radius: 4px" />
             <button type="button" class="wv-btn wv-btn-sm wv-btn-del" @click="catForm.foto = ''">✕ Rimuovi foto</button>
           </div>
-          <div class="hint">Usata anche come Hero image in testa alla pagina generata dallo shortcode [ws_workshop_page].</div>
+          <div class="hint">Usata anche come Hero image in testa alla pagina generata dallo shortcode [ws_workshop_page]. Consigliata una risoluzione tra 1600 e 2000px di larghezza per una buona resa a piena larghezza.</div>
         </div>
 
         <div class="hint" style="margin: 0 0 4px">Questi campi compaiono nella pagina generata con [ws_workshop_page] — non sull'Aula virtuale, che resta puramente funzionale. Puoi anche incollare ogni singolo blocco altrove con lo shortcode indicato in etichetta (aggiungi <code>slug="{{ editingCategoria ? editingCategoria.slug : '...' }}"</code>).</div>
