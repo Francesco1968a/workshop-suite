@@ -84,6 +84,12 @@ final class WS_Hub_Sync implements WS_Module {
         $cat_name = ($terms && !is_wp_error($terms)) ? $terms[0]->name : 'Workshop';
         $cat_term_id = ($terms && !is_wp_error($terms)) ? $terms[0]->term_id : 0;
 
+        // Modalità: virtual eventi have no physical geo data at all — don't
+        // fake a city/country fallback for them (the old 'Napoli, Italy'
+        // default was written back when only physical workshops existed).
+        $modalita = $meta['modalita'][0] ?? 'fisico';
+        $is_virtual = $modalita === 'virtuale';
+
         // Geo fields: event meta overrides category defaults, which override hardcoded fallbacks
         $city = $meta['citta'][0] ?? $meta['_wv_citta'][0] ?? null;
         $country = $meta['nazione'][0] ?? null;
@@ -93,9 +99,26 @@ final class WS_Hub_Sync implements WS_Module {
             $country = $country ?: (WS_Data::get_field('nazione', 'categoria_evento_' . $cat_term_id) ?: null);
             $address = $address ?: (WS_Data::get_field('indirizzo', 'categoria_evento_' . $cat_term_id) ?: null);
         }
-        $city = $city ?: 'Napoli, Italy';
-        $country = $country ?: 'Italy';
+        if ($is_virtual) {
+            $city = $city ?: 'Online';
+            $country = $country ?: '';
+        } else {
+            $city = $city ?: 'Napoli, Italy';
+            $country = $country ?: 'Italy';
+        }
         $address = $address ?: '';
+
+        // Where to join, for the Hub to show a "Partecipa online" CTA
+        // instead of a map pin — prefers our own embedded [ws_aula_virtuale]
+        // page over the raw meeting link, same preference as the {luogo}
+        // mail placeholder.
+        $virtual_join_url = '';
+        if ($is_virtual) {
+            $aula_page_id = (int) ($meta['_ws_aula_page_id'][0] ?? 0);
+            $virtual_join_url = ($aula_page_id && get_post_status($aula_page_id) === 'publish')
+                ? get_permalink($aula_page_id)
+                : (string) ($meta['link_virtuale'][0] ?? '');
+        }
 
         // Resolve real public booking URL (prevent 404 on private CPTs)
         $booking_url = '';
@@ -129,7 +152,13 @@ final class WS_Hub_Sync implements WS_Module {
             'city'                => $city,
             'country'             => $country,
             'location_address'    => $address,
-            'start_date'          => $meta['data_inizio'][0] ?? $meta['_wv_data_inizio'][0] ?? '',
+            'location_type'       => $is_virtual ? 'online' : 'in_presenza',
+            'virtual_join_url'    => $virtual_join_url,
+            // 'data_inizio' was never a real evento meta key (the field is
+            // 'data_evento') — this was silently sending an empty start
+            // date to the Hub for every event; fixed alongside the
+            // virtual-eventi support since it touches the same payload.
+            'start_date'          => $meta['data_evento'][0] ?? $meta['_wv_data_inizio'][0] ?? '',
             'end_date'            => $meta['data_fine'][0] ?? $meta['_wv_data_fine'][0] ?? '',
             'start_time'          => $meta['ora_inizio'][0] ?? '',
             'price'               => $meta['prezzo'][0] ?? $meta['_wv_prezzo'][0] ?? '',
