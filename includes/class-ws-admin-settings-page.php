@@ -155,6 +155,16 @@ final class WS_Admin_Settings_Page implements WS_Module {
             [$this, 'render_eventi_partecipanti']
         );
 
+        // Submenu 3b: Aula Virtuale (same Eventi tab, filtered to Modalità = virtuale)
+        add_submenu_page(
+            'workshop-suite-dashboard',
+            __('Aula Virtuale', 'workshop-suite'),
+            __('💻 Aula Virtuale', 'workshop-suite'),
+            'manage_options',
+            'workshop-suite-aula-virtuale',
+            [$this, 'render_aula_virtuale']
+        );
+
         // Submenu 4: Poster Templates (Conditional module)
         if (WS_Settings::is_module_active('poster_studio', true)) {
             add_submenu_page(
@@ -245,7 +255,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
     }
 
     /** Enqueues one Vue bundle's JS/CSS + WS_CONFIG, without emitting any markup. */
-    private function enqueue_panel_assets(string $handle, string $js_file, string $css_file): void {
+    private function enqueue_panel_assets(string $handle, string $js_file, string $css_file, array $extra_config = []): void {
         $asset_js  = WS_PATH . $js_file;
         $asset_css = WS_PATH . $css_file;
 
@@ -279,19 +289,19 @@ final class WS_Admin_Settings_Page implements WS_Module {
             );
         }
 
-        $config = [
+        $config = array_merge([
             'restUrl'       => esc_url_raw(rest_url('workshop-suite/v1/')),
             'nonce'         => wp_create_nonce('wp_rest'),
             'brandName'     => WS_Settings::get('site_brand_name', 'Workshop Suite'),
-        ];
+        ], $extra_config);
         wp_localize_script($handle, 'WS_CONFIG', $config);
         wp_localize_script($handle, 'FVW_CONFIG', $config);
     }
 
-    private function render_panel_wrapper(string $app_id, string $handle, string $js_file, string $css_file): void {
+    private function render_panel_wrapper(string $app_id, string $handle, string $js_file, string $css_file, array $extra_config = []): void {
         if (!current_user_can('manage_options')) return;
 
-        $this->enqueue_panel_assets($handle, $js_file, $css_file);
+        $this->enqueue_panel_assets($handle, $js_file, $css_file, $extra_config);
         ?>
         <div class="wrap ws-admin-wrap">
             <div id="<?php echo esc_attr($app_id); ?>"></div>
@@ -308,6 +318,20 @@ final class WS_Admin_Settings_Page implements WS_Module {
             $_GET['vista'] = 'categorie';
         }
         $this->render_panel_wrapper('ws-admin-app', 'ws-admin', 'assets/dist/admin.js', 'assets/dist/admin.css');
+    }
+
+    /**
+     * "Aula Virtuale" — the exact same Eventi/Partecipanti tab as
+     * workshop-suite-eventi, just pre-filtered to Modalità = virtuale. Not
+     * a separate panel: a live workshop is still just an evento with a
+     * date and capacity, so it reuses booking/reminder/calendar as-is
+     * instead of a parallel system.
+     */
+    public function render_aula_virtuale(): void {
+        if (!isset($_GET['vista'])) {
+            $_GET['vista'] = 'eventi';
+        }
+        $this->render_panel_wrapper('ws-admin-app', 'ws-admin', 'assets/dist/admin.js', 'assets/dist/admin.css', ['panelMode' => 'virtuale']);
     }
 
     public function render_eventi_partecipanti(): void {

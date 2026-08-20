@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 
+const props = defineProps({ filterModalita: { type: String, default: '' } });
 const emit = defineEmits(['message']);
 
 const loading = ref(true);
@@ -53,6 +54,7 @@ async function load() {
   const url = new URL(apiUrl('admin/eventi-tab'));
   if (editEv.value) url.searchParams.set('edit_ev', editEv.value);
   if (editIsc.value) url.searchParams.set('edit_isc', editIsc.value);
+  if (props.filterModalita) url.searchParams.set('modalita', props.filterModalita);
   const data = await (await fetch(url, { headers: headers() })).json();
   categorie.value = data.categorie;
   eventi.value = data.eventi;
@@ -71,7 +73,7 @@ async function load() {
       link_virtuale: editingEvento.value.link_virtuale || '',
     });
   } else {
-    Object.assign(eventoForm, { categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: 'fisico', link_virtuale: '' });
+    Object.assign(eventoForm, { categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: props.filterModalita || 'fisico', link_virtuale: '' });
   }
 
   if (editingIscrizione.value) {
@@ -193,7 +195,7 @@ onMounted(() => {
       </form>
     </template>
 
-    <h3>{{ editIsc ? 'Modifica iscrizione' : 'Eventi in programma' }}</h3>
+    <h3>{{ editIsc ? 'Modifica iscrizione' : (props.filterModalita === 'virtuale' ? 'Aule virtuali in programma' : 'Eventi in programma') }}</h3>
     <div class="wv-eventi-grid">
       <div v-for="e in eventi" :key="e.id" class="wv-card wv-evcard-grid">
         <div class="wv-evcard-foto" :style="e.categoria_foto ? { backgroundImage: `url('${e.categoria_foto}')` } : {}"></div>
