@@ -73,6 +73,7 @@ final class WS_Plugin {
             new WS_Shortcode_Categorie(),
             new WS_Shortcode_Aula_Virtuale(),
             new WS_Shortcode_Workshop_Page(),
+            new WS_Shortcode_Workshop_Text(),
             new WS_Admin_Nav_Filter(),
             new WS_T15_Reminder(),
             new WS_Rest_Messaggi(),
@@ -129,6 +130,7 @@ require_once WS_PATH . 'includes/class-ws-shortcode-admin.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-categorie.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-aula-virtuale.php';
 require_once WS_PATH . 'includes/class-ws-shortcode-workshop-page.php';
+require_once WS_PATH . 'includes/class-ws-shortcode-workshop-text.php';
 require_once WS_PATH . 'includes/class-ws-admin-nav-filter.php';
 require_once WS_PATH . 'includes/class-ws-t15-reminder.php';
 require_once WS_PATH . 'includes/class-ws-rest-messaggi.php';

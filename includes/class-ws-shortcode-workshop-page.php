@@ -44,9 +44,9 @@ final class WS_Shortcode_Workshop_Page implements WS_Module {
         $ctx = 'categoria_evento_' . $tid;
         $hero = (string) WS_Data::get_field('foto_categoria', $ctx);
         $intro = (string) WS_Data::get_field('intro', $ctx);
-        $programma = (string) WS_Data::get_field('programma_testo', $ctx);
-        $requisiti = (string) WS_Data::get_field('requisiti', $ctx);
-        $note = (string) WS_Data::get_field('note_importanti', $ctx);
+        $program = (string) WS_Data::get_field('program', $ctx);
+        $requirements = (string) WS_Data::get_field('requirements', $ctx);
+        $note = (string) WS_Data::get_field('important_notes', $ctx);
 
         ob_start();
         ?>
@@ -107,22 +107,22 @@ final class WS_Shortcode_Workshop_Page implements WS_Module {
                         <div class="ws-wp-intro"><?php echo esc_html($intro); ?></div>
                     <?php endif; ?>
 
-                    <?php if ($intro && ($programma || $requisiti || $note)): ?><div class="ws-wp-divider"></div><?php endif; ?>
+                    <?php if ($intro && ($program || $requirements || $note)): ?><div class="ws-wp-divider"></div><?php endif; ?>
 
-                    <?php if ($programma || $requisiti): ?>
+                    <?php if ($program || $requirements): ?>
                         <div class="ws-wp-grid">
-                            <?php if ($programma): ?>
+                            <?php if ($program): ?>
                                 <div class="ws-wp-card">
                                     <span class="ws-wp-card-icon">📸</span>
                                     <h2>Programma</h2>
-                                    <div class="ws-wp-text"><?php echo esc_html($programma); ?></div>
+                                    <div class="ws-wp-text"><?php echo esc_html($program); ?></div>
                                 </div>
                             <?php endif; ?>
-                            <?php if ($requisiti): ?>
+                            <?php if ($requirements): ?>
                                 <div class="ws-wp-card">
                                     <span class="ws-wp-card-icon">✅</span>
                                     <h2>Requisiti</h2>
-                                    <div class="ws-wp-text"><?php echo esc_html($requisiti); ?></div>
+                                    <div class="ws-wp-text"><?php echo esc_html($requirements); ?></div>
                                 </div>
                             <?php endif; ?>
                         </div>

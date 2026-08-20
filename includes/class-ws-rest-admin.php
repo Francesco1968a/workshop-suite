@@ -572,6 +572,7 @@ final class WS_Rest_Admin implements WS_Module {
                 $editing_categoria = [
                     'id' => $edit_cat,
                     'nome' => $t->name,
+                    'slug' => $t->slug,
                     'url' => WS_Data::get_field('url_pagina', 'categoria_evento_' . $edit_cat) ?: '',
                     'foto' => WS_Data::get_field('foto_categoria', 'categoria_evento_' . $edit_cat) ?: '',
                     'contesto_ai' => WS_Data::get_field('contesto_ai', 'categoria_evento_' . $edit_cat) ?: '',
@@ -586,9 +587,9 @@ final class WS_Rest_Admin implements WS_Module {
                     'nazione' => WS_Data::get_field('nazione', 'categoria_evento_' . $edit_cat) ?: '',
                     'indirizzo' => WS_Data::get_field('indirizzo', 'categoria_evento_' . $edit_cat) ?: '',
                     'intro' => WS_Data::get_field('intro', 'categoria_evento_' . $edit_cat) ?: '',
-                    'programma_testo' => WS_Data::get_field('programma_testo', 'categoria_evento_' . $edit_cat) ?: '',
-                    'requisiti' => WS_Data::get_field('requisiti', 'categoria_evento_' . $edit_cat) ?: '',
-                    'note_importanti' => WS_Data::get_field('note_importanti', 'categoria_evento_' . $edit_cat) ?: '',
+                    'program' => WS_Data::get_field('program', 'categoria_evento_' . $edit_cat) ?: '',
+                    'requirements' => WS_Data::get_field('requirements', 'categoria_evento_' . $edit_cat) ?: '',
+                    'important_notes' => WS_Data::get_field('important_notes', 'categoria_evento_' . $edit_cat) ?: '',
                 ];
             }
         }
@@ -796,9 +797,9 @@ final class WS_Rest_Admin implements WS_Module {
         $nazione = sanitize_text_field((string) $request->get_param('nazione'));
         $indirizzo = sanitize_text_field((string) $request->get_param('indirizzo'));
         $intro = sanitize_textarea_field((string) $request->get_param('intro'));
-        $programma_testo = sanitize_textarea_field((string) $request->get_param('programma_testo'));
-        $requisiti = sanitize_textarea_field((string) $request->get_param('requisiti'));
-        $note_importanti = sanitize_textarea_field((string) $request->get_param('note_importanti'));
+        $program = sanitize_textarea_field((string) $request->get_param('program'));
+        $requirements = sanitize_textarea_field((string) $request->get_param('requirements'));
+        $important_notes = sanitize_textarea_field((string) $request->get_param('important_notes'));
 
         $t = wp_insert_term($nome, 'categoria_evento');
         if (is_wp_error($t)) return new WP_Error('failed', $t->get_error_message(), ['status' => 500]);
@@ -836,9 +837,9 @@ final class WS_Rest_Admin implements WS_Module {
         if ($nazione) WS_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
         if ($indirizzo) WS_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
         if ($intro) WS_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
-        if ($programma_testo) WS_Data::update_field('programma_testo', $programma_testo, 'categoria_evento_' . $tid);
-        if ($requisiti) WS_Data::update_field('requisiti', $requisiti, 'categoria_evento_' . $tid);
-        if ($note_importanti) WS_Data::update_field('note_importanti', $note_importanti, 'categoria_evento_' . $tid);
+        if ($program) WS_Data::update_field('program', $program, 'categoria_evento_' . $tid);
+        if ($requirements) WS_Data::update_field('requirements', $requirements, 'categoria_evento_' . $tid);
+        if ($important_notes) WS_Data::update_field('important_notes', $important_notes, 'categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria creata.', 'id' => $tid]);
     }
@@ -863,9 +864,9 @@ final class WS_Rest_Admin implements WS_Module {
         $nazione = sanitize_text_field((string) $request->get_param('nazione'));
         $indirizzo = sanitize_text_field((string) $request->get_param('indirizzo'));
         $intro = sanitize_textarea_field((string) $request->get_param('intro'));
-        $programma_testo = sanitize_textarea_field((string) $request->get_param('programma_testo'));
-        $requisiti = sanitize_textarea_field((string) $request->get_param('requisiti'));
-        $note_importanti = sanitize_textarea_field((string) $request->get_param('note_importanti'));
+        $program = sanitize_textarea_field((string) $request->get_param('program'));
+        $requirements = sanitize_textarea_field((string) $request->get_param('requirements'));
+        $important_notes = sanitize_textarea_field((string) $request->get_param('important_notes'));
 
         wp_update_term($tid, 'categoria_evento', ['name' => $nome]);
         WS_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
@@ -894,9 +895,9 @@ final class WS_Rest_Admin implements WS_Module {
         WS_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
         WS_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
         WS_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
-        WS_Data::update_field('programma_testo', $programma_testo, 'categoria_evento_' . $tid);
-        WS_Data::update_field('requisiti', $requisiti, 'categoria_evento_' . $tid);
-        WS_Data::update_field('note_importanti', $note_importanti, 'categoria_evento_' . $tid);
+        WS_Data::update_field('program', $program, 'categoria_evento_' . $tid);
+        WS_Data::update_field('requirements', $requirements, 'categoria_evento_' . $tid);
+        WS_Data::update_field('important_notes', $important_notes, 'categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria aggiornata.']);
     }
