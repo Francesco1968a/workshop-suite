@@ -56,30 +56,36 @@ final class WS_Shortcode_Workshop_Page implements WS_Module {
             .ws-wp-wrap { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 1100px; margin: 0 auto; color: var(--ws-text-body); }
             .ws-wp-msg { color: var(--ws-text-muted); }
 
-            .ws-wp-hero { position: relative; width: 100%; aspect-ratio: 21/9; background-size: cover; background-position: center; border-radius: 10px; overflow: hidden; margin-bottom: -60px; }
-            .ws-wp-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,0) 100%); }
-            .ws-wp-hero-inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 90px 34px 24px; }
-            .ws-wp-kicker { display: inline-block; align-self: flex-start; background: rgba(255,102,8,.9); color: #fff; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: 4px 12px; border-radius: 3px; margin-bottom: 12px; }
-            .ws-wp-hero-title { font-size: clamp(28px, 4.2vw, 44px); font-weight: 800; color: #fff; margin: 0; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+            .ws-wp-hero { position: relative; width: 100%; aspect-ratio: 21/9; background-size: cover; background-position: center; border-radius: 12px; overflow: hidden; margin-bottom: -70px; box-shadow: 0 20px 40px -16px rgba(0,0,0,.35); }
+            .ws-wp-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,0) 100%); }
+            .ws-wp-hero-inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 100px 40px 30px; }
+            .ws-wp-kicker { display: inline-block; align-self: flex-start; background: rgba(255,102,8,.92); color: #fff; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 5px 14px; border-radius: 20px; margin-bottom: 14px; }
+            .ws-wp-hero-title { font-size: clamp(28px, 4.4vw, 46px); font-weight: 800; color: #fff; margin: 0; text-shadow: 0 2px 14px rgba(0,0,0,.45); letter-spacing: -.01em; }
 
-            .ws-wp-body { position: relative; z-index: 2; background: var(--ws-card-bg); border: 1px solid var(--ws-card-border); border-radius: 10px; padding: 40px; }
-            .ws-theme-dark .ws-wp-body { background: #0f1115; }
+            .ws-wp-body { position: relative; z-index: 2; background: var(--ws-card-bg); border: 1px solid var(--ws-card-border); border-radius: 12px; padding: 56px 48px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+            .ws-theme-dark .ws-wp-body { background: #0f1115; box-shadow: none; }
             .ws-wp-no-hero .ws-wp-body { margin-top: 0; }
 
-            .ws-wp-intro { font-size: 17px; line-height: 1.75; color: var(--ws-text-body); white-space: pre-line; margin-bottom: 8px; }
+            .ws-wp-intro { font-size: 18px; line-height: 1.85; color: var(--ws-text-body); white-space: pre-line; }
+            .ws-wp-intro::first-letter { font-size: 2.6em; font-weight: 800; color: var(--ws-accent); float: left; line-height: .8; padding-right: 8px; padding-top: 4px; }
 
-            .ws-wp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 34px; }
+            .ws-wp-divider { height: 1px; background: linear-gradient(90deg, var(--ws-card-border), transparent 70%); margin: 52px 0; }
+
+            .ws-wp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
             @media (max-width: 720px) { .ws-wp-grid { grid-template-columns: 1fr; } }
-            .ws-wp-card { background: var(--ws-surface-alt); border: 1px solid var(--ws-card-border); border-radius: 8px; padding: 22px 24px; }
-            .ws-wp-card h2 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ws-accent); margin: 0 0 12px; }
-            .ws-wp-card .ws-wp-text { font-size: 15px; line-height: 1.7; color: var(--ws-text-body); white-space: pre-line; }
+            .ws-wp-card { background: var(--ws-surface-alt); border: 1px solid var(--ws-card-border); border-radius: 10px; padding: 28px 26px; transition: transform .15s ease, box-shadow .15s ease; }
+            .ws-wp-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -12px rgba(0,0,0,.15); }
+            .ws-wp-card-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,102,8,.14); font-size: 18px; margin-bottom: 14px; }
+            .ws-wp-card h2 { font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ws-accent); margin: 0 0 14px; }
+            .ws-wp-card .ws-wp-text { font-size: 15px; line-height: 1.75; color: var(--ws-text-body); white-space: pre-line; }
 
-            .ws-wp-note { margin-top: 24px; border: 1px solid rgba(255,102,8,.4); background: rgba(255,102,8,.08); border-radius: 8px; padding: 20px 24px; }
-            .ws-wp-note h2 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ws-accent); margin: 0 0 10px; }
-            .ws-wp-note .ws-wp-text { font-size: 15px; line-height: 1.7; color: var(--ws-text-body); white-space: pre-line; }
+            .ws-wp-note { margin-top: 44px; border: 1px solid rgba(255,102,8,.4); background: rgba(255,102,8,.08); border-radius: 10px; padding: 26px 28px; }
+            .ws-wp-note-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,102,8,.18); font-size: 18px; margin-bottom: 14px; }
+            .ws-wp-note h2 { font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ws-accent); margin: 0 0 12px; }
+            .ws-wp-note .ws-wp-text { font-size: 15px; line-height: 1.75; color: var(--ws-text-body); white-space: pre-line; }
 
-            .ws-wp-booking { margin-top: 46px; padding-top: 34px; border-top: 1px solid var(--ws-card-border); }
-            .ws-wp-booking-title { font-size: 22px; font-weight: 800; color: var(--ws-text-heading); margin: 0 0 22px; text-align: center; }
+            .ws-wp-booking { margin-top: 60px; padding-top: 48px; border-top: 1px solid var(--ws-card-border); }
+            .ws-wp-booking-title { font-size: 24px; font-weight: 800; color: var(--ws-text-heading); margin: 0 0 30px; text-align: center; }
         </style>
         <div class="ws-theme-wrapper ws-theme-<?php echo esc_attr($theme); ?>">
             <div class="ws-wp-wrap<?php echo $hero ? '' : ' ws-wp-no-hero'; ?>">
@@ -101,17 +107,21 @@ final class WS_Shortcode_Workshop_Page implements WS_Module {
                         <div class="ws-wp-intro"><?php echo esc_html($intro); ?></div>
                     <?php endif; ?>
 
+                    <?php if ($intro && ($programma || $requisiti || $note)): ?><div class="ws-wp-divider"></div><?php endif; ?>
+
                     <?php if ($programma || $requisiti): ?>
                         <div class="ws-wp-grid">
                             <?php if ($programma): ?>
                                 <div class="ws-wp-card">
-                                    <h2>📸 Programma</h2>
+                                    <span class="ws-wp-card-icon">📸</span>
+                                    <h2>Programma</h2>
                                     <div class="ws-wp-text"><?php echo esc_html($programma); ?></div>
                                 </div>
                             <?php endif; ?>
                             <?php if ($requisiti): ?>
                                 <div class="ws-wp-card">
-                                    <h2>✅ Requisiti</h2>
+                                    <span class="ws-wp-card-icon">✅</span>
+                                    <h2>Requisiti</h2>
                                     <div class="ws-wp-text"><?php echo esc_html($requisiti); ?></div>
                                 </div>
                             <?php endif; ?>
@@ -120,7 +130,8 @@ final class WS_Shortcode_Workshop_Page implements WS_Module {
 
                     <?php if ($note): ?>
                         <div class="ws-wp-note">
-                            <h2>⚠️ Note importanti</h2>
+                            <span class="ws-wp-note-icon">⚠️</span>
+                            <h2>Note importanti</h2>
                             <div class="ws-wp-text"><?php echo esc_html($note); ?></div>
                         </div>
                     <?php endif; ?>
