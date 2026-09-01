@@ -89,7 +89,7 @@ final class WSMA_Rest_Riepilogo implements WSMA_Module {
 
             $terms = get_the_terms($id, 'wsma_categoria_evento');
             $cat_name = $terms ? $terms[0]->name : '—';
-            $foto = $terms ? WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $terms[0]->term_id) : '';
+            $foto = $terms ? WSMA_Data::get_field('foto_categoria', 'wsma_categoria_evento_' . $terms[0]->term_id) : '';
             $n_richieste = WSMA_Data::count_richieste($id);
 
             $eventi[] = [
@@ -217,14 +217,14 @@ final class WSMA_Rest_Riepilogo implements WSMA_Module {
         $terms_ev = get_the_terms($evento_id, 'wsma_categoria_evento');
         $cat_id_ev = $terms_ev ? $terms_ev[0]->term_id : 0;
         $cat_name_ev = $terms_ev ? $terms_ev[0]->name : '—';
-        $foto_ev = $cat_id_ev ? WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $cat_id_ev) : '';
-        $cat_url_ev = $cat_id_ev ? WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $cat_id_ev) : '';
-        $fb_share_enabled = $cat_id_ev ? (bool) WSMA_Data::get_field('fb_share_enabled', 'categoria_evento_' . $cat_id_ev) : false;
+        $foto_ev = $cat_id_ev ? WSMA_Data::get_field('foto_categoria', 'wsma_categoria_evento_' . $cat_id_ev) : '';
+        $cat_url_ev = $cat_id_ev ? WSMA_Data::get_field('url_pagina', 'wsma_categoria_evento_' . $cat_id_ev) : '';
+        $fb_share_enabled = $cat_id_ev ? (bool) WSMA_Data::get_field('fb_share_enabled', 'wsma_categoria_evento_' . $cat_id_ev) : false;
         $fb_share_text = '';
         if ($fb_share_enabled) {
-            $city = (string) WSMA_Data::get_field('citta', $evento_id) ?: ($cat_id_ev ? (string) WSMA_Data::get_field('citta', 'categoria_evento_' . $cat_id_ev) : '');
-            $address = (string) WSMA_Data::get_field('indirizzo', $evento_id) ?: ($cat_id_ev ? (string) WSMA_Data::get_field('indirizzo', 'categoria_evento_' . $cat_id_ev) : '');
-            $intro = $cat_id_ev ? (string) WSMA_Data::get_field('intro', 'categoria_evento_' . $cat_id_ev) : '';
+            $city = (string) WSMA_Data::get_field('citta', $evento_id) ?: ($cat_id_ev ? (string) WSMA_Data::get_field('citta', 'wsma_categoria_evento_' . $cat_id_ev) : '');
+            $address = (string) WSMA_Data::get_field('indirizzo', $evento_id) ?: ($cat_id_ev ? (string) WSMA_Data::get_field('indirizzo', 'wsma_categoria_evento_' . $cat_id_ev) : '');
+            $intro = $cat_id_ev ? (string) WSMA_Data::get_field('intro', 'wsma_categoria_evento_' . $cat_id_ev) : '';
             $luogo = trim($address ? ($address . ($city ? ', ' . $city : '')) : $city);
             $righe = [
                 WSMA_Data::evento_label($evento_id),
@@ -341,8 +341,8 @@ final class WSMA_Rest_Riepilogo implements WSMA_Module {
 
         $terms = get_the_terms($eid, 'wsma_categoria_evento');
         $cat_id = $terms ? $terms[0]->term_id : 0;
-        $oggetto_tpl = $cat_id ? WSMA_Data::get_field('oggetto_conferma', 'categoria_evento_' . $cat_id) : '';
-        $mail_tpl = $cat_id ? WSMA_Data::get_field('mail_conferma', 'categoria_evento_' . $cat_id) : '';
+        $oggetto_tpl = $cat_id ? WSMA_Data::get_field('oggetto_conferma', 'wsma_categoria_evento_' . $cat_id) : '';
+        $mail_tpl = $cat_id ? WSMA_Data::get_field('mail_conferma', 'wsma_categoria_evento_' . $cat_id) : '';
         if (!$oggetto_tpl) $oggetto_tpl = '✓ Confermato · {categoria_nome} · {periodo}';
         if (!$mail_tpl) $mail_tpl = "Ciao {nome},\n\nsei ufficialmente confermato per {categoria_nome} del {periodo}.\n\nIn allegato il file calendario (.ics) per aggiungere l'evento al tuo Google o Apple Calendar.\n\nPer qualsiasi cosa, rispondimi a questa mail o scrivimi su WhatsApp.\n\nA presto,\nFrancesco";
 

@@ -48,7 +48,7 @@ final class WSMA_Shortcode_Prezzo implements WSMA_Module {
 
         if (!$term) return '';
 
-        $valore = (float) WSMA_Data::get_field($campo, 'categoria_evento_' . $term->term_id);
+        $valore = (float) WSMA_Data::get_field($campo, 'wsma_categoria_evento_' . $term->term_id);
         if ($valore <= 0) return '';
 
         if ((string) $atts['raw'] === '1') {

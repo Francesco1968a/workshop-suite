@@ -206,8 +206,8 @@ final class WSMA_Ringraziamento implements WSMA_Module {
         $terms = get_the_terms($eid, 'wsma_categoria_evento');
         $cat_id = $terms ? $terms[0]->term_id : 0;
 
-        $oggetto_tpl = $cat_id ? WSMA_Data::get_field('oggetto_ringraziamento', 'categoria_evento_' . $cat_id) : '';
-        $mail_tpl = $cat_id ? WSMA_Data::get_field('mail_ringraziamento', 'categoria_evento_' . $cat_id) : '';
+        $oggetto_tpl = $cat_id ? WSMA_Data::get_field('oggetto_ringraziamento', 'wsma_categoria_evento_' . $cat_id) : '';
+        $mail_tpl = $cat_id ? WSMA_Data::get_field('mail_ringraziamento', 'wsma_categoria_evento_' . $cat_id) : '';
 
         if (!$mail_tpl) {
             $body = $this->default_body($isc_id);

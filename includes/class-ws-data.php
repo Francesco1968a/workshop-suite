@@ -46,8 +46,8 @@ final class WSMA_Data {
         if (function_exists('get_field')) {
             return \get_field($field, $id);
         }
-        if (is_string($id) && strpos($id, 'categoria_evento_') === 0) {
-            $term_id = (int) str_replace('categoria_evento_', '', $id);
+        if (is_string($id) && strpos($id, 'wsma_categoria_evento_') === 0) {
+            $term_id = (int) str_replace('wsma_categoria_evento_', '', $id);
             return get_term_meta($term_id, $field, true);
         }
         if ($id === false) {
@@ -63,8 +63,8 @@ final class WSMA_Data {
         if (function_exists('update_field')) {
             return \update_field($field, $value, $id);
         }
-        if (is_string($id) && strpos($id, 'categoria_evento_') === 0) {
-            $term_id = (int) str_replace('categoria_evento_', '', $id);
+        if (is_string($id) && strpos($id, 'wsma_categoria_evento_') === 0) {
+            $term_id = (int) str_replace('wsma_categoria_evento_', '', $id);
             return update_term_meta($term_id, $field, $value);
         }
         if ($id === false) {
@@ -299,7 +299,7 @@ final class WSMA_Data {
         $all_cats = get_terms(['taxonomy' => 'wsma_categoria_evento', 'hide_empty' => false]);
         if (is_wp_error($all_cats)) return null;
         foreach ($all_cats as $cat) {
-            $cat_url = self::get_field('url_pagina', 'categoria_evento_' . $cat->term_id);
+            $cat_url = self::get_field('url_pagina', 'wsma_categoria_evento_' . $cat->term_id);
             if ($cat_url && untrailingslashit($cat_url) === $source_norm) {
                 return $cat;
             }
@@ -427,7 +427,7 @@ final class WSMA_Data {
 
         $terms = $eid ? get_the_terms($eid, 'wsma_categoria_evento') : null;
         $categoria_nome = $terms ? $terms[0]->name : '';
-        $categoria_url = $terms ? self::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id) : '';
+        $categoria_url = $terms ? self::get_field('url_pagina', 'wsma_categoria_evento_' . $terms[0]->term_id) : '';
 
         $d1 = $eid ? self::get_field('data_evento', $eid) : '';
         $d2 = $eid ? (self::get_field('data_fine', $eid) ?: $d1) : '';

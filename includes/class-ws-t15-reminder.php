@@ -104,8 +104,8 @@ final class WSMA_T15_Reminder implements WSMA_Module {
         $terms = get_the_terms($eid, 'wsma_categoria_evento');
         $cat_id = $terms ? $terms[0]->term_id : 0;
 
-        $oggetto_tpl = $cat_id ? WSMA_Data::get_field('oggetto_t15', 'categoria_evento_' . $cat_id) : '';
-        $mail_tpl = $cat_id ? WSMA_Data::get_field('mail_t15', 'categoria_evento_' . $cat_id) : '';
+        $oggetto_tpl = $cat_id ? WSMA_Data::get_field('oggetto_t15', 'wsma_categoria_evento_' . $cat_id) : '';
+        $mail_tpl = $cat_id ? WSMA_Data::get_field('mail_t15', 'wsma_categoria_evento_' . $cat_id) : '';
         if (!$oggetto_tpl) $oggetto_tpl = self::default_oggetto();
         if (!$mail_tpl) $mail_tpl = self::default_mail();
 

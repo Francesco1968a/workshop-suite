@@ -86,7 +86,7 @@ final class WSMA_Mail_Templates implements WSMA_Module {
         if ($eid) {
             $terms = get_the_terms($eid, 'wsma_categoria_evento');
             if ($terms) {
-                $tpl = WSMA_Data::get_field($key, 'categoria_evento_' . $terms[0]->term_id);
+                $tpl = WSMA_Data::get_field($key, 'wsma_categoria_evento_' . $terms[0]->term_id);
             }
         }
         if (!$tpl) $tpl = self::default_template($key);

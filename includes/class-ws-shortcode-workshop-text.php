@@ -62,7 +62,7 @@ final class WSMA_Shortcode_Workshop_Text implements WSMA_Module {
         }
         if (!$term || is_wp_error($term)) return '';
 
-        $value = (string) WSMA_Data::get_field($meta_key, 'categoria_evento_' . $term->term_id);
+        $value = (string) WSMA_Data::get_field($meta_key, 'wsma_categoria_evento_' . $term->term_id);
         if (!$value) return '';
 
         if ($field === 'photo') {

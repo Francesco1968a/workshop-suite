@@ -80,7 +80,7 @@ final class WSMA_Shortcode_Workshop_Page implements WSMA_Module {
         }
 
         $tid = $term->term_id;
-        $ctx = 'categoria_evento_' . $tid;
+        $ctx = 'wsma_categoria_evento_' . $tid;
         $hero = (string) WSMA_Data::get_field('foto_categoria', $ctx);
         $intro = (string) WSMA_Data::get_field('intro', $ctx);
         $program = (string) WSMA_Data::get_field('program', $ctx);

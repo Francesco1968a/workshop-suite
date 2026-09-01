@@ -72,8 +72,8 @@ final class WSMA_Rest_Admin implements WSMA_Module {
         $acconto = 0.0;
         $terms = get_the_terms($id, 'wsma_categoria_evento');
         if ($terms && !is_wp_error($terms)) {
-            $prezzo = (float) WSMA_Data::get_field('prezzo', 'categoria_evento_' . $terms[0]->term_id);
-            $acconto = (float) WSMA_Data::get_field('acconto', 'categoria_evento_' . $terms[0]->term_id);
+            $prezzo = (float) WSMA_Data::get_field('prezzo', 'wsma_categoria_evento_' . $terms[0]->term_id);
+            $acconto = (float) WSMA_Data::get_field('acconto', 'wsma_categoria_evento_' . $terms[0]->term_id);
         }
         return [
             'id' => $id,
@@ -338,8 +338,8 @@ final class WSMA_Rest_Admin implements WSMA_Module {
             $term = ($terms && !is_wp_error($terms)) ? $terms[0] : null;
             $cat_id = $term ? $term->term_id : 0;
             $cat_name = $term ? $term->name : '';
-            $cat_tipo = $cat_id ? (string) (WSMA_Data::get_field('tipo_categoria', 'categoria_evento_' . $cat_id) ?: get_term_meta($cat_id, 'tipo_categoria', true)) : '';
-            $cat_foto = $cat_id ? (string) (WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $cat_id) ?: get_term_meta($cat_id, 'foto_categoria', true)) : '';
+            $cat_tipo = $cat_id ? (string) (WSMA_Data::get_field('tipo_categoria', 'wsma_categoria_evento_' . $cat_id) ?: get_term_meta($cat_id, 'tipo_categoria', true)) : '';
+            $cat_foto = $cat_id ? (string) (WSMA_Data::get_field('foto_categoria', 'wsma_categoria_evento_' . $cat_id) ?: get_term_meta($cat_id, 'foto_categoria', true)) : '';
             $d_inizio = (string) WSMA_Data::get_field('data_evento', $id);
             $d_fine = (string) WSMA_Data::get_field('data_fine', $id);
 
@@ -614,24 +614,24 @@ final class WSMA_Rest_Admin implements WSMA_Module {
                     'id' => $edit_cat,
                     'nome' => $t->name,
                     'slug' => $t->slug,
-                    'url' => WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $edit_cat) ?: '',
-                    'foto' => WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $edit_cat) ?: '',
-                    'contesto_ai' => WSMA_Data::get_field('contesto_ai', 'categoria_evento_' . $edit_cat) ?: '',
-                    'tipo' => $this->sanitize_tipo((string) WSMA_Data::get_field('tipo_categoria', 'categoria_evento_' . $edit_cat)),
-                    'oggetto_conferma' => WSMA_Data::get_field('oggetto_conferma', 'categoria_evento_' . $edit_cat) ?: '',
-                    'mail_conferma' => WSMA_Data::get_field('mail_conferma', 'categoria_evento_' . $edit_cat) ?: '',
-                    'oggetto_t15' => WSMA_Data::get_field('oggetto_t15', 'categoria_evento_' . $edit_cat) ?: '',
-                    'mail_t15' => WSMA_Data::get_field('mail_t15', 'categoria_evento_' . $edit_cat) ?: '',
-                    'prezzo' => (float) WSMA_Data::get_field('prezzo', 'categoria_evento_' . $edit_cat),
-                    'acconto' => (float) WSMA_Data::get_field('acconto', 'categoria_evento_' . $edit_cat),
-                    'citta' => WSMA_Data::get_field('citta', 'categoria_evento_' . $edit_cat) ?: '',
-                    'nazione' => WSMA_Data::get_field('nazione', 'categoria_evento_' . $edit_cat) ?: '',
-                    'indirizzo' => WSMA_Data::get_field('indirizzo', 'categoria_evento_' . $edit_cat) ?: '',
-                    'intro' => WSMA_Data::get_field('intro', 'categoria_evento_' . $edit_cat) ?: '',
-                    'program' => WSMA_Data::get_field('program', 'categoria_evento_' . $edit_cat) ?: '',
-                    'requirements' => WSMA_Data::get_field('requirements', 'categoria_evento_' . $edit_cat) ?: '',
-                    'important_notes' => WSMA_Data::get_field('important_notes', 'categoria_evento_' . $edit_cat) ?: '',
-                    'fb_share_enabled' => (bool) WSMA_Data::get_field('fb_share_enabled', 'categoria_evento_' . $edit_cat),
+                    'url' => WSMA_Data::get_field('url_pagina', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'foto' => WSMA_Data::get_field('foto_categoria', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'contesto_ai' => WSMA_Data::get_field('contesto_ai', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'tipo' => $this->sanitize_tipo((string) WSMA_Data::get_field('tipo_categoria', 'wsma_categoria_evento_' . $edit_cat)),
+                    'oggetto_conferma' => WSMA_Data::get_field('oggetto_conferma', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'mail_conferma' => WSMA_Data::get_field('mail_conferma', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'oggetto_t15' => WSMA_Data::get_field('oggetto_t15', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'mail_t15' => WSMA_Data::get_field('mail_t15', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'prezzo' => (float) WSMA_Data::get_field('prezzo', 'wsma_categoria_evento_' . $edit_cat),
+                    'acconto' => (float) WSMA_Data::get_field('acconto', 'wsma_categoria_evento_' . $edit_cat),
+                    'citta' => WSMA_Data::get_field('citta', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'nazione' => WSMA_Data::get_field('nazione', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'indirizzo' => WSMA_Data::get_field('indirizzo', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'intro' => WSMA_Data::get_field('intro', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'program' => WSMA_Data::get_field('program', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'requirements' => WSMA_Data::get_field('requirements', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'important_notes' => WSMA_Data::get_field('important_notes', 'wsma_categoria_evento_' . $edit_cat) ?: '',
+                    'fb_share_enabled' => (bool) WSMA_Data::get_field('fb_share_enabled', 'wsma_categoria_evento_' . $edit_cat),
                 ];
             }
         }
@@ -654,13 +654,13 @@ final class WSMA_Rest_Admin implements WSMA_Module {
                 'id' => $t->term_id,
                 'nome' => $t->name,
                 'slug' => $t->slug,
-                'url' => WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $t->term_id) ?: '',
-                'foto' => WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $t->term_id) ?: '',
-                'tipo' => $this->sanitize_tipo((string) WSMA_Data::get_field('tipo_categoria', 'categoria_evento_' . $t->term_id)),
+                'url' => WSMA_Data::get_field('url_pagina', 'wsma_categoria_evento_' . $t->term_id) ?: '',
+                'foto' => WSMA_Data::get_field('foto_categoria', 'wsma_categoria_evento_' . $t->term_id) ?: '',
+                'tipo' => $this->sanitize_tipo((string) WSMA_Data::get_field('tipo_categoria', 'wsma_categoria_evento_' . $t->term_id)),
                 'count' => (int) $t->count,
-                'prezzo' => (float) WSMA_Data::get_field('prezzo', 'categoria_evento_' . $t->term_id),
-                'acconto' => (float) WSMA_Data::get_field('acconto', 'categoria_evento_' . $t->term_id),
-                'citta' => WSMA_Data::get_field('citta', 'categoria_evento_' . $t->term_id) ?: '',
+                'prezzo' => (float) WSMA_Data::get_field('prezzo', 'wsma_categoria_evento_' . $t->term_id),
+                'acconto' => (float) WSMA_Data::get_field('acconto', 'wsma_categoria_evento_' . $t->term_id),
+                'citta' => WSMA_Data::get_field('citta', 'wsma_categoria_evento_' . $t->term_id) ?: '',
                 'prossimo_evento' => $prossimo,
             ];
         }
@@ -870,7 +870,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
         do_action('wsma_scope_assign_new_owner', 'categoria', $tid);
 
         if ($url) {
-            WSMA_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
+            WSMA_Data::update_field('url_pagina', $url, 'wsma_categoria_evento_' . $tid);
             update_term_meta($tid, 'url_pagina', $url);
             $linked_page_id = url_to_postid($url);
             if ($linked_page_id) {
@@ -883,28 +883,28 @@ final class WSMA_Rest_Admin implements WSMA_Module {
             }
         }
         if ($foto) {
-            WSMA_Data::update_field('foto_categoria', $foto, 'categoria_evento_' . $tid);
+            WSMA_Data::update_field('foto_categoria', $foto, 'wsma_categoria_evento_' . $tid);
             update_term_meta($tid, 'foto_categoria', $foto);
         }
-        if ($contesto_ai) WSMA_Data::update_field('contesto_ai', $contesto_ai, 'categoria_evento_' . $tid);
+        if ($contesto_ai) WSMA_Data::update_field('contesto_ai', $contesto_ai, 'wsma_categoria_evento_' . $tid);
         if ($tipo) {
-            WSMA_Data::update_field('tipo_categoria', $tipo, 'categoria_evento_' . $tid);
+            WSMA_Data::update_field('tipo_categoria', $tipo, 'wsma_categoria_evento_' . $tid);
             update_term_meta($tid, 'tipo_categoria', $tipo);
         }
-        if ($oggetto_conferma) WSMA_Data::update_field('oggetto_conferma', $oggetto_conferma, 'categoria_evento_' . $tid);
-        if ($mail_conferma) WSMA_Data::update_field('mail_conferma', $mail_conferma, 'categoria_evento_' . $tid);
-        if ($oggetto_t15) WSMA_Data::update_field('oggetto_t15', $oggetto_t15, 'categoria_evento_' . $tid);
-        if ($mail_t15) WSMA_Data::update_field('mail_t15', $mail_t15, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('prezzo', $prezzo, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('acconto', $acconto, 'categoria_evento_' . $tid);
-        if ($citta) WSMA_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
-        if ($nazione) WSMA_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
-        if ($indirizzo) WSMA_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
-        if ($intro) WSMA_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
-        if ($program) WSMA_Data::update_field('program', $program, 'categoria_evento_' . $tid);
-        if ($requirements) WSMA_Data::update_field('requirements', $requirements, 'categoria_evento_' . $tid);
-        if ($important_notes) WSMA_Data::update_field('important_notes', $important_notes, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('fb_share_enabled', $fb_share_enabled, 'categoria_evento_' . $tid);
+        if ($oggetto_conferma) WSMA_Data::update_field('oggetto_conferma', $oggetto_conferma, 'wsma_categoria_evento_' . $tid);
+        if ($mail_conferma) WSMA_Data::update_field('mail_conferma', $mail_conferma, 'wsma_categoria_evento_' . $tid);
+        if ($oggetto_t15) WSMA_Data::update_field('oggetto_t15', $oggetto_t15, 'wsma_categoria_evento_' . $tid);
+        if ($mail_t15) WSMA_Data::update_field('mail_t15', $mail_t15, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('prezzo', $prezzo, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('acconto', $acconto, 'wsma_categoria_evento_' . $tid);
+        if ($citta) WSMA_Data::update_field('citta', $citta, 'wsma_categoria_evento_' . $tid);
+        if ($nazione) WSMA_Data::update_field('nazione', $nazione, 'wsma_categoria_evento_' . $tid);
+        if ($indirizzo) WSMA_Data::update_field('indirizzo', $indirizzo, 'wsma_categoria_evento_' . $tid);
+        if ($intro) WSMA_Data::update_field('intro', $intro, 'wsma_categoria_evento_' . $tid);
+        if ($program) WSMA_Data::update_field('program', $program, 'wsma_categoria_evento_' . $tid);
+        if ($requirements) WSMA_Data::update_field('requirements', $requirements, 'wsma_categoria_evento_' . $tid);
+        if ($important_notes) WSMA_Data::update_field('important_notes', $important_notes, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('fb_share_enabled', $fb_share_enabled, 'wsma_categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria creata.', 'id' => $tid]);
     }
@@ -938,7 +938,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
         $fb_share_enabled = !empty($request->get_param('fb_share_enabled')) ? 1 : 0;
 
         wp_update_term($tid, 'wsma_categoria_evento', ['name' => $nome]);
-        WSMA_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('url_pagina', $url, 'wsma_categoria_evento_' . $tid);
         update_term_meta($tid, 'url_pagina', $url);
         if ($url) {
             $linked_page_id = url_to_postid($url);
@@ -949,25 +949,25 @@ final class WSMA_Rest_Admin implements WSMA_Module {
                 }
             }
         }
-        WSMA_Data::update_field('foto_categoria', $foto, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('foto_categoria', $foto, 'wsma_categoria_evento_' . $tid);
         update_term_meta($tid, 'foto_categoria', $foto);
-        WSMA_Data::update_field('contesto_ai', $contesto_ai, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('tipo_categoria', $tipo, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('contesto_ai', $contesto_ai, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('tipo_categoria', $tipo, 'wsma_categoria_evento_' . $tid);
         update_term_meta($tid, 'tipo_categoria', $tipo);
-        WSMA_Data::update_field('oggetto_conferma', $oggetto_conferma, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('mail_conferma', $mail_conferma, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('oggetto_t15', $oggetto_t15, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('mail_t15', $mail_t15, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('prezzo', $prezzo, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('acconto', $acconto, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('program', $program, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('requirements', $requirements, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('important_notes', $important_notes, 'categoria_evento_' . $tid);
-        WSMA_Data::update_field('fb_share_enabled', $fb_share_enabled, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('oggetto_conferma', $oggetto_conferma, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('mail_conferma', $mail_conferma, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('oggetto_t15', $oggetto_t15, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('mail_t15', $mail_t15, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('prezzo', $prezzo, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('acconto', $acconto, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('citta', $citta, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('nazione', $nazione, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('indirizzo', $indirizzo, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('intro', $intro, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('program', $program, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('requirements', $requirements, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('important_notes', $important_notes, 'wsma_categoria_evento_' . $tid);
+        WSMA_Data::update_field('fb_share_enabled', $fb_share_enabled, 'wsma_categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria aggiornata.']);
     }

@@ -196,9 +196,9 @@ final class WSMA_Hub_Sync implements WSMA_Module {
         $country = $meta['nazione'][0] ?? null;
         $address = $meta['indirizzo'][0] ?? null;
         if ($cat_term_id) {
-            $city = $city ?: (WSMA_Data::get_field('citta', 'categoria_evento_' . $cat_term_id) ?: null);
-            $country = $country ?: (WSMA_Data::get_field('nazione', 'categoria_evento_' . $cat_term_id) ?: null);
-            $address = $address ?: (WSMA_Data::get_field('indirizzo', 'categoria_evento_' . $cat_term_id) ?: null);
+            $city = $city ?: (WSMA_Data::get_field('citta', 'wsma_categoria_evento_' . $cat_term_id) ?: null);
+            $country = $country ?: (WSMA_Data::get_field('nazione', 'wsma_categoria_evento_' . $cat_term_id) ?: null);
+            $address = $address ?: (WSMA_Data::get_field('indirizzo', 'wsma_categoria_evento_' . $cat_term_id) ?: null);
         }
         if ($is_virtual) {
             $city = $city ?: 'Online';
@@ -224,7 +224,7 @@ final class WSMA_Hub_Sync implements WSMA_Module {
         // Resolve real public booking URL (prevent 404 on private CPTs)
         $booking_url = '';
         if ($terms && !is_wp_error($terms)) {
-            $cat_url = WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id);
+            $cat_url = WSMA_Data::get_field('url_pagina', 'wsma_categoria_evento_' . $terms[0]->term_id);
             if ($cat_url) {
                 $booking_url = esc_url_raw($cat_url);
             }

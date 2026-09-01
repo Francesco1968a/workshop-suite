@@ -296,9 +296,9 @@ onMounted(() => {
           </select>
         </div>
 
-        <div class="wv-field"><label>Città <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="city"]</code></label><input type="text" v-model="catForm.citta" placeholder="Napoli" /></div>
-        <div class="wv-field"><label>Nazione <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="country"]</code></label><input type="text" v-model="catForm.nazione" placeholder="Italia" /></div>
-        <div class="wv-field"><label>Indirizzo (opzionale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="address"]</code></label><input type="text" v-model="catForm.indirizzo" placeholder="Via/Piazza..." /></div>
+        <div class="wv-field"><label>Città <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="city"]</code></label><input type="text" v-model="catForm.citta" placeholder="Napoli" /></div>
+        <div class="wv-field"><label>Nazione <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="country"]</code></label><input type="text" v-model="catForm.nazione" placeholder="Italia" /></div>
+        <div class="wv-field"><label>Indirizzo (opzionale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="address"]</code></label><input type="text" v-model="catForm.indirizzo" placeholder="Via/Piazza..." /></div>
 
         <div class="wv-field">
           <label>
@@ -321,7 +321,7 @@ onMounted(() => {
         </div>
 
         <div class="wv-field">
-          <label>Foto Categoria (URL / Libreria Media / Upload locale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="photo"]</code></label>
+          <label>Foto Categoria (URL / Libreria Media / Upload locale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="photo"]</code></label>
           <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px">
             <input type="text" v-model="catForm.foto" placeholder="URL immagine o carica..." style="flex: 1" />
             <button type="button" class="wv-btn wv-btn-sm" @click="openCatMedia">Media</button>
@@ -346,10 +346,10 @@ onMounted(() => {
           <div v-if="aiError" style="color:#ff6b6b; font-size:13px; margin-top:6px">{{ aiError }}</div>
           <div class="hint" style="margin-top:6px">Compila i campi qui sotto con una proposta — resta sempre da rivedere prima di salvare. Richiede un connettore AI configurato e la funzione attiva in AI Assistant.</div>
         </div>
-        <div class="wv-field"><label>Introduzione <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="intro"]</code></label><textarea v-model="catForm.intro" rows="3" placeholder="Uno o due paragrafi di presentazione del workshop..."></textarea></div>
-        <div class="wv-field"><label>Programma <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="program"]</code></label><textarea v-model="catForm.program" rows="6" placeholder="Giorno 1: ...&#10;Giorno 2: ..."></textarea></div>
-        <div class="wv-field"><label>Requisiti <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="requirements"]</code></label><textarea v-model="catForm.requirements" rows="3" placeholder="Es. Fotocamera reflex o mirrorless, nessuna esperienza richiesta..."></textarea></div>
-        <div class="wv-field"><label>Note importanti <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="important_notes"]</code></label><textarea v-model="catForm.important_notes" rows="3" placeholder="Es. Punto di ritrovo, cosa portare, condizioni meteo..."></textarea></div>
+        <div class="wv-field"><label>Introduzione <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="intro"]</code></label><textarea v-model="catForm.intro" rows="3" placeholder="Uno o due paragrafi di presentazione del workshop..."></textarea></div>
+        <div class="wv-field"><label>Programma <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="program"]</code></label><textarea v-model="catForm.program" rows="6" placeholder="Giorno 1: ...&#10;Giorno 2: ..."></textarea></div>
+        <div class="wv-field"><label>Requisiti <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="requirements"]</code></label><textarea v-model="catForm.requirements" rows="3" placeholder="Es. Fotocamera reflex o mirrorless, nessuna esperienza richiesta..."></textarea></div>
+        <div class="wv-field"><label>Note importanti <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="important_notes"]</code></label><textarea v-model="catForm.important_notes" rows="3" placeholder="Es. Punto di ritrovo, cosa portare, condizioni meteo..."></textarea></div>
 
         <div style="background: rgba(255,102,8,0.06); border: 1px solid rgba(255,102,8,0.3); border-radius: 6px; padding: 14px 16px; margin: 4px 0 18px">
           <label style="display:block; font-weight:600; margin-bottom:6px;">🌐 Traduci con AI (opzionale)</label>

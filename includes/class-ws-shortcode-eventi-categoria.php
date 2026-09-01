@@ -72,7 +72,7 @@ final class WSMA_Shortcode_Eventi_Categoria implements WSMA_Module {
         $is_dark = ($atts['theme'] === 'dark');
 
         $term = get_term_by('slug', $atts['slug'], 'wsma_categoria_evento');
-        $foto = $term ? WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $term->term_id) : '';
+        $foto = $term ? WSMA_Data::get_field('foto_categoria', 'wsma_categoria_evento_' . $term->term_id) : '';
 
         $oggi = current_time('Y-m-d');
         $q = new WP_Query([

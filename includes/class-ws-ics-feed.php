@@ -154,7 +154,7 @@ final class WSMA_Ics_Feed implements WSMA_Module {
 
             $terms = get_the_terms($ev->ID, 'wsma_categoria_evento');
             $cat_name = $terms ? $terms[0]->name : 'Workshop';
-            $cat_url  = $terms ? WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id) : '';
+            $cat_url  = $terms ? WSMA_Data::get_field('url_pagina', 'wsma_categoria_evento_' . $terms[0]->term_id) : '';
 
             $modalita = WSMA_Data::get_field('modalita', $ev->ID) ?: 'fisico';
             $location = $modalita === 'virtuale'

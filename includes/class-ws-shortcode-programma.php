@@ -93,8 +93,8 @@ final class WSMA_Shortcode_Programma implements WSMA_Module {
               $s = WSMA_Data::stato_posti($id);
               $terms = get_the_terms($id, 'wsma_categoria_evento');
               $cat_name = $terms ? $terms[0]->name : '';
-              $foto = $terms ? WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $terms[0]->term_id) : '';
-              $cat_url = $terms ? WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id) : '';
+              $foto = $terms ? WSMA_Data::get_field('foto_categoria', 'wsma_categoria_evento_' . $terms[0]->term_id) : '';
+              $cat_url = $terms ? WSMA_Data::get_field('url_pagina', 'wsma_categoria_evento_' . $terms[0]->term_id) : '';
 
               $card_html  = '<div class="wv-prog-foto"' . ($foto ? ' style="background-image:url(\'' . esc_url($foto) . '\');"' : '') . '></div>';
               $card_html .= '<div class="wv-prog-body">';
