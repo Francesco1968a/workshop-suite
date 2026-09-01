@@ -6,19 +6,37 @@ if (!defined('ABSPATH')) exit;
  * Public Shortcode: [ws_proponente] / [workshop_suite_bio]
  * Renders an elegant, responsive biography card for the workshop trainer/proposer.
  */
-final class WS_Shortcode_Proponente implements WS_Module {
+final class WSMA_Shortcode_Proponente implements WSMA_Module {
 
     public function should_load(): bool {
         return true;
     }
 
     public function register(): void {
-        add_shortcode('ws_proponente', [$this, 'render']);
-        add_shortcode('workshop_suite_bio', [$this, 'render']);
+        add_shortcode('wsma_proponente', [$this, 'render']);
+        add_shortcode('ws_proponente', [$this, 'render']); // legacy alias, existing page content
+        add_shortcode('workshop_suite_bio', [$this, 'render']); // legacy alias, existing page content
+        add_action('wp_enqueue_scripts', [$this, 'maybe_enqueue_style']);
+    }
+
+    /**
+     * Was a ~145-line inline <style> block re-printed into the page on
+     * every render() call — moved to an external, browser-cacheable file.
+     * Enqueued unconditionally (not gated by has_shortcode() on
+     * post_content) since the shortcode can also be dropped in via a
+     * widget, template part, or another shortcode's output that
+     * has_shortcode() wouldn't see — a few KB of CSS on every frontend
+     * page load is a safer trade than the card silently rendering
+     * unstyled on a page-builder-composed page.
+     */
+    public function maybe_enqueue_style(): void {
+        $css_path = WSMA_PATH . 'assets/dist/proponente.css';
+        if (!file_exists($css_path)) return;
+        wp_enqueue_style('ws-proponente', WSMA_URL . 'assets/dist/proponente.css', [], (string) filemtime($css_path));
     }
 
     public function render($atts = []): string {
-        $settings = WS_Settings::get_all();
+        $settings = WSMA_Settings::get_all();
 
         $nome      = $settings['proponente_nome'] ?: get_option('blogname');
         $ruolo     = $settings['proponente_ruolo'] ?: '';
@@ -130,7 +148,7 @@ final class WS_Shortcode_Proponente implements WS_Module {
                 <div class="ws-bio-actions">
                     <?php if (!empty($sito)) : ?>
                         <a href="<?php echo esc_url($sito); ?>" target="_blank" rel="noopener noreferrer" class="ws-bio-action-btn ws-bio-site-btn">
-                            🌐 <?php esc_html_e('Sito Ufficiale', 'workshop-suite'); ?>
+                            🌐 <?php esc_html_e('Sito Ufficiale', 'wsmaker'); ?>
                         </a>
                     <?php endif; ?>
 
@@ -145,151 +163,6 @@ final class WS_Shortcode_Proponente implements WS_Module {
             </div>
         </div>
 
-        <style>
-        .ws-bio-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            max-width: 680px;
-            margin: 24px auto;
-            font-family: inherit;
-            color: #1e293b;
-        }
-        .ws-bio-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 18px;
-        }
-        .ws-bio-avatar-wrap {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 2px solid #2271b1;
-            background: #f1f5f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .ws-bio-avatar {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .ws-bio-avatar-placeholder {
-            font-size: 32px;
-            color: #94a3b8;
-        }
-        .ws-bio-titles {
-            flex: 1;
-        }
-        .ws-bio-name {
-            margin: 0 0 4px 0;
-            font-size: 20px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-        .ws-bio-role {
-            font-size: 14px;
-            font-weight: 600;
-            color: #2271b1;
-            margin-bottom: 4px;
-        }
-        .ws-bio-location {
-            font-size: 13px;
-            color: #64748b;
-            margin-bottom: 6px;
-        }
-        .ws-bio-languages {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .ws-bio-lang-badge {
-            font-size: 11px;
-            font-weight: 600;
-            background: #f1f5f9;
-            color: #334155;
-            padding: 2px 8px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
-        .ws-bio-content {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #334155;
-            margin-bottom: 20px;
-            padding-top: 14px;
-            border-top: 1px solid #f1f5f9;
-        }
-        .ws-bio-footer {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding-top: 14px;
-            border-top: 1px solid #f1f5f9;
-        }
-        .ws-bio-socials {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .ws-bio-social-btn {
-            display: inline-flex;
-            align-items: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: #475569;
-            text-decoration: none;
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            padding: 4px 10px;
-            border-radius: 6px;
-            transition: all 0.15s ease;
-        }
-        .ws-bio-social-btn:hover {
-            background: #0f172a;
-            color: #ffffff;
-            border-color: #0f172a;
-        }
-        .ws-bio-actions {
-            display: flex;
-            gap: 8px;
-        }
-        .ws-bio-action-btn {
-            display: inline-flex;
-            align-items: center;
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            transition: all 0.15s ease;
-        }
-        .ws-bio-site-btn {
-            background: #2271b1;
-            color: #ffffff;
-        }
-        .ws-bio-site-btn:hover {
-            background: #135e96;
-            color: #ffffff;
-        }
-        .ws-bio-wa-btn {
-            background: #25d366;
-            color: #ffffff;
-        }
-        .ws-bio-wa-btn:hover {
-            background: #1ebe57;
-            color: #ffffff;
-        }
-        </style>
         <?php
         return ob_get_clean();
     }

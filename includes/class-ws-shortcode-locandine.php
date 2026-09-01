@@ -6,10 +6,10 @@ if (!defined('ABSPATH')) exit;
  * Shortcode & Admin Page module for Locandine Generator ([workshop_locandine]).
  * Passes extra FVW_CONFIG keys: defaultTheme and brandName.
  */
-final class WS_Shortcode_Locandine extends WS_Shortcode_Base {
+final class WSMA_Shortcode_Locandine extends WSMA_Shortcode_Base {
 
     public function should_load(): bool {
-        return WS_Settings::is_module_active('poster_studio', true);
+        return defined('WS_PRO_VERSION') && WSMA_Settings::is_module_active('poster_studio', false);
     }
 
     protected function handle(): string  { return 'ws-locandine'; }
@@ -19,8 +19,8 @@ final class WS_Shortcode_Locandine extends WS_Shortcode_Base {
 
     protected function extra_config(): array {
         return [
-            'defaultTheme' => WS_Settings::get('default_theme_mode', 'dark'),
-            'brandName'    => WS_Settings::get('site_brand_name', 'FRANCESCOVEROLINO'),
+            'defaultTheme' => WSMA_Settings::get('default_theme_mode', 'dark'),
+            'brandName'    => WSMA_Settings::get('site_brand_name', 'FRANCESCOVEROLINO'),
         ];
     }
 

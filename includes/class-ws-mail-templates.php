@@ -6,20 +6,20 @@ if (!defined('ABSPATH')) exit;
  * Ported from legacy snippet 19 "CAMPI ACF: Template email su categoria".
  * Registers the category-level Mail #1 (Risposta) template fields and the
  * per-iscrizione tracking fields (`messaggio_originale`, `mail_*_sent_at`,
- * `replied_at`) that WS_Data, WS_Rest_Messaggi and WS_Rest_Riepilogo
+ * `replied_at`) that WSMA_Data, WSMA_Rest_Messaggi and WSMA_Rest_Riepilogo
  * already read/write without formally owning the field-group registration.
  *
  * The legacy `wv_send_template_email()` sent via `wp_mail()`, which
  * FluentSMTP silently forces to the wrong sender address (same bug fixed
  * this session for Conferma/T-15/Ringraziamento) — this port sends via
- * `WS_Mail_Inbox::send_reply()` instead and logs to `wv_thread`, matching
+ * `WSMA_Mail_Inbox::send_reply()` instead and logs to `wv_thread`, matching
  * the pattern used everywhere else. Only Mail #1 (Risposta) is actually
- * called by live code (WS_Fluent_Forms_Intake on submission); the legacy
+ * called by live code (WSMA_Fluent_Forms_Intake on submission); the legacy
  * Mail #2/#3/#4 (Follow-up/Reminder/Welcome) machinery was never wired to
  * an active cron in this codebase and has no caller — kept only as inert
  * template fields for backward field-data compatibility, not re-wired.
  */
-final class WS_Mail_Templates implements WS_Module {
+final class WSMA_Mail_Templates implements WSMA_Module {
 
     private const META_THREAD = 'wv_thread';
 
@@ -48,7 +48,7 @@ final class WS_Mail_Templates implements WS_Module {
                 ['key' => 'field_cat_oggetto_welcome', 'label' => 'Oggetto Mail #4 (Welcome T-5, legacy)', 'name' => 'oggetto_welcome', 'type' => 'text'],
                 ['key' => 'field_cat_mail_welcome', 'label' => 'Corpo Mail #4 (Welcome T-5, legacy)', 'name' => 'mail_welcome', 'type' => 'textarea', 'rows' => 10],
             ],
-            'location' => [[['param' => 'taxonomy', 'operator' => '==', 'value' => 'categoria_evento']]],
+            'location' => [[['param' => 'taxonomy', 'operator' => '==', 'value' => 'wsma_categoria_evento']]],
         ]);
 
         acf_add_local_field_group([
@@ -63,7 +63,7 @@ final class WS_Mail_Templates implements WS_Module {
                 ['key' => 'field_i_replied_at', 'label' => 'Cliente ha risposto il', 'name' => 'replied_at', 'type' => 'date_time_picker', 'return_format' => 'Y-m-d H:i:s'],
                 ['key' => 'field_i_followup_paused', 'label' => 'Follow-up in pausa', 'name' => 'followup_paused', 'type' => 'true_false', 'default_value' => 0],
             ],
-            'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'iscrizione']]],
+            'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'wsma_iscrizione']]],
         ]);
     }
 
@@ -81,23 +81,23 @@ final class WS_Mail_Templates implements WS_Module {
     }
 
     public static function get_rendered(int $iscrizione_id, string $key): string {
-        $eid = (int) WS_Data::get_field('evento', $iscrizione_id);
+        $eid = (int) WSMA_Data::get_field('evento', $iscrizione_id);
         $tpl = '';
         if ($eid) {
-            $terms = get_the_terms($eid, 'categoria_evento');
+            $terms = get_the_terms($eid, 'wsma_categoria_evento');
             if ($terms) {
-                $tpl = WS_Data::get_field($key, 'categoria_evento_' . $terms[0]->term_id);
+                $tpl = WSMA_Data::get_field($key, 'categoria_evento_' . $terms[0]->term_id);
             }
         }
         if (!$tpl) $tpl = self::default_template($key);
-        return WS_Data::render_template($tpl, $iscrizione_id);
+        return WSMA_Data::render_template($tpl, $iscrizione_id);
     }
 
     /** Sends Mail #1 (Risposta) and updates tracking + thread log. Only 'mail_risposta' is called by live code. */
     public static function send_template_email(int $iscrizione_id, string $template_key): bool {
-        $pid = (int) WS_Data::get_field('partecipante', $iscrizione_id);
+        $pid = (int) WSMA_Data::get_field('partecipante', $iscrizione_id);
         if (!$pid) return false;
-        $email = WS_Data::get_field('email', $pid);
+        $email = WSMA_Data::get_field('email', $pid);
         if (!$email) return false;
 
         $subject_key = 'oggetto_' . str_replace('mail_', '', $template_key);
@@ -105,7 +105,7 @@ final class WS_Mail_Templates implements WS_Module {
         $body = self::get_rendered($iscrizione_id, $template_key);
         if (!$subject || !$body) return false;
 
-        $result = WS_Mail_Inbox::send_reply($email, $subject, $body);
+        $result = WSMA_Mail_Inbox::send_reply($email, $subject, $body);
         if (!$result['ok']) return false;
 
         $tracking_map = [
@@ -115,10 +115,10 @@ final class WS_Mail_Templates implements WS_Module {
             'mail_welcome'  => 'mail_welcome_sent_at',
         ];
         if (isset($tracking_map[$template_key])) {
-            WS_Data::update_field($tracking_map[$template_key], current_time('Y-m-d H:i:s'), $iscrizione_id);
+            WSMA_Data::update_field($tracking_map[$template_key], current_time('Y-m-d H:i:s'), $iscrizione_id);
         }
 
-        WS_Data::append_thread($iscrizione_id, 'out', $subject, $body);
+        WSMA_Data::append_thread($iscrizione_id, 'out', $subject, $body);
 
         return true;
     }

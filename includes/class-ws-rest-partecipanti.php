@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) exit;
  * Ports the query from the legacy `workshop_partecipanti_lista` shortcode
  * 1:1 (same post type, same ACF fields, same search behaviour).
  */
-final class WS_Rest_Partecipanti implements WS_Module {
+final class WSMA_Rest_Partecipanti implements WSMA_Module {
 
     public function should_load(): bool {
         return true; // REST routes must register on every request, WP filters by URL internally.
@@ -37,7 +37,7 @@ final class WS_Rest_Partecipanti implements WS_Module {
         $q = (string) $request->get_param('q');
 
         $args = [
-            'post_type'      => 'partecipante',
+            'post_type'      => 'wsma_partecipante',
             'posts_per_page' => 200,
             'orderby'        => 'title',
             'order'          => 'ASC',
@@ -66,7 +66,7 @@ final class WS_Rest_Partecipanti implements WS_Module {
         $stats_map = [];
         if (!empty($p_ids)) {
             $all_iscrizioni = get_posts([
-                'post_type'      => 'iscrizione',
+                'post_type'      => 'wsma_iscrizione',
                 'posts_per_page' => -1,
                 'no_found_rows'  => true,
                 'meta_query'     => [
@@ -83,13 +83,13 @@ final class WS_Rest_Partecipanti implements WS_Module {
                 update_postmeta_cache($isc_ids);
 
                 foreach ($all_iscrizioni as $isc) {
-                    $pid = (int) WS_Data::get_field('partecipante', $isc->ID);
+                    $pid = (int) WSMA_Data::get_field('partecipante', $isc->ID);
                     if (!$pid) continue;
                     if (!isset($stats_map[$pid])) {
                         $stats_map[$pid] = ['totali' => 0, 'confermate' => 0];
                     }
                     $stats_map[$pid]['totali']++;
-                    $stato = WS_Data::get_field('stato', $isc->ID);
+                    $stato = WSMA_Data::get_field('stato', $isc->ID);
                     if ($stato === 'confermato') {
                         $stats_map[$pid]['confermate']++;
                     }
@@ -104,9 +104,9 @@ final class WS_Rest_Partecipanti implements WS_Module {
 
             return [
                 'id'         => $pid,
-                'nome'       => trim(WS_Data::get_field('nome', $pid) . ' ' . WS_Data::get_field('cognome', $pid)),
-                'email'      => WS_Data::get_field('email', $pid) ?: '',
-                'citta'      => WS_Data::get_field('citta', $pid) ?: '',
+                'nome'       => trim(WSMA_Data::get_field('nome', $pid) . ' ' . WSMA_Data::get_field('cognome', $pid)),
+                'email'      => WSMA_Data::get_field('email', $pid) ?: '',
+                'citta'      => WSMA_Data::get_field('citta', $pid) ?: '',
                 'totali'     => (int) $tot,
                 'confermate' => (int) $conf,
             ];

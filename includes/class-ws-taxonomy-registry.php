@@ -3,14 +3,14 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Class WS_Taxonomy_Registry
+ * Class WSMA_Taxonomy_Registry
  * 
  * Fetches and synchronizes categories and event types from Woorkshoop Global Hub.
  * Acts as the Single Source of Truth across all client installations.
  */
-final class WS_Taxonomy_Registry {
+final class WSMA_Taxonomy_Registry {
 
-    const HUB_TAXONOMY_URL = 'https://workshopsuite.pro/wp-json/woorkshoop-hub/v1/taxonomies';
+    const HUB_TAXONOMY_URL = 'https://wsmaker.pro/wp-json/woorkshoop-hub/v1/taxonomies';
     const CACHE_KEY        = '_ws_hub_taxonomies_cache';
     const CACHE_TTL        = 86400; // 24 hours
 

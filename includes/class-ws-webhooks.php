@@ -18,20 +18,29 @@ if (!defined('ABSPATH')) exit;
  * sites automatically, including future ones, without needing to know
  * about them.
  */
-final class WS_Webhooks implements WS_Module {
+final class WSMA_Webhooks implements WSMA_Module {
 
     private const OPTION = 'ws_webhooks';
     private const LOG_OPTION = 'ws_webhooks_log';
     private const LOG_MAX = 20;
 
     public function should_load(): bool {
-        return WS_Settings::is_module_active('webhooks', false);
+        return defined('WS_PRO_VERSION') && WSMA_Settings::is_module_active('webhooks', false);
     }
+
+    // Backoff delays (seconds) before each retry, indexed by the attempt
+    // that just failed: attempt 1 fails -> wait 2min for attempt 2; attempt
+    // 2 fails -> wait 10min for attempt 3; attempt 3 fails -> wait 30min
+    // for attempt 4 (the last one — if that also fails, it's logged and
+    // dropped, no more retries).
+    private const RETRY_DELAYS = [1 => 120, 2 => 600, 3 => 1800];
+    private const MAX_ATTEMPTS = 4;
 
     public function register(): void {
         add_action('wp_insert_post', [$this, 'on_post_inserted'], 20, 3);
         add_action('added_post_meta', [$this, 'on_meta_changed'], 10, 4);
         add_action('updated_post_meta', [$this, 'on_meta_changed'], 10, 4);
+        add_action('ws_webhook_dispatch', [$this, 'handle_dispatch_cron'], 10, 4);
         add_action('admin_menu', [$this, 'add_admin_menu'], 58);
         add_action('admin_post_ws_webhooks_save', [$this, 'handle_save']);
         add_action('admin_post_ws_webhooks_test', [$this, 'handle_test']);
@@ -40,7 +49,7 @@ final class WS_Webhooks implements WS_Module {
     // ───────────────────────── triggers ─────────────────────────
 
     public function on_post_inserted(int $post_id, WP_Post $post, bool $update): void {
-        if ($update || $post->post_type !== 'iscrizione') return;
+        if ($update || $post->post_type !== 'wsma_iscrizione') return;
         // Fired at the tail end of wp_insert_post, before the caller has
         // had a chance to attach partecipante/evento/corso meta — defer
         // to the next request cycle isn't practical here, so just read
@@ -53,24 +62,24 @@ final class WS_Webhooks implements WS_Module {
 
     public function on_meta_changed($meta_id, int $post_id, string $meta_key, $meta_value): void {
         if ($meta_key !== 'stato' || $meta_value !== 'confermato') return;
-        if (get_post_type($post_id) !== 'iscrizione') return;
+        if (get_post_type($post_id) !== 'wsma_iscrizione') return;
         $this->dispatch('confirmed', $this->build_payload($post_id));
     }
 
     private function build_payload(int $isc_id): array {
-        $pid = (int) WS_Data::get_field('partecipante', $isc_id);
-        $eid = (int) WS_Data::get_field('evento', $isc_id);
-        $cid = (int) WS_Data::get_field('corso', $isc_id);
+        $pid = (int) WSMA_Data::get_field('partecipante', $isc_id);
+        $eid = (int) WSMA_Data::get_field('evento', $isc_id);
+        $cid = (int) WSMA_Data::get_field('corso', $isc_id);
 
         return [
             'iscrizione_id' => $isc_id,
-            'tipo' => (string) WS_Data::get_field('tipo_iscrizione', $isc_id),
-            'stato' => (string) WS_Data::get_field('stato', $isc_id),
+            'tipo' => (string) WSMA_Data::get_field('tipo_iscrizione', $isc_id),
+            'stato' => (string) WSMA_Data::get_field('stato', $isc_id),
             'partecipante' => $pid ? [
-                'nome' => (string) WS_Data::get_field('nome', $pid),
-                'cognome' => (string) WS_Data::get_field('cognome', $pid),
-                'email' => (string) WS_Data::get_field('email', $pid),
-                'telefono' => (string) WS_Data::get_field('telefono', $pid),
+                'nome' => (string) WSMA_Data::get_field('nome', $pid),
+                'cognome' => (string) WSMA_Data::get_field('cognome', $pid),
+                'email' => (string) WSMA_Data::get_field('email', $pid),
+                'telefono' => (string) WSMA_Data::get_field('telefono', $pid),
             ] : null,
             'evento' => $eid ? ['id' => $eid, 'titolo' => get_the_title($eid)] : null,
             'corso' => $cid ? ['id' => $cid, 'titolo' => get_the_title($cid)] : null,
@@ -79,14 +88,32 @@ final class WS_Webhooks implements WS_Module {
         ];
     }
 
+    /**
+     * Real dispatches go through WP-Cron (near-immediate, scheduled for
+     * "now") rather than firing inline — this decouples the HTTP call from
+     * the request thread that triggered it (a booking confirmation
+     * shouldn't wait on a third-party endpoint), and lets the cron
+     * callback actually wait for and check the response, which a
+     * fire-and-forget inline call couldn't: without knowing whether it
+     * succeeded, there was nothing to retry on failure.
+     */
     private function dispatch(string $event, array $payload): void {
         foreach (self::get_endpoints() as $endpoint) {
             if (empty($endpoint['url']) || empty($endpoint['events'][$event])) continue;
-            $this->send($endpoint['url'], $event, $payload, false);
+            wp_schedule_single_event(time(), 'ws_webhook_dispatch', [$endpoint['url'], $event, $payload, 1]);
         }
     }
 
-    private function send(string $url, string $event, array $payload, bool $blocking): array {
+    public function handle_dispatch_cron(string $url, string $event, array $payload, int $attempt): void {
+        $result = $this->send($url, $event, $payload, true, $attempt);
+
+        if (!$result['success'] && $attempt < self::MAX_ATTEMPTS) {
+            $delay = self::RETRY_DELAYS[$attempt] ?? 1800;
+            wp_schedule_single_event(time() + $delay, 'ws_webhook_dispatch', [$url, $event, $payload, $attempt + 1]);
+        }
+    }
+
+    private function send(string $url, string $event, array $payload, bool $blocking, int $attempt = 1): array {
         $response = wp_remote_post($url, [
             'timeout' => $blocking ? 10 : 0.5,
             'blocking' => $blocking,
@@ -94,7 +121,7 @@ final class WS_Webhooks implements WS_Module {
             'body' => wp_json_encode(['event' => $event, 'data' => $payload]),
         ]);
 
-        $result = ['url' => $url, 'event' => $event, 'time' => current_time('mysql')];
+        $result = ['url' => $url, 'event' => $event, 'time' => current_time('mysql'), 'attempt' => $attempt];
         if ($blocking) {
             $result['success'] = !is_wp_error($response) && wp_remote_retrieve_response_code($response) < 400;
             $result['status'] = is_wp_error($response) ? $response->get_error_message() : wp_remote_retrieve_response_code($response);
@@ -122,8 +149,8 @@ final class WS_Webhooks implements WS_Module {
     public function add_admin_menu(): void {
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Webhooks', 'workshop-suite'),
-            __('🔌 Webhooks', 'workshop-suite'),
+            __('Webhooks', 'wsmaker'),
+            __('🔌 Webhooks', 'wsmaker'),
             'manage_options',
             'ws-webhooks',
             [$this, 'render_admin_page']
@@ -134,10 +161,14 @@ final class WS_Webhooks implements WS_Module {
         if (!current_user_can('manage_options')) wp_die('Access Denied');
         check_admin_referer('ws_webhooks_save');
 
-        $labels = (array) ($_POST['label'] ?? []);
-        $urls = (array) ($_POST['url'] ?? []);
-        $events_created = (array) ($_POST['event_created'] ?? []);
-        $events_confirmed = (array) ($_POST['event_confirmed'] ?? []);
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each element is sanitized individually below (esc_url_raw/sanitize_text_field) inside the foreach.
+        $labels = isset($_POST['label']) ? (array) wp_unslash($_POST['label']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each element is sanitized individually below (esc_url_raw) inside the foreach.
+        $urls = isset($_POST['url']) ? (array) wp_unslash($_POST['url']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- only used as a boolean presence check (!empty()) below, never output or stored raw.
+        $events_created = isset($_POST['event_created']) ? (array) wp_unslash($_POST['event_created']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- only used as a boolean presence check (!empty()) below, never output or stored raw.
+        $events_confirmed = isset($_POST['event_confirmed']) ? (array) wp_unslash($_POST['event_confirmed']) : [];
 
         $endpoints = [];
         foreach ($urls as $i => $raw_url) {
@@ -162,9 +193,9 @@ final class WS_Webhooks implements WS_Module {
         if (!current_user_can('manage_options')) wp_die('Access Denied');
         check_admin_referer('ws_webhooks_test');
 
-        $url = esc_url_raw((string) ($_POST['test_url'] ?? ''));
+        $url = isset($_POST['test_url']) ? esc_url_raw(wp_unslash((string) $_POST['test_url'])) : '';
         if ($url) {
-            $this->send($url, 'test', ['message' => 'Test da Workshop Suite', 'site' => home_url(), 'timestamp' => current_time('mysql')], true);
+            $this->send($url, 'test', ['message' => 'Test da WSMaker', 'site' => home_url(), 'timestamp' => current_time('mysql')], true);
         }
 
         wp_safe_redirect(add_query_arg(['page' => 'ws-webhooks', 'tested' => 1], admin_url('admin.php')));
@@ -173,20 +204,19 @@ final class WS_Webhooks implements WS_Module {
 
     public function render_admin_page(): void {
         $endpoints = self::get_endpoints();
-        if (empty($_GET['saved']) === false || empty($endpoints)) {
-            // Always show at least one empty row to fill in.
-        }
         $log = get_option(self::LOG_OPTION, []);
         ?>
         <div class="wrap" style="max-width: 900px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-            <h1>🔌 <?php esc_html_e('Webhooks', 'workshop-suite'); ?></h1>
+            <h1>🔌 <?php esc_html_e('Webhooks', 'wsmaker'); ?></h1>
             <p style="font-size: 14px; color: #64748b;">
-                <?php esc_html_e('Invia un payload JSON a Zapier, Make.com, Zoho CRM o Google Sheets (tramite il loro trigger "Catch Webhook") ad ogni nuova iscrizione e/o conferma.', 'workshop-suite'); ?>
+                <?php esc_html_e('Invia un payload JSON a Zapier, Make.com, Zoho CRM o Google Sheets (tramite il loro trigger "Catch Webhook") ad ogni nuova iscrizione e/o conferma.', 'wsmaker'); ?>
             </p>
 
+            <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only success-message flag after a redirect, no form data is processed. ?>
             <?php if (!empty($_GET['saved'])): ?>
                 <div style="background:#ecfdf5;border:1px solid #10b981;padding:12px 16px;border-radius:8px;color:#065f46;margin-bottom:16px;">✅ Salvato.</div>
             <?php endif; ?>
+            <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only success-message flag after a redirect, no form data is processed. ?>
             <?php if (!empty($_GET['tested'])): ?>
                 <div style="background:#eff6ff;border:1px solid #3b82f6;padding:12px 16px;border-radius:8px;color:#1e3a8a;margin-bottom:16px;">📡 Test inviato — controlla il log qui sotto per l'esito.</div>
             <?php endif; ?>
@@ -243,13 +273,14 @@ final class WS_Webhooks implements WS_Module {
             <?php if ($log): ?>
                 <h2 style="margin-top:32px;">Log recente</h2>
                 <table class="widefat striped">
-                    <thead><tr><th>Quando</th><th>Evento</th><th>URL</th><th>Esito</th></tr></thead>
+                    <thead><tr><th>Quando</th><th>Evento</th><th>URL</th><th>Tentativo</th><th>Esito</th></tr></thead>
                     <tbody>
                         <?php foreach ($log as $entry): ?>
                             <tr>
                                 <td><?php echo esc_html($entry['time'] ?? ''); ?></td>
                                 <td><?php echo esc_html($entry['event'] ?? ''); ?></td>
                                 <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?php echo esc_html($entry['url'] ?? ''); ?></td>
+                                <td><?php echo isset($entry['attempt']) ? esc_html((int) $entry['attempt'] . ' / ' . self::MAX_ATTEMPTS) : '—'; ?></td>
                                 <td>
                                     <?php if (array_key_exists('success', $entry)): ?>
                                         <?php echo $entry['success'] ? '✅ ' . esc_html((string) $entry['status']) : '❌ ' . esc_html((string) $entry['status']); ?>

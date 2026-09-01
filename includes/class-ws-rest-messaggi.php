@@ -9,10 +9,10 @@ if (!defined('ABSPATH')) exit;
  * interattiva con le informazioni di quale mail deve partire").
  *
  * Read-only listing here; the actual send actions reuse existing
- * endpoints (WS_Rest_Riepilogo::conferma_iscrizione for Conferma) or a
- * thin per-row wrapper around WS_T15_Reminder::send_one() for T-15.
+ * endpoints (WSMA_Rest_Riepilogo::conferma_iscrizione for Conferma) or a
+ * thin per-row wrapper around WSMA_T15_Reminder::send_one() for T-15.
  */
-final class WS_Rest_Messaggi implements WS_Module {
+final class WSMA_Rest_Messaggi implements WSMA_Module {
 
     public function should_load(): bool {
         return true;
@@ -42,22 +42,22 @@ final class WS_Rest_Messaggi implements WS_Module {
     }
 
     private function riga_iscrizione(int $isc_id, string $tipo, ?int $giorni_a_evento = null): array {
-        $pid = (int) WS_Data::get_field('partecipante', $isc_id);
-        $eid = (int) WS_Data::get_field('evento', $isc_id);
+        $pid = (int) WSMA_Data::get_field('partecipante', $isc_id);
+        $eid = (int) WSMA_Data::get_field('evento', $isc_id);
         return [
             'isc_id' => $isc_id,
             'tipo' => $tipo,
-            'nome' => $pid ? trim(WS_Data::get_field('nome', $pid) . ' ' . WS_Data::get_field('cognome', $pid)) : get_the_title($isc_id),
-            'email' => $pid ? (WS_Data::get_field('email', $pid) ?: '') : '',
-            'telefono' => $pid ? (WS_Data::get_field('telefono', $pid) ?: '') : '',
-            'citta' => $pid ? (WS_Data::get_field('citta', $pid) ?: '') : '',
-            'evento_label' => $eid ? WS_Data::evento_label($eid) : '',
+            'nome' => $pid ? trim(WSMA_Data::get_field('nome', $pid) . ' ' . WSMA_Data::get_field('cognome', $pid)) : get_the_title($isc_id),
+            'email' => $pid ? (WSMA_Data::get_field('email', $pid) ?: '') : '',
+            'telefono' => $pid ? (WSMA_Data::get_field('telefono', $pid) ?: '') : '',
+            'citta' => $pid ? (WSMA_Data::get_field('citta', $pid) ?: '') : '',
+            'evento_label' => $eid ? WSMA_Data::evento_label($eid) : '',
             'giorni_a_evento' => $giorni_a_evento,
-            'messaggio_originale' => WS_Data::get_field('messaggio_originale', $isc_id) ?: '',
+            'messaggio_originale' => WSMA_Data::get_field('messaggio_originale', $isc_id) ?: '',
             // The form-submission date — an iscrizione is created at the
             // moment FluentForm submits it, so its own post date is that date.
             'messaggio_originale_data' => get_the_date('d/m/Y H:i', $isc_id),
-            'note' => (string) WS_Data::get_field('note', $isc_id),
+            'note' => (string) WSMA_Data::get_field('note', $isc_id),
             'reply_draft' => (string) get_post_meta($isc_id, self::META_DRAFT, true),
             'thread' => $this->get_thread($isc_id),
         ];
@@ -70,23 +70,23 @@ final class WS_Rest_Messaggi implements WS_Module {
      * contact list once handled.
      */
     public function get_messaggi_tab(): WP_REST_Response {
-        $oggi = date('Y-m-d');
+        $oggi = current_time('Y-m-d');
 
         $eventi_attivi = get_posts([
-            'post_type' => 'evento', 'posts_per_page' => -1, 'fields' => 'ids',
+            'post_type' => 'wsma_evento', 'posts_per_page' => -1, 'fields' => 'ids',
             'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']],
         ]);
 
-        $t15_pending = array_map('intval', WS_T15_Reminder::pending());
+        $t15_pending = array_map('intval', WSMA_T15_Reminder::pending());
         $contatti = [];
 
         if ($eventi_attivi) {
             $iscrizioni = get_posts([
-                'post_type' => 'iscrizione', 'posts_per_page' => -1,
+                'post_type' => 'wsma_iscrizione', 'posts_per_page' => -1,
                 'meta_query' => [['key' => 'evento', 'value' => $eventi_attivi, 'compare' => 'IN']],
             ]);
             foreach ($iscrizioni as $isc) {
-                $stato = WS_Data::get_field('stato', $isc->ID);
+                $stato = WSMA_Data::get_field('stato', $isc->ID);
                 if ($stato !== 'confermato') {
                     $tipo = 'conferma';
                 } elseif (in_array($isc->ID, $t15_pending, true)) {
@@ -95,8 +95,8 @@ final class WS_Rest_Messaggi implements WS_Module {
                     $tipo = 'ok';
                 }
 
-                $eid = (int) WS_Data::get_field('evento', $isc->ID);
-                $data_ev = WS_Data::get_field('data_evento', $eid);
+                $eid = (int) WSMA_Data::get_field('evento', $isc->ID);
+                $data_ev = WSMA_Data::get_field('data_evento', $eid);
                 $giorni = $data_ev ? (int) floor((strtotime($data_ev) - strtotime($oggi)) / 86400) : null;
 
                 $contatti[] = $this->riga_iscrizione($isc->ID, $tipo, $giorni);
@@ -113,17 +113,17 @@ final class WS_Rest_Messaggi implements WS_Module {
 
     public function invia_t15_singolo(WP_REST_Request $request) {
         $isc_id = (int) $request['id'];
-        if (get_post_type($isc_id) !== 'iscrizione') {
+        if (get_post_type($isc_id) !== 'wsma_iscrizione') {
             return new WP_Error('not_found', 'Iscrizione non trovata', ['status' => 404]);
         }
-        $reminder = new WS_T15_Reminder();
+        $reminder = new WSMA_T15_Reminder();
         $ok = $reminder->send_one($isc_id);
         return new WP_REST_Response(['sent' => $ok, 'msg' => $ok ? 'Promemoria inviato.' : 'Invio fallito (email mancante o casella mail non configurata?).']);
     }
 
     public function salva_bozza(WP_REST_Request $request) {
         $isc_id = (int) $request['id'];
-        if (get_post_type($isc_id) !== 'iscrizione') {
+        if (get_post_type($isc_id) !== 'wsma_iscrizione') {
             return new WP_Error('not_found', 'Iscrizione non trovata', ['status' => 404]);
         }
         $body = sanitize_textarea_field((string) $request->get_param('body'));
@@ -133,12 +133,12 @@ final class WS_Rest_Messaggi implements WS_Module {
 
     public function invia_risposta(WP_REST_Request $request) {
         $isc_id = (int) $request['id'];
-        if (get_post_type($isc_id) !== 'iscrizione') {
+        if (get_post_type($isc_id) !== 'wsma_iscrizione') {
             return new WP_Error('not_found', 'Iscrizione non trovata', ['status' => 404]);
         }
 
-        $pid = (int) WS_Data::get_field('partecipante', $isc_id);
-        $email = $pid ? WS_Data::get_field('email', $pid) : '';
+        $pid = (int) WSMA_Data::get_field('partecipante', $isc_id);
+        $email = $pid ? WSMA_Data::get_field('email', $pid) : '';
         $body = sanitize_textarea_field((string) $request->get_param('body'));
         $subject = sanitize_text_field((string) $request->get_param('subject')) ?: 'Re: la tua richiesta';
 
@@ -146,11 +146,11 @@ final class WS_Rest_Messaggi implements WS_Module {
             return new WP_Error('invalid', 'Email del partecipante o testo mancante.', ['status' => 400]);
         }
 
-        // Sent via direct Zoho SMTP (WS_Mail_Inbox::send_reply), not wp_mail():
+        // Sent via direct Zoho SMTP (WSMA_Mail_Inbox::send_reply), not wp_mail():
         // FluentSMTP routes this site through Amazon SES with a forced sender
         // address, which would silently override any From we set and likely
         // reject an unverified sender anyway.
-        $result = WS_Mail_Inbox::send_reply($email, $subject, $body);
+        $result = WSMA_Mail_Inbox::send_reply($email, $subject, $body);
         if (!$result['ok']) {
             return new WP_Error('send_failed', $result['msg'], ['status' => 500]);
         }

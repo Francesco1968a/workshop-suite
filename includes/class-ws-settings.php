@@ -3,10 +3,10 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Central settings helper for Workshop Suite.
+ * Central settings helper for WSMaker.
  * Handles options storage and default values for site-wide configuration.
  */
-final class WS_Settings {
+final class WSMA_Settings {
 
     public const OPTION_KEY = 'workshop_suite_settings';
     public const LEGACY_OPTION_KEY = 'fvw_settings';
@@ -14,19 +14,20 @@ final class WS_Settings {
     /** @return array<string, mixed> */
     public static function get_all(): array {
         $defaults = [
-            'site_brand_name'  => get_option('blogname') ?: 'Workshop Suite',
+            'site_brand_name'  => get_option('blogname') ?: 'WSMaker',
             'sender_name'      => get_option('blogname') ?: 'Staff',
             'sender_email'     => get_option('admin_email') ?: '',
             'currency_symbol'  => '€',
             'enable_t15_reminders' => 1,
             'default_theme_mode'   => 'dark', // 'dark' (default), 'light'
-            'custom_css'           => '',
             'event_types'          => ['Workshop', 'Viaggio Fotografico', 'Masterclass'],
             'default_notice'       => 'Iscrizioni aperte',
             'intake_rate_limit_enabled'  => 1,
             'intake_rate_limit_requests' => 5,
             'intake_rate_limit_window'   => 60,
             'intake_honeypot_enabled'    => 1,
+            'intake_geolocation_enabled' => 0,
+            'intake_geolocation_api_url' => '',
             // Profilo Proponente / Trainer Bio
             'proponente_nome'        => '',
             'proponente_ruolo'       => '',
@@ -45,21 +46,19 @@ final class WS_Settings {
             'proponente_x'           => '',
             // Moduli & Add-ons (Tutor LMS Pro Modular Architecture)
             'active_modules'         => [
-                'multi_docente'    => 1,
                 'stripe_payments'  => 0,
                 'woocommerce'      => 0,
                 'webhooks'         => 0,
                 // Off by default: syncs event data (title, description,
                 // location, price, organizer bio/photo) to an external
-                // directory at workshopsuite.pro on every publish/update.
+                // directory at wsmaker.pro on every publish/update.
                 // Must stay opt-in — sending site data to a third-party
                 // service without explicit consent is undisclosed by
                 // default otherwise. See readme.txt's "External services"
                 // section.
                 'global_hub_pro'   => 0,
-                'poster_studio'    => 1,
-                'pdf_receipts'     => 0,
-                'whatsapp_widget'  => 1,
+                'poster_studio'    => 0,
+                'calendar_sync'    => 0,
             ],
         ];
 
@@ -102,8 +101,7 @@ final class WS_Settings {
         $clean['currency_symbol']      = sanitize_text_field($new_settings['currency_symbol'] ?? '€');
         $clean['enable_t15_reminders'] = !empty($new_settings['enable_t15_reminders']) ? 1 : 0;
         $clean['default_theme_mode']   = in_array($new_settings['default_theme_mode'] ?? '', ['dark', 'light'], true) ? $new_settings['default_theme_mode'] : 'dark';
-        $clean['custom_css']           = wp_strip_all_tags($new_settings['custom_css'] ?? '');
-        
+
         if (isset($new_settings['event_types']) && is_array($new_settings['event_types'])) {
             $clean['event_types'] = array_values(array_filter(array_map('sanitize_text_field', $new_settings['event_types'])));
         } else {
@@ -115,6 +113,8 @@ final class WS_Settings {
         $clean['intake_rate_limit_requests'] = max(1, (int) ($new_settings['intake_rate_limit_requests'] ?? 5));
         $clean['intake_rate_limit_window']   = max(10, (int) ($new_settings['intake_rate_limit_window'] ?? 60));
         $clean['intake_honeypot_enabled']    = !empty($new_settings['intake_honeypot_enabled']) ? 1 : 0;
+        $clean['intake_geolocation_enabled'] = !empty($new_settings['intake_geolocation_enabled']) ? 1 : 0;
+        $clean['intake_geolocation_api_url'] = esc_url_raw(trim((string) ($new_settings['intake_geolocation_api_url'] ?? '')));
 
         // Sanitization Profilo Proponente
         $clean['proponente_nome']      = sanitize_text_field($new_settings['proponente_nome'] ?? '');

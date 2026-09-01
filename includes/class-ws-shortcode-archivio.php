@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 /** Vue 3 + Element Plus rewrite of the legacy `workshop_archivio` shortcode. */
-final class WS_Shortcode_Archivio extends WS_Shortcode_Base {
+final class WSMA_Shortcode_Archivio extends WSMA_Shortcode_Base {
 
     protected function handle(): string  { return 'ws-archivio'; }
     protected function js_file(): string  { return 'assets/dist/archivio.js'; }

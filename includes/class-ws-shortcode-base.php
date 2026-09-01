@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) exit;
  * per handle — not once per class instance — so it fires only once per
  * request no matter how many shortcodes are active on the same page.
  */
-abstract class WS_Shortcode_Base implements WS_Module {
+abstract class WSMA_Shortcode_Base implements WSMA_Module {
 
     // -----------------------------------------------------------------------
     // Subclasses MUST implement these
@@ -23,10 +23,10 @@ abstract class WS_Shortcode_Base implements WS_Module {
     /** JS asset handle — must match the key in script_loader_tag. */
     abstract protected function handle(): string;
 
-    /** Relative path from WS_PATH, e.g. 'assets/dist/admin.js' */
+    /** Relative path from WSMA_PATH, e.g. 'assets/dist/admin.js' */
     abstract protected function js_file(): string;
 
-    /** Relative path from WS_PATH, e.g. 'assets/dist/admin.css' — empty string to skip. */
+    /** Relative path from WSMA_PATH, e.g. 'assets/dist/admin.css' — empty string to skip. */
     abstract protected function css_file(): string;
 
     /** The HTML id of the Vue mount point, e.g. 'ws-admin-app' */
@@ -43,7 +43,7 @@ abstract class WS_Shortcode_Base implements WS_Module {
     }
 
     // -----------------------------------------------------------------------
-    // WS_Module default implementations
+    // WSMA_Module default implementations
     // -----------------------------------------------------------------------
 
     public function should_load(): bool {
@@ -105,21 +105,21 @@ abstract class WS_Shortcode_Base implements WS_Module {
         }
 
         $handle   = $this->handle();
-        $js_path  = WS_PATH . $this->js_file();
-        $css_path = $this->css_file() ? WS_PATH . $this->css_file() : '';
+        $js_path  = WSMA_PATH . $this->js_file();
+        $css_path = $this->css_file() ? WSMA_PATH . $this->css_file() : '';
 
         wp_enqueue_script(
             $handle,
-            WS_URL . $this->js_file(),
+            WSMA_URL . $this->js_file(),
             [],
-            file_exists($js_path) ? (string) filemtime($js_path) : WS_VERSION,
+            file_exists($js_path) ? (string) filemtime($js_path) : WSMA_VERSION,
             true
         );
 
         if ($css_path && file_exists($css_path)) {
             wp_enqueue_style(
                 $handle,
-                WS_URL . $this->css_file(),
+                WSMA_URL . $this->css_file(),
                 [],
                 (string) filemtime($css_path)
             );
@@ -132,13 +132,13 @@ abstract class WS_Shortcode_Base implements WS_Module {
 
         wp_localize_script($handle, 'WS_CONFIG', $config);
         wp_localize_script($handle, 'FVW_CONFIG', $config);
-        WS_I18n::localize($handle);
+        WSMA_I18n::localize($handle);
 
         // Frontend-only theming: the wp-admin dashboard pages never go
         // through this method (they use render_panel_wrapper() in
-        // WS_Admin_Settings_Page instead), so this wrapper class only ever
+        // WSMA_Admin_Settings_Page instead), so this wrapper class only ever
         // affects the shortcode-embedded frontend pages, never wp-admin.
-        $theme = WS_Settings::get('default_theme_mode', 'dark');
+        $theme = WSMA_Settings::get('default_theme_mode', 'dark');
         $theme = in_array($theme, ['dark', 'light'], true) ? $theme : 'dark';
 
         return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><div id="' . esc_attr($this->app_id()) . '"></div></div>';

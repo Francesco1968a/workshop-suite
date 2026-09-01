@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) exit;
  * Reads `pid` from the query string client-side, same as the legacy version.
  * Returns empty string when user lacks access (no login link shown intentionally).
  */
-final class WS_Shortcode_Partecipante extends WS_Shortcode_Base {
+final class WSMA_Shortcode_Partecipante extends WSMA_Shortcode_Base {
 
     public function should_load(): bool {
         return !is_admin() || wp_doing_ajax();

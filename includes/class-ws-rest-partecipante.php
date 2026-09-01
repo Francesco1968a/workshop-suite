@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) exit;
  * Ports the read + save logic from the legacy `workshop_partecipante`
  * shortcode 1:1 (same ACF fields, same stats/timeline sources).
  */
-final class WS_Rest_Partecipante implements WS_Module {
+final class WSMA_Rest_Partecipante implements WSMA_Module {
 
     public function should_load(): bool {
         return true;
@@ -18,7 +18,7 @@ final class WS_Rest_Partecipante implements WS_Module {
     }
 
     public function register_routes(): void {
-        $perm = fn() => current_user_can('manage_options');
+        $perm = fn() => current_user_can('manage_options') || current_user_can('ws_access_panel');
 
         register_rest_route('workshop-suite/v1', '/partecipante/(?P<id>\d+)', [
             'methods'             => 'GET',
@@ -40,7 +40,7 @@ final class WS_Rest_Partecipante implements WS_Module {
     }
 
     private function find(int $pid) {
-        if (!$pid || get_post_type($pid) !== 'partecipante') return null;
+        if (!$pid || get_post_type($pid) !== 'wsma_partecipante') return null;
         return $pid;
     }
 
@@ -58,9 +58,9 @@ final class WS_Rest_Partecipante implements WS_Module {
         foreach (['nome', 'cognome', 'email', 'telefono', 'citta'] as $f) {
             $val = sanitize_text_field((string) $request->get_param($f));
             if ($f === 'email') $val = sanitize_email($val);
-            WS_Data::update_field($f, $val, $pid);
+            WSMA_Data::update_field($f, $val, $pid);
         }
-        $new_title = trim(WS_Data::get_field('nome', $pid) . ' ' . WS_Data::get_field('cognome', $pid));
+        $new_title = trim(WSMA_Data::get_field('nome', $pid) . ' ' . WSMA_Data::get_field('cognome', $pid));
         if ($new_title) wp_update_post(['ID' => $pid, 'post_title' => $new_title]);
 
         return new WP_REST_Response($this->serialize($pid));
@@ -71,21 +71,21 @@ final class WS_Rest_Partecipante implements WS_Module {
         if (!$pid) return new WP_Error('not_found', 'Partecipante non trovato', ['status' => 404]);
 
         $note = sanitize_textarea_field((string) $request->get_param('note_interne'));
-        WS_Data::update_field('note_interne', $note, $pid);
+        WSMA_Data::update_field('note_interne', $note, $pid);
 
         return new WP_REST_Response(['note_interne' => $note]);
     }
 
     private function serialize(int $pid): array {
-        $nome    = WS_Data::get_field('nome', $pid);
-        $cognome = WS_Data::get_field('cognome', $pid);
-        $email   = WS_Data::get_field('email', $pid);
-        $tel     = WS_Data::get_field('telefono', $pid);
-        $citta   = WS_Data::get_field('citta', $pid);
-        $note    = WS_Data::get_field('note_interne', $pid) ?: '';
+        $nome    = WSMA_Data::get_field('nome', $pid);
+        $cognome = WSMA_Data::get_field('cognome', $pid);
+        $email   = WSMA_Data::get_field('email', $pid);
+        $tel     = WSMA_Data::get_field('telefono', $pid);
+        $citta   = WSMA_Data::get_field('citta', $pid);
+        $note    = WSMA_Data::get_field('note_interne', $pid) ?: '';
 
-        $stats    = WS_Data::stats_partecipante($pid);
-        $timeline = WS_Data::timeline_partecipante($pid);
+        $stats    = WSMA_Data::stats_partecipante($pid);
+        $timeline = WSMA_Data::timeline_partecipante($pid);
 
         $tel_clean = preg_replace('/\D/', '', (string) $tel);
         $wa_link = $tel_clean ? 'https://wa.me/' . ($tel_clean[0] === '3' ? '39' . $tel_clean : $tel_clean) : '';
@@ -110,17 +110,17 @@ final class WS_Rest_Partecipante implements WS_Module {
                 'giorni_ultimo'   => $stats['giorni_ultimo'],
             ],
             'iscrizioni' => array_map(function ($isc_id) {
-                $evento_id = (int) WS_Data::get_field('evento', $isc_id);
-                $corso_id = (int) WS_Data::get_field('corso', $isc_id);
+                $evento_id = (int) WSMA_Data::get_field('evento', $isc_id);
+                $corso_id = (int) WSMA_Data::get_field('corso', $isc_id);
                 if ($evento_id) {
-                    $label = WS_Data::evento_label($evento_id);
+                    $label = WSMA_Data::evento_label($evento_id);
                 } elseif ($corso_id) {
                     $label = get_the_title($corso_id);
                 } else {
                     $label = get_the_title($isc_id);
                 }
-                $stato = WS_Data::get_field('stato', $isc_id) === 'confermato' ? 'confermato' : 'richiesta';
-                $stato_pagamento = (string) WS_Data::get_field('stato_pagamento', $isc_id);
+                $stato = WSMA_Data::get_field('stato', $isc_id) === 'confermato' ? 'confermato' : 'richiesta';
+                $stato_pagamento = (string) WSMA_Data::get_field('stato_pagamento', $isc_id);
                 if (!in_array($stato_pagamento, ['in_attesa', 'acconto_pagato', 'saldato'], true)) {
                     $stato_pagamento = 'in_attesa';
                 }
@@ -135,7 +135,7 @@ final class WS_Rest_Partecipante implements WS_Module {
                     'stato_pagamento' => $stato_pagamento,
                     'data_fmt'        => get_the_date('d/m/Y', $isc_id),
                 ];
-            }, WS_Data::iscrizioni_partecipante($pid)),
+            }, WSMA_Data::iscrizioni_partecipante($pid)),
             'timeline' => array_map(function ($e) {
                 $when = strtotime($e['t']);
                 return [

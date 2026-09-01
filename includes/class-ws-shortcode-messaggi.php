@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) exit;
  * List-of-contacts + detail pane, modeled visually on the legacy Mail Box
  * layout the user liked, but organized by nominativo instead of mail type.
  */
-final class WS_Shortcode_Messaggi extends WS_Shortcode_Base {
+final class WSMA_Shortcode_Messaggi extends WSMA_Shortcode_Base {
 
     protected function handle(): string  { return 'ws-messaggi'; }
     protected function js_file(): string  { return 'assets/dist/messaggi.js'; }

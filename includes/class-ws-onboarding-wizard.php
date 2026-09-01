@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) exit;
  * page load of an already-active site, and not retroactively for sites
  * that were already using the plugin before this wizard existed.
  */
-final class WS_Onboarding_Wizard implements WS_Module {
+final class WSMA_Onboarding_Wizard implements WSMA_Module {
 
     private const OPTION_COMPLETED = 'ws_onboarding_completed';
     private const TRANSIENT_SHOW = 'ws_show_onboarding';
@@ -45,7 +45,8 @@ final class WS_Onboarding_Wizard implements WS_Module {
         if (!get_transient(self::TRANSIENT_SHOW)) return;
         if (!current_user_can('manage_options')) return;
         if (wp_doing_ajax() || (defined('DOING_CRON') && DOING_CRON) || wp_doing_cron()) return;
-        if (isset($_GET['page']) && $_GET['page'] === self::PAGE_SLUG) return;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page-slug check to skip a redirect, no form data is processed here.
+        if (isset($_GET['page']) && sanitize_key(wp_unslash($_GET['page'])) === self::PAGE_SLUG) return;
 
         delete_transient(self::TRANSIENT_SHOW);
         wp_safe_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG));
@@ -56,7 +57,7 @@ final class WS_Onboarding_Wizard implements WS_Module {
     public function add_hidden_page(): void {
         add_submenu_page(
             null,
-            __('Configurazione guidata', 'workshop-suite'),
+            __('Configurazione guidata', 'wsmaker'),
             '',
             'manage_options',
             self::PAGE_SLUG,
@@ -69,15 +70,16 @@ final class WS_Onboarding_Wizard implements WS_Module {
 
         $step = isset($_GET['step']) && $_GET['step'] === '2' ? 2 : 1;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ws_wizard_nonce_field'])) {
-            if (!wp_verify_nonce($_POST['ws_wizard_nonce_field'], 'ws_wizard_nonce')) {
-                wp_die(esc_html__('Richiesta non valida, riprova.', 'workshop-suite'));
+        $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
+        if ($request_method === 'POST' && isset($_POST['ws_wizard_nonce_field'])) {
+            if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ws_wizard_nonce_field'])), 'ws_wizard_nonce')) {
+                wp_die(esc_html__('Richiesta non valida, riprova.', 'wsmaker'));
             }
 
             if (isset($_POST['ws_wizard_step1_submit'])) {
-                $settings = WS_Settings::get_all();
+                $settings = WSMA_Settings::get_all();
                 $settings['active_modules']['global_hub_pro'] = !empty($_POST['ws_hub_consent']) ? 1 : 0;
-                WS_Settings::update_all($settings);
+                WSMA_Settings::update_all($settings);
                 wp_safe_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG . '&step=2'));
                 exit;
             }
@@ -92,17 +94,17 @@ final class WS_Onboarding_Wizard implements WS_Module {
             }
         }
 
-        $asset_css = WS_PATH . 'assets/dist/admin.css';
+        $asset_css = WSMA_PATH . 'assets/dist/admin.css';
         if (file_exists($asset_css)) {
-            wp_enqueue_style('ws-admin-settings-css', WS_URL . 'assets/dist/admin.css', [], (string) filemtime($asset_css));
+            wp_enqueue_style('ws-admin-settings-css', WSMA_URL . 'assets/dist/admin.css', [], (string) filemtime($asset_css));
         }
 
         ?>
         <div class="wrap ws-wizard-wrap">
             <div class="ws-wizard-box">
                 <div class="ws-wizard-steps">
-                    <span class="ws-wizard-step<?php echo $step === 1 ? ' ws-wizard-step--active' : ''; ?>">1. <?php esc_html_e('Condivisione dati', 'workshop-suite'); ?></span>
-                    <span class="ws-wizard-step<?php echo $step === 2 ? ' ws-wizard-step--active' : ''; ?>">2. <?php esc_html_e('Casella mail', 'workshop-suite'); ?></span>
+                    <span class="ws-wizard-step<?php echo $step === 1 ? ' ws-wizard-step--active' : ''; ?>">1. <?php esc_html_e('Condivisione dati', 'wsmaker'); ?></span>
+                    <span class="ws-wizard-step<?php echo $step === 2 ? ' ws-wizard-step--active' : ''; ?>">2. <?php esc_html_e('Casella mail', 'wsmaker'); ?></span>
                 </div>
 
                 <?php if ($step === 1): $this->render_step1(); else: $this->render_step2(); endif; ?>
@@ -113,28 +115,28 @@ final class WS_Onboarding_Wizard implements WS_Module {
 
     private function render_step1(): void {
         ?>
-        <h1><?php esc_html_e('Benvenuto in Workshop Suite 👋', 'workshop-suite'); ?></h1>
-        <p class="ws-wizard-lead"><?php esc_html_e('Prima di iniziare, una scelta che riguarda solo te: vuoi condividere i tuoi eventi pubblicati con la directory pubblica di Workshop Suite?', 'workshop-suite'); ?></p>
+        <h1><?php esc_html_e('Benvenuto in WSMaker 👋', 'wsmaker'); ?></h1>
+        <p class="ws-wizard-lead"><?php esc_html_e('Prima di iniziare, una scelta che riguarda solo te: vuoi condividere i tuoi eventi pubblicati con la directory pubblica di WSMaker?', 'wsmaker'); ?></p>
 
         <div class="ws-wizard-disclosure">
-            <p><strong><?php esc_html_e('Cosa viene inviato, se accetti:', 'workshop-suite'); ?></strong></p>
-            <p><?php esc_html_e('Titolo, descrizione, date e luogo, categoria, prezzo e acconto, posti disponibili, immagine in evidenza, URL della pagina di prenotazione, e il tuo profilo pubblico da proponente (nome, ruolo, bio, foto, sito, lingue) come lo configurerai nelle impostazioni.', 'workshop-suite'); ?></p>
-            <p><?php esc_html_e('Va a workshopsuite.pro, la directory pubblica del progetto Workshop Suite — serve a farti trovare da chi cerca corsi come i tuoi. Puoi cambiare questa scelta in qualsiasi momento da Impostazioni → Moduli & Add-ons.', 'workshop-suite'); ?></p>
+            <p><strong><?php esc_html_e('Cosa viene inviato, se accetti:', 'wsmaker'); ?></strong></p>
+            <p><?php esc_html_e('Titolo, descrizione, date e luogo, categoria, prezzo e acconto, posti disponibili, immagine in evidenza, URL della pagina di prenotazione, e il tuo profilo pubblico da proponente (nome, ruolo, bio, foto, sito, lingue) come lo configurerai nelle impostazioni.', 'wsmaker'); ?></p>
+            <p><?php esc_html_e('Va a wsmaker.pro, la directory pubblica del progetto WSMaker — serve a farti trovare da chi cerca corsi come i tuoi. Puoi cambiare questa scelta in qualsiasi momento da Impostazioni → Moduli & Add-ons.', 'wsmaker'); ?></p>
         </div>
 
         <form method="post">
             <?php wp_nonce_field('ws_wizard_nonce', 'ws_wizard_nonce_field'); ?>
             <label class="ws-wizard-choice">
                 <input type="radio" name="ws_hub_consent" value="1">
-                <span><strong><?php esc_html_e('Sì, condividi i miei eventi', 'workshop-suite'); ?></strong> — <?php esc_html_e('aumenta la visibilità, aiuta anche la bio proponente ad avere uno scopo', 'workshop-suite'); ?></span>
+                <span><strong><?php esc_html_e('Sì, condividi i miei eventi', 'wsmaker'); ?></strong> — <?php esc_html_e('aumenta la visibilità, aiuta anche la bio proponente ad avere uno scopo', 'wsmaker'); ?></span>
             </label>
             <label class="ws-wizard-choice">
                 <input type="radio" name="ws_hub_consent" value="0" checked>
-                <span><strong><?php esc_html_e('No, resta tutto sul mio sito', 'workshop-suite'); ?></strong> — <?php esc_html_e('nessun dato lascia il tuo sito', 'workshop-suite'); ?></span>
+                <span><strong><?php esc_html_e('No, resta tutto sul mio sito', 'wsmaker'); ?></strong> — <?php esc_html_e('nessun dato lascia il tuo sito', 'wsmaker'); ?></span>
             </label>
 
             <div class="ws-wizard-actions">
-                <button type="submit" name="ws_wizard_step1_submit" value="1" class="button button-primary button-hero"><?php esc_html_e('Continua →', 'workshop-suite'); ?></button>
+                <button type="submit" name="ws_wizard_step1_submit" value="1" class="button button-primary button-hero"><?php esc_html_e('Continua →', 'wsmaker'); ?></button>
             </div>
         </form>
         <?php
@@ -142,14 +144,14 @@ final class WS_Onboarding_Wizard implements WS_Module {
 
     private function render_step2(): void {
         ?>
-        <h1><?php esc_html_e('Casella mail per la messaggistica', 'workshop-suite'); ?></h1>
-        <p class="ws-wizard-lead"><?php esc_html_e('Workshop Suite può inviare conferme, promemoria e rispondere ai partecipanti direttamente dalla tua casella mail. Puoi configurarla ora, oppure più tardi da Impostazioni → Mail.', 'workshop-suite'); ?></p>
+        <h1><?php esc_html_e('Casella mail per la messaggistica', 'wsmaker'); ?></h1>
+        <p class="ws-wizard-lead"><?php esc_html_e('WSMaker può inviare conferme, promemoria e rispondere ai partecipanti direttamente dalla tua casella mail. Puoi configurarla ora, oppure più tardi da Impostazioni → Mail.', 'wsmaker'); ?></p>
 
         <form method="post">
             <?php wp_nonce_field('ws_wizard_nonce', 'ws_wizard_nonce_field'); ?>
             <div class="ws-wizard-actions">
-                <button type="submit" name="ws_wizard_finish" value="1" class="button button-secondary"><?php esc_html_e('Configura dopo', 'workshop-suite'); ?></button>
-                <button type="submit" name="ws_wizard_finish" value="1" data-go-mail="1" onclick="document.getElementById('ws-wizard-go-mail').value='1';" class="button button-primary button-hero"><?php esc_html_e('Configura ora →', 'workshop-suite'); ?></button>
+                <button type="submit" name="ws_wizard_finish" value="1" class="button button-secondary"><?php esc_html_e('Configura dopo', 'wsmaker'); ?></button>
+                <button type="submit" name="ws_wizard_finish" value="1" data-go-mail="1" onclick="document.getElementById('ws-wizard-go-mail').value='1';" class="button button-primary button-hero"><?php esc_html_e('Configura ora →', 'wsmaker'); ?></button>
                 <input type="hidden" id="ws-wizard-go-mail" name="ws_go_to_mail" value="0">
             </div>
         </form>

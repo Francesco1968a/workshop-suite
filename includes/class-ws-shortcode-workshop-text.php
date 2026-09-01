@@ -14,11 +14,11 @@ if (!defined('ABSPATH')) exit;
  *
  * `field` is a stable English token even where the underlying term-meta
  * key is still Italian (citta/nazione/indirizzo, kept as-is since they're
- * shared with WS_Hub_Sync's evento-level geo fields — renaming those has
+ * shared with WSMA_Hub_Sync's evento-level geo fields — renaming those has
  * a much bigger blast radius than the categoria-only text fields) — the
  * generalist-plugin API surface stays English regardless of storage.
  */
-final class WS_Shortcode_Workshop_Text implements WS_Module {
+final class WSMA_Shortcode_Workshop_Text implements WSMA_Module {
 
     private const FIELD_MAP = [
         'intro'           => 'intro',
@@ -36,25 +36,43 @@ final class WS_Shortcode_Workshop_Text implements WS_Module {
     }
 
     public function register(): void {
-        add_shortcode('ws_workshop_text', [$this, 'render']);
+        add_shortcode('wsma_workshop_text', [$this, 'render']);
+        add_shortcode('ws_workshop_text', [$this, 'render']); // legacy alias, existing page content
     }
 
     public function render($atts): string {
-        $atts = shortcode_atts(['slug' => '', 'field' => 'intro'], $atts);
-        $slug = sanitize_title($atts['slug']);
+        $atts = shortcode_atts(['slug' => '', 'categoria' => '', 'field' => 'intro'], $atts);
         $field = isset(self::FIELD_MAP[$atts['field']]) ? $atts['field'] : 'intro';
         $meta_key = self::FIELD_MAP[$field];
 
-        $term = $slug ? get_term_by('slug', $slug, 'categoria_evento') : null;
+        // 'slug' and 'categoria' are accepted as aliases (matches
+        // [ws_form_iscrizione]'s own attribute), and when neither is given
+        // the categoria is auto-detected from the current page — same
+        // resolution logic already used by [ws_prezzo]/[workshop_prossimo],
+        // so this shortcode works standalone inside a categoria page
+        // without having to repeat the slug by hand.
+        $explicit_slug = sanitize_title($atts['slug'] ?: $atts['categoria']);
+        $term = null;
+        if ($explicit_slug) {
+            $term = get_term_by('slug', $explicit_slug, 'wsma_categoria_evento');
+        } else {
+            global $post;
+            if ($post) {
+                $term = WSMA_Data::find_categoria_by_url(get_permalink($post->ID));
+            }
+        }
         if (!$term || is_wp_error($term)) return '';
 
-        $value = (string) WS_Data::get_field($meta_key, 'categoria_evento_' . $term->term_id);
+        $value = (string) WSMA_Data::get_field($meta_key, 'categoria_evento_' . $term->term_id);
         if (!$value) return '';
 
         if ($field === 'photo') {
             return '<img src="' . esc_url($value) . '" alt="' . esc_attr($term->name) . '" style="max-width:100%;height:auto;display:block;" loading="lazy" />';
         }
 
-        return '<div class="ws-workshop-text" style="white-space: pre-line; line-height: 1.7;">' . esc_html($value) . '</div>';
+        // wpautop turns blank-line-separated text into real <p> paragraphs
+        // (and single line breaks into <br>) — sturdier than a CSS
+        // white-space trick for genuinely multi-paragraph notes.
+        return '<div class="ws-workshop-text" style="line-height: 1.7;">' . wpautop(esc_html($value)) . '</div>';
     }
 }

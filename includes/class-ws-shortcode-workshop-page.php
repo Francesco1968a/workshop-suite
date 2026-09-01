@@ -18,77 +18,80 @@ if (!defined('ABSPATH')) exit;
  * our auto-created WP page has a plain white background, so without this
  * override its text is nearly invisible.
  */
-final class WS_Shortcode_Workshop_Page implements WS_Module {
+final class WSMA_Shortcode_Workshop_Page implements WSMA_Module {
 
     public function should_load(): bool {
         return true;
     }
 
     public function register(): void {
-        add_shortcode('ws_workshop_page', [$this, 'render']);
+        add_shortcode('wsma_workshop_page', [$this, 'render']);
+        add_shortcode('ws_workshop_page', [$this, 'render']); // legacy alias, existing page content
+        add_action('wp_enqueue_scripts', [$this, 'maybe_enqueue_style']);
+    }
+
+    /** Fully static CSS — enqueued early since render() itself runs too late (during content rendering) to print styles reliably. */
+    public function maybe_enqueue_style(): void {
+        if (is_admin()) return;
+        global $post;
+        if (!$post || !has_shortcode((string) $post->post_content, 'ws_workshop_page')) return;
+
+        WSMA_Data::enqueue_inline_style(
+            '.ws-wp-wrap { --ws-card-bg: #ffffff; --ws-card-border: #e2e8f0; --ws-text-heading: #1d2327; --ws-text-body: #3c434a; --ws-text-muted: #646970; --ws-surface-alt: #f6f7f7; --ws-accent: #ff6608; }'
+            . '.ws-theme-dark .ws-wp-wrap { --ws-card-bg: transparent; --ws-card-border: rgba(255,255,255,.15); --ws-text-heading: #ffffff; --ws-text-body: rgba(255,255,255,.82); --ws-text-muted: rgba(255,255,255,.55); --ws-surface-alt: rgba(255,255,255,.05); }'
+            . '.ws-wp-wrap { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 1100px; margin: 0 auto; color: var(--ws-text-body); }'
+            . '.ws-wp-msg { color: var(--ws-text-muted); }'
+            . '.ws-wp-hero { position: relative; width: 100%; aspect-ratio: 21/9; background-size: cover; background-position: center; border-radius: 12px; overflow: hidden; margin-bottom: -70px; box-shadow: 0 20px 40px -16px rgba(0,0,0,.35); }'
+            . '.ws-wp-hero::after { content: \'\'; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,0) 100%); }'
+            . '.ws-wp-hero-inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 100px 40px 30px; }'
+            . '.ws-wp-kicker { display: inline-block; align-self: flex-start; background: rgba(255,102,8,.92); color: #fff; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 5px 14px; border-radius: 20px; margin-bottom: 14px; }'
+            . '.ws-wp-hero-title { font-size: clamp(28px, 4.4vw, 46px); font-weight: 800; color: #fff; margin: 0; text-shadow: 0 2px 14px rgba(0,0,0,.45); letter-spacing: -.01em; }'
+            . '.ws-wp-body { position: relative; z-index: 2; background: var(--ws-card-bg); border: 1px solid var(--ws-card-border); border-radius: 12px; padding: 56px 48px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }'
+            . '.ws-theme-dark .ws-wp-body { background: #0f1115; box-shadow: none; }'
+            . '.ws-wp-no-hero .ws-wp-body { margin-top: 0; }'
+            . '.ws-wp-intro { font-size: 18px; line-height: 1.85; color: var(--ws-text-body); white-space: pre-line; }'
+            . '.ws-wp-intro::first-letter { font-size: 2.6em; font-weight: 800; color: var(--ws-accent); float: left; line-height: .8; padding-right: 8px; padding-top: 4px; }'
+            . '.ws-wp-divider { height: 1px; background: linear-gradient(90deg, var(--ws-card-border), transparent 70%); margin: 52px 0; }'
+            . '.ws-wp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }'
+            . '@media (max-width: 720px) { .ws-wp-grid { grid-template-columns: 1fr; } }'
+            . '.ws-wp-card { background: var(--ws-surface-alt); border: 1px solid var(--ws-card-border); border-radius: 10px; padding: 28px 26px; transition: transform .15s ease, box-shadow .15s ease; }'
+            . '.ws-wp-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -12px rgba(0,0,0,.15); }'
+            . '.ws-wp-card-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,102,8,.14); font-size: 18px; margin-bottom: 14px; }'
+            . '.ws-wp-card h2 { font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ws-accent); margin: 0 0 14px; }'
+            . '.ws-wp-card .ws-wp-text { font-size: 15px; line-height: 1.75; color: var(--ws-text-body); white-space: pre-line; }'
+            . '.ws-wp-note { margin-top: 44px; border: 1px solid rgba(255,102,8,.4); background: rgba(255,102,8,.08); border-radius: 10px; padding: 26px 28px; }'
+            . '.ws-wp-note-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,102,8,.18); font-size: 18px; margin-bottom: 14px; }'
+            . '.ws-wp-note h2 { font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ws-accent); margin: 0 0 12px; }'
+            . '.ws-wp-note .ws-wp-text { font-size: 15px; line-height: 1.75; color: var(--ws-text-body); white-space: pre-line; }'
+            . '.ws-wp-booking { margin-top: 60px; padding-top: 48px; border-top: 1px solid var(--ws-card-border); }'
+            . '.ws-wp-booking-title { font-size: 24px; font-weight: 800; color: var(--ws-text-heading); margin: 0 0 30px; text-align: center; }'
+        );
     }
 
     public function render($atts): string {
         $atts = shortcode_atts(['slug' => ''], $atts);
         $slug = sanitize_title($atts['slug']);
 
-        $theme = WS_Settings::get('default_theme_mode', 'dark');
+        $theme = WSMA_Settings::get('default_theme_mode', 'dark');
         $theme = in_array($theme, ['dark', 'light'], true) ? $theme : 'dark';
 
-        $term = $slug ? get_term_by('slug', $slug, 'categoria_evento') : null;
+        $term = $slug ? get_term_by('slug', $slug, 'wsma_categoria_evento') : null;
         if (!$term || is_wp_error($term)) {
             return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><p class="ws-wp-msg">Categoria workshop non trovata.</p></div>';
         }
 
         $tid = $term->term_id;
         $ctx = 'categoria_evento_' . $tid;
-        $hero = (string) WS_Data::get_field('foto_categoria', $ctx);
-        $intro = (string) WS_Data::get_field('intro', $ctx);
-        $program = (string) WS_Data::get_field('program', $ctx);
-        $requirements = (string) WS_Data::get_field('requirements', $ctx);
-        $note = (string) WS_Data::get_field('important_notes', $ctx);
+        $hero = (string) WSMA_Data::get_field('foto_categoria', $ctx);
+        $intro = (string) WSMA_Data::get_field('intro', $ctx);
+        $program = (string) WSMA_Data::get_field('program', $ctx);
+        $requirements = (string) WSMA_Data::get_field('requirements', $ctx);
+        $note = (string) WSMA_Data::get_field('important_notes', $ctx);
 
         ob_start();
         ?>
-        <style>
-            .ws-wp-wrap { --ws-card-bg: #ffffff; --ws-card-border: #e2e8f0; --ws-text-heading: #1d2327; --ws-text-body: #3c434a; --ws-text-muted: #646970; --ws-surface-alt: #f6f7f7; --ws-accent: #ff6608; }
-            .ws-theme-dark .ws-wp-wrap { --ws-card-bg: transparent; --ws-card-border: rgba(255,255,255,.15); --ws-text-heading: #ffffff; --ws-text-body: rgba(255,255,255,.82); --ws-text-muted: rgba(255,255,255,.55); --ws-surface-alt: rgba(255,255,255,.05); }
-            .ws-wp-wrap { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 1100px; margin: 0 auto; color: var(--ws-text-body); }
-            .ws-wp-msg { color: var(--ws-text-muted); }
-
-            .ws-wp-hero { position: relative; width: 100%; aspect-ratio: 21/9; background-size: cover; background-position: center; border-radius: 12px; overflow: hidden; margin-bottom: -70px; box-shadow: 0 20px 40px -16px rgba(0,0,0,.35); }
-            .ws-wp-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,0) 100%); }
-            .ws-wp-hero-inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 100px 40px 30px; }
-            .ws-wp-kicker { display: inline-block; align-self: flex-start; background: rgba(255,102,8,.92); color: #fff; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 5px 14px; border-radius: 20px; margin-bottom: 14px; }
-            .ws-wp-hero-title { font-size: clamp(28px, 4.4vw, 46px); font-weight: 800; color: #fff; margin: 0; text-shadow: 0 2px 14px rgba(0,0,0,.45); letter-spacing: -.01em; }
-
-            .ws-wp-body { position: relative; z-index: 2; background: var(--ws-card-bg); border: 1px solid var(--ws-card-border); border-radius: 12px; padding: 56px 48px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
-            .ws-theme-dark .ws-wp-body { background: #0f1115; box-shadow: none; }
-            .ws-wp-no-hero .ws-wp-body { margin-top: 0; }
-
-            .ws-wp-intro { font-size: 18px; line-height: 1.85; color: var(--ws-text-body); white-space: pre-line; }
-            .ws-wp-intro::first-letter { font-size: 2.6em; font-weight: 800; color: var(--ws-accent); float: left; line-height: .8; padding-right: 8px; padding-top: 4px; }
-
-            .ws-wp-divider { height: 1px; background: linear-gradient(90deg, var(--ws-card-border), transparent 70%); margin: 52px 0; }
-
-            .ws-wp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-            @media (max-width: 720px) { .ws-wp-grid { grid-template-columns: 1fr; } }
-            .ws-wp-card { background: var(--ws-surface-alt); border: 1px solid var(--ws-card-border); border-radius: 10px; padding: 28px 26px; transition: transform .15s ease, box-shadow .15s ease; }
-            .ws-wp-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -12px rgba(0,0,0,.15); }
-            .ws-wp-card-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,102,8,.14); font-size: 18px; margin-bottom: 14px; }
-            .ws-wp-card h2 { font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ws-accent); margin: 0 0 14px; }
-            .ws-wp-card .ws-wp-text { font-size: 15px; line-height: 1.75; color: var(--ws-text-body); white-space: pre-line; }
-
-            .ws-wp-note { margin-top: 44px; border: 1px solid rgba(255,102,8,.4); background: rgba(255,102,8,.08); border-radius: 10px; padding: 26px 28px; }
-            .ws-wp-note-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,102,8,.18); font-size: 18px; margin-bottom: 14px; }
-            .ws-wp-note h2 { font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ws-accent); margin: 0 0 12px; }
-            .ws-wp-note .ws-wp-text { font-size: 15px; line-height: 1.75; color: var(--ws-text-body); white-space: pre-line; }
-
-            .ws-wp-booking { margin-top: 60px; padding-top: 48px; border-top: 1px solid var(--ws-card-border); }
-            .ws-wp-booking-title { font-size: 24px; font-weight: 800; color: var(--ws-text-heading); margin: 0 0 30px; text-align: center; }
-        </style>
         <div class="ws-theme-wrapper ws-theme-<?php echo esc_attr($theme); ?>">
-            <div class="ws-wp-wrap<?php echo $hero ? '' : ' ws-wp-no-hero'; ?>">
+            <div class="ws-wp-wrap<?php echo esc_attr($hero ? '' : ' ws-wp-no-hero'); ?>">
                 <?php if ($hero): ?>
                     <div class="ws-wp-hero" style="background-image:url('<?php echo esc_url($hero); ?>')">
                         <div class="ws-wp-hero-inner">

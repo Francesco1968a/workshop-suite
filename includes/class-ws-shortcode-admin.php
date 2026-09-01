@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 /** Vue 3 + Element Plus rewrite of the legacy `workshop_admin` shortcode. */
-final class WS_Shortcode_Admin extends WS_Shortcode_Base {
+final class WSMA_Shortcode_Admin extends WSMA_Shortcode_Base {
 
     public function should_load(): bool {
         return !is_admin() || wp_doing_ajax();
@@ -35,8 +35,8 @@ final class WS_Shortcode_Admin extends WS_Shortcode_Base {
      * KB, harmless to register on pages that don't end up using it.
      */
     public function maybe_enqueue_theme_css(): void {
-        $css_path = WS_PATH . 'assets/dist/admin-theme.css';
+        $css_path = WSMA_PATH . 'assets/dist/admin-theme.css';
         if (!file_exists($css_path)) return;
-        wp_enqueue_style('ws-admin-theme', WS_URL . 'assets/dist/admin-theme.css', [], (string) filemtime($css_path));
+        wp_enqueue_style('ws-admin-theme', WSMA_URL . 'assets/dist/admin-theme.css', [], (string) filemtime($css_path));
     }
 }

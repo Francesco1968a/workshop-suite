@@ -5,10 +5,10 @@ if (!defined('ABSPATH')) exit;
 /**
  * Vue 3 + Element Plus rewrite of the legacy `workshop_calendar_panel` shortcode.
  * The legacy "Calendari esterni" snippet also served the live
- * `/wv-calendar/[token].ics` feed — that logic is ported to WS_Ics_Feed
+ * `/wv-calendar/[token].ics` feed — that logic is ported to WSMA_Ics_Feed
  * so the whole legacy snippet can be deactivated once both are verified.
  */
-final class WS_Shortcode_Calendario extends WS_Shortcode_Base {
+final class WSMA_Shortcode_Calendario extends WSMA_Shortcode_Base {
 
     protected function handle(): string  { return 'ws-calendario'; }
     protected function js_file(): string  { return 'assets/dist/calendario.js'; }

@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) exit;
  * messaging-system rework) — sent to Confermato participants 15 days
  * before their event. No AI, no custom mail engine: content is authored
  * per-category in the Categorie tab, delivery goes through the same direct
- * Zoho SMTP path as Conferma/replies (WS_Mail_Inbox::send_reply()) —
+ * Zoho SMTP path as Conferma/replies (WSMA_Mail_Inbox::send_reply()) —
  * originally routed through a FluentCRM tag+automation, switched over once
  * the SMTP channel was verified working, so there's one delivery mechanism
  * instead of two and no FluentCRM automation left to configure.
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) exit;
  * (`wv_t15_sent_at`) so this doesn't collide with that still-active
  * legacy cron reading/writing `mail_welcome_sent_at`.
  */
-final class WS_T15_Reminder implements WS_Module {
+final class WSMA_T15_Reminder implements WSMA_Module {
 
     public const DAYS_OFFSET = 15;
     public const META_SENT = 'wv_t15_sent_at';
@@ -55,7 +55,7 @@ final class WS_T15_Reminder implements WS_Module {
         $max_date = $now->modify('+' . self::DAYS_OFFSET . ' days')->format('Y-m-d');
 
         $eventi = get_posts([
-            'post_type'      => 'evento',
+            'post_type'      => 'wsma_evento',
             'posts_per_page' => -1,
             'fields'         => 'ids',
             'no_found_rows'  => true,
@@ -69,7 +69,7 @@ final class WS_T15_Reminder implements WS_Module {
         if (!$eventi) return [];
 
         return get_posts([
-            'post_type'      => 'iscrizione',
+            'post_type'      => 'wsma_iscrizione',
             'posts_per_page' => -1,
             'fields'         => 'ids',
             'no_found_rows'  => true,
@@ -94,29 +94,29 @@ final class WS_T15_Reminder implements WS_Module {
     }
 
     public function send_one(int $isc_id): bool {
-        $pid = (int) WS_Data::get_field('partecipante', $isc_id);
-        $eid = (int) WS_Data::get_field('evento', $isc_id);
+        $pid = (int) WSMA_Data::get_field('partecipante', $isc_id);
+        $eid = (int) WSMA_Data::get_field('evento', $isc_id);
         if (!$pid || !$eid) return false;
 
-        $email = WS_Data::get_field('email', $pid);
+        $email = WSMA_Data::get_field('email', $pid);
         if (!$email) return false;
 
-        $terms = get_the_terms($eid, 'categoria_evento');
+        $terms = get_the_terms($eid, 'wsma_categoria_evento');
         $cat_id = $terms ? $terms[0]->term_id : 0;
 
-        $oggetto_tpl = $cat_id ? WS_Data::get_field('oggetto_t15', 'categoria_evento_' . $cat_id) : '';
-        $mail_tpl = $cat_id ? WS_Data::get_field('mail_t15', 'categoria_evento_' . $cat_id) : '';
+        $oggetto_tpl = $cat_id ? WSMA_Data::get_field('oggetto_t15', 'categoria_evento_' . $cat_id) : '';
+        $mail_tpl = $cat_id ? WSMA_Data::get_field('mail_t15', 'categoria_evento_' . $cat_id) : '';
         if (!$oggetto_tpl) $oggetto_tpl = self::default_oggetto();
         if (!$mail_tpl) $mail_tpl = self::default_mail();
 
-        $subject = WS_Data::render_template($oggetto_tpl, $isc_id);
-        $body = WS_Data::render_template($mail_tpl, $isc_id);
+        $subject = WSMA_Data::render_template($oggetto_tpl, $isc_id);
+        $body = WSMA_Data::render_template($mail_tpl, $isc_id);
 
-        $result = WS_Mail_Inbox::send_reply($email, $subject, $body);
+        $result = WSMA_Mail_Inbox::send_reply($email, $subject, $body);
         if (!$result['ok']) return false;
 
-        WS_Data::update_field(self::META_SENT, current_time('mysql'), $isc_id);
-        WS_Data::append_thread($isc_id, 'out', $subject, $body);
+        WSMA_Data::update_field(self::META_SENT, current_time('mysql'), $isc_id);
+        WSMA_Data::append_thread($isc_id, 'out', $subject, $body);
 
         return true;
     }

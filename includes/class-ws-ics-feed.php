@@ -9,10 +9,10 @@ if (!defined('ABSPATH')) exit;
  * poll this URL on their own schedule), not just an admin panel — must keep
  * behaving identically: same rewrite rule, same ICS output byte-for-byte.
  */
-final class WS_Ics_Feed implements WS_Module {
+final class WSMA_Ics_Feed implements WSMA_Module {
 
     public function should_load(): bool {
-        return true;
+        return defined('WS_PRO_VERSION') && WSMA_Settings::is_module_active('calendar_sync', false);
     }
 
     public function register(): void {
@@ -45,14 +45,14 @@ final class WS_Ics_Feed implements WS_Module {
 
     private function is_valid_token(string $token): bool {
         // Check legacy global token for backward compatibility
-        if (hash_equals(WS_Data::legacy_calendar_token(), $token)) {
+        if (hash_equals(WSMA_Data::legacy_calendar_token(), $token)) {
             return true;
         }
 
         // Check if token matches any administrator user
         $admins = get_users(['capability' => 'manage_options', 'fields' => 'ID']);
         foreach ($admins as $uid) {
-            $user_token = WS_Data::calendar_token((int) $uid);
+            $user_token = WSMA_Data::calendar_token((int) $uid);
             if (hash_equals($user_token, $token)) {
                 return true;
             }
@@ -82,18 +82,30 @@ final class WS_Ics_Feed implements WS_Module {
     }
 
     private function output_ics(): void {
+        // Some site-level HTML-minifying output buffers (mu-plugins,
+        // caching layers) hook template_redirect/wp_head and wrap ALL
+        // page output in an ob_start() callback built for HTML — applied
+        // to this feed's raw text/calendar body, that mangles it (regex
+        // meant for <link>/<script> tags corrupting non-HTML content).
+        // This feed is real external infrastructure (calendar apps poll
+        // it on a schedule), so it must always leave completely untouched
+        // — discard any buffering already in effect before printing.
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
         nocache_headers();
-        $domain = parse_url(home_url(), PHP_URL_HOST) ?: 'localhost';
+        $domain = wp_parse_url(home_url(), PHP_URL_HOST) ?: 'localhost';
         $site_name = get_option('blogname') ?: 'Workshop CRM';
         $filename = sanitize_title($site_name) . '-workshop.ics';
 
         header('Content-Type: text/calendar; charset=utf-8');
         header('Content-Disposition: inline; filename="' . $filename . '"');
 
-        $due_anni_fa = date('Y-m-d', strtotime('-2 years'));
+        $due_anni_fa = wp_date('Y-m-d', strtotime('-2 years'));
 
         $eventi = get_posts([
-            'post_type' => 'evento',
+            'post_type' => 'wsma_evento',
             'posts_per_page' => -1,
             'meta_key' => 'data_evento',
             'orderby' => 'meta_value',
@@ -134,31 +146,31 @@ final class WS_Ics_Feed implements WS_Module {
         $out .= $this->ics_fold('END:VTIMEZONE');
 
         foreach ($eventi as $ev) {
-            $date_inizio = WS_Data::get_field('data_evento', $ev->ID);
+            $date_inizio = WSMA_Data::get_field('data_evento', $ev->ID);
             if (!$date_inizio) continue;
-            $date_fine   = WS_Data::get_field('data_fine', $ev->ID) ?: $date_inizio;
-            $ora_inizio  = WS_Data::get_field('ora_inizio', $ev->ID) ?: '09:00';
-            $ora_fine    = WS_Data::get_field('ora_fine', $ev->ID) ?: '18:00';
+            $date_fine   = WSMA_Data::get_field('data_fine', $ev->ID) ?: $date_inizio;
+            $ora_inizio  = WSMA_Data::get_field('ora_inizio', $ev->ID) ?: '09:00';
+            $ora_fine    = WSMA_Data::get_field('ora_fine', $ev->ID) ?: '18:00';
 
-            $terms = get_the_terms($ev->ID, 'categoria_evento');
+            $terms = get_the_terms($ev->ID, 'wsma_categoria_evento');
             $cat_name = $terms ? $terms[0]->name : 'Workshop';
-            $cat_url  = $terms ? WS_Data::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id) : '';
+            $cat_url  = $terms ? WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id) : '';
 
-            $modalita = WS_Data::get_field('modalita', $ev->ID) ?: 'fisico';
+            $modalita = WSMA_Data::get_field('modalita', $ev->ID) ?: 'fisico';
             $location = $modalita === 'virtuale'
-                ? (string) WS_Data::get_field('link_virtuale', $ev->ID)
-                : (string) WS_Data::get_field('indirizzo_geocoding', $ev->ID);
+                ? (string) WSMA_Data::get_field('link_virtuale', $ev->ID)
+                : (string) WSMA_Data::get_field('indirizzo_geocoding', $ev->ID);
 
-            $iscrizioni = WS_Data::iscrizioni_evento($ev->ID);
+            $iscrizioni = WSMA_Data::iscrizioni_evento($ev->ID);
             $confermati = [];
             $richieste = [];
             foreach ($iscrizioni as $isc) {
-                $pid = WS_Data::get_field('partecipante', $isc);
+                $pid = WSMA_Data::get_field('partecipante', $isc);
                 if (!$pid) continue;
-                $st = WS_Data::get_field('stato', $isc);
-                $nome = trim(WS_Data::get_field('nome', $pid) . ' ' . WS_Data::get_field('cognome', $pid));
-                $tel = WS_Data::get_field('telefono', $pid);
-                $email = WS_Data::get_field('email', $pid);
+                $st = WSMA_Data::get_field('stato', $isc);
+                $nome = trim(WSMA_Data::get_field('nome', $pid) . ' ' . WSMA_Data::get_field('cognome', $pid));
+                $tel = WSMA_Data::get_field('telefono', $pid);
+                $email = WSMA_Data::get_field('email', $pid);
                 $line = $nome;
                 if ($tel)   $line .= ' · ' . $tel;
                 if ($email) $line .= ' · ' . $email;
@@ -166,17 +178,25 @@ final class WS_Ics_Feed implements WS_Module {
                 else                      $richieste[]  = $line;
             }
 
-            $posti_totali = (int) WS_Data::get_field('posti_totali', $ev->ID);
+            $posti_totali = (int) WSMA_Data::get_field('posti_totali', $ev->ID);
             $n_conf = count($confermati);
             $n_rich = count($richieste);
 
             $summary = $cat_name . ' · ' . $n_conf . '/' . $posti_totali;
             if ($n_rich > 0) $summary .= ' (+' . $n_rich . ' rich.)';
 
+            // Same deep-link pattern already exposed by Riepilogo
+            // (class-ws-rest-riepilogo.php's edit_ev_link) — lands the
+            // calendar-app user straight on this evento's admin edit
+            // screen, not just the public category page.
+            $admin_page = WSMA_Data::find_page_url_containing('[workshop_admin]');
+            $edit_ev_link = $admin_page ? add_query_arg(['vista' => 'eventi', 'edit_ev' => $ev->ID], $admin_page) : '';
+
             $desc = [];
             $desc[] = 'Workshop: ' . $cat_name;
             $desc[] = 'Posti: ' . $n_conf . ' su ' . $posti_totali;
             if ($cat_url) $desc[] = 'Pagina: ' . $cat_url;
+            if ($edit_ev_link) $desc[] = 'Gestisci: ' . $edit_ev_link;
             $desc[] = '';
             $desc[] = '=== CONFERMATI (' . $n_conf . ') ===';
             if ($n_conf) {
@@ -191,8 +211,8 @@ final class WS_Ics_Feed implements WS_Module {
             }
             $description = implode("\n", $desc);
 
-            $dtstart = date('Ymd\THis', strtotime($date_inizio . ' ' . $ora_inizio));
-            $dtend   = date('Ymd\THis', strtotime($date_fine   . ' ' . $ora_fine));
+            $dtstart = wp_date('Ymd\THis', strtotime($date_inizio . ' ' . $ora_inizio));
+            $dtend   = wp_date('Ymd\THis', strtotime($date_fine   . ' ' . $ora_fine));
             $uid     = 'wv-evento-' . $ev->ID . '@' . $domain;
             $dtstamp = gmdate('Ymd\THis\Z');
             $modified = gmdate('Ymd\THis\Z', strtotime($ev->post_modified_gmt));
@@ -215,6 +235,7 @@ final class WS_Ics_Feed implements WS_Module {
 
         $out .= $this->ics_fold('END:VCALENDAR');
 
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- this is a text/calendar (.ics) feed, not HTML; esc_html() would corrupt the iCalendar syntax. Dynamic values are already escaped for ICS via ics_escape() above.
         echo $out;
     }
 }

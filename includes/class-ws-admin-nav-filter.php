@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 /** Hides nav menu items titled "Admin Workshop..." from non-admins. Ported from the legacy "Workshop CRM 4 Dashboard" snippet. */
-final class WS_Admin_Nav_Filter implements WS_Module {
+final class WSMA_Admin_Nav_Filter implements WSMA_Module {
 
     public function should_load(): bool {
         return true;

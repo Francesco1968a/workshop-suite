@@ -6,23 +6,14 @@ if (!defined('ABSPATH')) exit;
  * Handles Internationalization (i18n), localization dictionaries, 
  * script translations, and Polylang / WPML multi-language integration.
  */
-final class WS_I18n implements WS_Module {
+final class WSMA_I18n implements WSMA_Module {
 
     public function should_load(): bool {
         return true;
     }
 
     public function register(): void {
-        add_action('init', [$this, 'load_textdomain']);
         add_action('init', [$this, 'register_multilingual_strings'], 20);
-    }
-
-    public function load_textdomain(): void {
-        load_plugin_textdomain(
-            'workshop-suite',
-            false,
-            dirname(plugin_basename(WS_PATH . 'workshop-suite.php')) . '/languages'
-        );
     }
 
     /**
@@ -251,7 +242,7 @@ final class WS_I18n implements WS_Module {
      * Register dynamic plugin strings for WPML / Polylang translation
      */
     public function register_multilingual_strings(): void {
-        $settings = WS_Settings::get_all();
+        $settings = WSMA_Settings::get_all();
 
         $strings_to_register = [
             'site_brand_name'    => $settings['site_brand_name'] ?? '',
@@ -267,12 +258,12 @@ final class WS_I18n implements WS_Module {
 
             // Polylang string registration
             if (function_exists('pll_register_string')) {
-                pll_register_string($key, $value, 'Workshop Suite');
+                pll_register_string($key, $value, 'WSMaker');
             }
 
             // WPML string registration
             if (function_exists('icl_register_string')) {
-                icl_register_string('Workshop Suite', $key, $value);
+                icl_register_string('WSMaker', $key, $value);
             }
         }
     }

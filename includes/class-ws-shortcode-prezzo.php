@@ -9,15 +9,17 @@ if (!defined('ABSPATH')) exit;
  * auto-rilevata dalla pagina corrente) già usata da [ws_form_iscrizione]
  * e [workshop_prossimo].
  */
-final class WS_Shortcode_Prezzo implements WS_Module {
+final class WSMA_Shortcode_Prezzo implements WSMA_Module {
 
     public function should_load(): bool {
         return true;
     }
 
     public function register(): void {
-        add_shortcode('ws_prezzo', [$this, 'render_prezzo']);
-        add_shortcode('ws_acconto', [$this, 'render_acconto']);
+        add_shortcode('wsma_prezzo', [$this, 'render_prezzo']);
+        add_shortcode('ws_prezzo', [$this, 'render_prezzo']); // legacy alias, existing page content
+        add_shortcode('wsma_acconto', [$this, 'render_acconto']);
+        add_shortcode('ws_acconto', [$this, 'render_acconto']); // legacy alias, existing page content
     }
 
     public function render_prezzo($atts) {
@@ -37,18 +39,18 @@ final class WS_Shortcode_Prezzo implements WS_Module {
 
         $term = null;
         if (!empty($atts['slug'])) {
-            $term = get_term_by('slug', $atts['slug'], 'categoria_evento');
+            $term = get_term_by('slug', $atts['slug'], 'wsma_categoria_evento');
             if (is_wp_error($term)) $term = null;
         } else {
             global $post;
             if ($post) {
-                $term = WS_Data::find_categoria_by_url(get_permalink($post->ID));
+                $term = WSMA_Data::find_categoria_by_url(get_permalink($post->ID));
             }
         }
 
         if (!$term) return '';
 
-        $valore = (float) WS_Data::get_field($campo, 'categoria_evento_' . $term->term_id);
+        $valore = (float) WSMA_Data::get_field($campo, 'categoria_evento_' . $term->term_id);
         if ($valore <= 0) return '';
 
         if ((string) $atts['raw'] === '1') {

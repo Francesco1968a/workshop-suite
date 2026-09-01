@@ -6,19 +6,41 @@ if (!defined('ABSPATH')) exit;
  * Woorkshoop Global Hub Client Sync Module.
  * Automatically syndicates workshops to the global hub directory.
  */
-final class WS_Hub_Sync implements WS_Module {
+final class WSMA_Hub_Sync implements WSMA_Module {
 
-    const DEFAULT_HUB_API_URL = 'https://workshopsuite.pro/wp-json/woorkshoop-hub/v1/sync';
+    const DEFAULT_HUB_API_URL = 'https://wsmaker.pro/wp-json/woorkshoop-hub/v1/sync';
 
     public function should_load(): bool {
-        return WS_Settings::is_module_active('global_hub_pro', true);
+        return WSMA_Settings::is_module_active('global_hub_pro', true);
     }
+
+    // Same backoff schedule as WSMA_Webhooks: attempt 1 fails -> retry in
+    // 2min, attempt 2 -> 10min, attempt 3 -> 30min, then give up.
+    private const RETRY_DELAYS = [1 => 120, 2 => 600, 3 => 1800];
+    private const MAX_ATTEMPTS = 4;
+    private const FAILURES_OPTION = 'ws_hub_sync_failures';
 
     public function register(): void {
         add_action('init', [__CLASS__, 'migrate_legacy_synced_events']);
-        add_action('save_post_evento', [__CLASS__, 'on_event_save'], 20, 2);
-        add_action('save_post_wv_eventi', [__CLASS__, 'on_event_save'], 20, 2);
+        add_action('save_post_ws_evento', [__CLASS__, 'on_event_save'], 20, 2);
         add_action('wp_trash_post', [__CLASS__, 'on_event_trash']);
+        add_action('ws_hub_sync_retry', [__CLASS__, 'retry_sync'], 10, 2);
+        add_action('admin_notices', [__CLASS__, 'maybe_show_failure_notice']);
+    }
+
+    /** Surfaces a final (post-retries) sync failure right on the evento's own edit screen, where an organizer would actually see it. */
+    public static function maybe_show_failure_notice(): void {
+        global $pagenow, $post;
+        if ($pagenow !== 'post.php' || !$post || !in_array($post->post_type, ['wsma_evento', 'wv_eventi'], true)) return;
+
+        $failures = get_option(self::FAILURES_OPTION, []);
+        $failure = $failures[$post->ID] ?? null;
+        if (!$failure) return;
+        ?>
+        <div class="notice notice-error">
+            <p><strong>Woorkshoop Global Hub:</strong> la sincronizzazione di questo evento è fallita dopo <?php echo (int) self::MAX_ATTEMPTS; ?> tentativi (<?php echo esc_html($failure['time']); ?>) — <?php echo esc_html($failure['message']); ?>. Salva di nuovo l'evento per riprovare.</p>
+        </div>
+        <?php
     }
 
     public static function on_event_save(int $post_id, WP_Post $post): void {
@@ -27,7 +49,47 @@ final class WS_Hub_Sync implements WS_Module {
         if ($post->post_status !== 'publish') return;
         if (!self::should_sync($post_id)) return;
 
-        self::sync_single_event($post_id);
+        self::attempt_sync($post_id, 1);
+    }
+
+    /**
+     * A single Hub API call can transiently fail (timeout, 500, temporary
+     * outage) — previously the result was just discarded with no retry,
+     * silently leaving the event out of sync with the Hub until the next
+     * unrelated edit happened to trigger save_post again.
+     */
+    private static function attempt_sync(int $post_id, int $attempt): void {
+        $res = self::sync_single_event($post_id);
+        if ($res['success']) {
+            self::clear_failure($post_id);
+            return;
+        }
+
+        if ($attempt < self::MAX_ATTEMPTS) {
+            $delay = self::RETRY_DELAYS[$attempt] ?? 1800;
+            wp_schedule_single_event(time() + $delay, 'ws_hub_sync_retry', [$post_id, $attempt + 1]);
+        } else {
+            self::record_failure($post_id, $res['message'] ?? 'Errore sconosciuto');
+        }
+    }
+
+    public static function retry_sync(int $post_id, int $attempt): void {
+        if (get_post_status($post_id) !== 'publish' || !self::should_sync($post_id)) return;
+        self::attempt_sync($post_id, $attempt);
+    }
+
+    private static function record_failure(int $post_id, string $message): void {
+        $failures = get_option(self::FAILURES_OPTION, []);
+        $failures[$post_id] = ['message' => $message, 'time' => current_time('mysql')];
+        update_option(self::FAILURES_OPTION, $failures, false);
+    }
+
+    private static function clear_failure(int $post_id): void {
+        $failures = get_option(self::FAILURES_OPTION, []);
+        if (isset($failures[$post_id])) {
+            unset($failures[$post_id]);
+            update_option(self::FAILURES_OPTION, $failures, false);
+        }
     }
 
     /**
@@ -46,7 +108,7 @@ final class WS_Hub_Sync implements WS_Module {
     }
 
     public static function on_event_trash(int $post_id): void {
-        if (!in_array(get_post_type($post_id), ['evento', 'wv_eventi'], true)) return;
+        if (!in_array(get_post_type($post_id), ['wsma_evento', 'wv_eventi'], true)) return;
         self::delete_from_hub($post_id);
     }
 
@@ -58,10 +120,10 @@ final class WS_Hub_Sync implements WS_Module {
      * listings already live on the Hub.
      */
     public static function migrate_legacy_synced_events(): void {
-        if (get_option('ws_hub_legacy_backfill_done')) return;
+        if (get_option('wsma_hub_legacy_backfill_done')) return;
 
         $ids = get_posts([
-            'post_type' => ['evento', 'wv_eventi'], 'post_status' => 'publish',
+            'post_type' => ['wsma_evento', 'wv_eventi'], 'post_status' => 'publish',
             'posts_per_page' => -1, 'fields' => 'ids', 'no_found_rows' => true,
             'meta_query' => [
                 ['key' => '_ws_hub_syndicated_url', 'compare' => 'EXISTS'],
@@ -71,7 +133,7 @@ final class WS_Hub_Sync implements WS_Module {
         foreach ($ids as $id) {
             update_post_meta($id, 'enable_hub_sync', 1);
         }
-        update_option('ws_hub_legacy_backfill_done', 1);
+        update_option('wsma_hub_legacy_backfill_done', 1);
     }
 
     /**
@@ -80,7 +142,7 @@ final class WS_Hub_Sync implements WS_Module {
      */
     public static function sync_all_published_events(): array {
         $query = new WP_Query([
-            'post_type'      => ['evento', 'wv_eventi'],
+            'post_type'      => ['wsma_evento', 'wv_eventi'],
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'fields'         => 'ids',
@@ -109,7 +171,7 @@ final class WS_Hub_Sync implements WS_Module {
         }
 
         $meta = get_post_meta($post_id);
-        $settings = WS_Settings::get_all();
+        $settings = WSMA_Settings::get_all();
 
         // Get hero image URL
         $image_url = '';
@@ -119,7 +181,7 @@ final class WS_Hub_Sync implements WS_Module {
         }
 
         // Get category / type terms
-        $terms = get_the_terms($post_id, 'categoria_evento');
+        $terms = get_the_terms($post_id, 'wsma_categoria_evento');
         $cat_name = ($terms && !is_wp_error($terms)) ? $terms[0]->name : 'Workshop';
         $cat_term_id = ($terms && !is_wp_error($terms)) ? $terms[0]->term_id : 0;
 
@@ -134,9 +196,9 @@ final class WS_Hub_Sync implements WS_Module {
         $country = $meta['nazione'][0] ?? null;
         $address = $meta['indirizzo'][0] ?? null;
         if ($cat_term_id) {
-            $city = $city ?: (WS_Data::get_field('citta', 'categoria_evento_' . $cat_term_id) ?: null);
-            $country = $country ?: (WS_Data::get_field('nazione', 'categoria_evento_' . $cat_term_id) ?: null);
-            $address = $address ?: (WS_Data::get_field('indirizzo', 'categoria_evento_' . $cat_term_id) ?: null);
+            $city = $city ?: (WSMA_Data::get_field('citta', 'categoria_evento_' . $cat_term_id) ?: null);
+            $country = $country ?: (WSMA_Data::get_field('nazione', 'categoria_evento_' . $cat_term_id) ?: null);
+            $address = $address ?: (WSMA_Data::get_field('indirizzo', 'categoria_evento_' . $cat_term_id) ?: null);
         }
         if ($is_virtual) {
             $city = $city ?: 'Online';
@@ -162,19 +224,19 @@ final class WS_Hub_Sync implements WS_Module {
         // Resolve real public booking URL (prevent 404 on private CPTs)
         $booking_url = '';
         if ($terms && !is_wp_error($terms)) {
-            $cat_url = WS_Data::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id);
+            $cat_url = WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id);
             if ($cat_url) {
                 $booking_url = esc_url_raw($cat_url);
             }
         }
         if (empty($booking_url)) {
-            $booking_page = WS_Data::find_page_url_containing('ws_form_iscrizione');
+            $booking_page = WSMA_Data::find_page_url_containing('ws_form_iscrizione');
             if (!$booking_page) {
                 // 'fvw_iscrizione' was never a real substring of either
                 // registered shortcode tag (fv_form_iscrizione /
                 // fvw_form_iscrizione), so this search never matched
                 // anything — try the actual live tag instead.
-                $booking_page = WS_Data::find_page_url_containing('fv_form_iscrizione');
+                $booking_page = WSMA_Data::find_page_url_containing('fv_form_iscrizione');
             }
             $booking_url = $booking_page ?: home_url();
         }
@@ -217,14 +279,14 @@ final class WS_Hub_Sync implements WS_Module {
         ];
 
         // Send via REST API to Hub
-        $hub_api_url = apply_filters('ws_hub_api_endpoint', self::DEFAULT_HUB_API_URL);
+        $hub_api_url = apply_filters('wsma_hub_api_endpoint', self::DEFAULT_HUB_API_URL);
 
         $response = wp_remote_post($hub_api_url, [
             'timeout'     => 12,
             'headers'     => [
                 'Content-Type' => 'application/json',
                 'Accept'       => 'application/json',
-                'Host'         => 'workshopsuite.pro',
+                'Host'         => 'wsmaker.pro',
             ],
             'body'        => wp_json_encode($payload),
             'sslverify'   => false,
@@ -255,7 +317,7 @@ final class WS_Hub_Sync implements WS_Module {
             'timeout'   => 8,
             'headers'   => [
                 'Content-Type' => 'application/json',
-                'Host'         => 'workshopsuite.pro',
+                'Host'         => 'wsmaker.pro',
             ],
             'body'      => wp_json_encode([
                 'uuid'        => $uuid,

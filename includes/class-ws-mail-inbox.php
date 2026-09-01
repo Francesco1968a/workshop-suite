@@ -14,7 +14,7 @@ use Webklex\PHPIMAP\ClientManager;
  * The password is write-only from the REST API's perspective: settings
  * GET never returns it, only whether one is stored (`has_password`).
  */
-final class WS_Mail_Inbox {
+final class WSMA_Mail_Inbox {
 
     private const OPTION = 'ws_imap_settings';
     private const LEGACY_OPTION = 'fvw_imap_settings';
@@ -29,7 +29,21 @@ final class WS_Mail_Inbox {
             }
             $stored = $legacy;
         }
-        return is_array($stored) ? $stored : [];
+        $stored = is_array($stored) ? $stored : [];
+
+        // Self-healing one-time migration: a password saved before
+        // encrypt_password()/get_decrypted_password() existed sits here
+        // as legacy plain text (get_decrypted_password() already tolerates
+        // that for reading). The first read after this fix encrypts it in
+        // place and re-saves, so it stops being plain text in the DB —
+        // after that the 'enc:' prefix check below is false and this
+        // never runs again.
+        if (!empty($stored['password']) && strpos($stored['password'], 'enc:') !== 0) {
+            $stored['password'] = self::encrypt_password($stored['password']);
+            update_option(self::OPTION, $stored, false);
+        }
+
+        return $stored;
     }
 
     public static function default_settings(): array {

@@ -2,8 +2,8 @@
 
 if (!defined('ABSPATH')) exit;
 
-/** Mounts the Vue Ringraziamento panel. REST endpoints live in WS_Ringraziamento. */
-final class WS_Shortcode_Ringraziamento implements WS_Module {
+/** Mounts the Vue Ringraziamento panel. REST endpoints live in WSMA_Ringraziamento. */
+final class WSMA_Shortcode_Ringraziamento implements WSMA_Module {
 
     public function should_load(): bool {
         return !is_admin() || wp_doing_ajax();
@@ -25,20 +25,20 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
             return '<p>Accesso riservato.</p>';
         }
 
-        $asset_js  = WS_PATH . 'assets/dist/ringraziamento.js';
-        $asset_css = WS_PATH . 'assets/dist/ringraziamento.css';
+        $asset_js  = WSMA_PATH . 'assets/dist/ringraziamento.js';
+        $asset_css = WSMA_PATH . 'assets/dist/ringraziamento.css';
 
         wp_enqueue_script(
             'ws-ringraziamento',
-            WS_URL . 'assets/dist/ringraziamento.js',
+            WSMA_URL . 'assets/dist/ringraziamento.js',
             [],
-            file_exists($asset_js) ? (string) filemtime($asset_js) : WS_VERSION,
+            file_exists($asset_js) ? (string) filemtime($asset_js) : WSMA_VERSION,
             true
         );
         if (file_exists($asset_css)) {
             wp_enqueue_style(
                 'ws-ringraziamento',
-                WS_URL . 'assets/dist/ringraziamento.css',
+                WSMA_URL . 'assets/dist/ringraziamento.css',
                 [],
                 (string) filemtime($asset_css)
             );
@@ -51,7 +51,7 @@ final class WS_Shortcode_Ringraziamento implements WS_Module {
         wp_localize_script('ws-ringraziamento', 'WS_CONFIG', $ringraziamento_config);
         wp_localize_script('ws-ringraziamento', 'FVW_CONFIG', $ringraziamento_config);
 
-        $theme = WS_Settings::get('default_theme_mode', 'dark');
+        $theme = WSMA_Settings::get('default_theme_mode', 'dark');
         $theme = in_array($theme, ['dark', 'light'], true) ? $theme : 'dark';
 
         return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><div id="ws-ringraziamento-app"></div></div>';

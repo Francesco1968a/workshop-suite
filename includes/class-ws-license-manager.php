@@ -3,14 +3,15 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * License Manager for Workshop Suite.
+ * License Manager for WSMaker.
  * Handles license key validation, status checking and updates integration.
  * Built to be compatible with Freemius / EDD (Easy Digital Downloads) Software Licensing.
  */
-final class WS_License_Manager implements WS_Module {
+final class WSMA_License_Manager implements WSMA_Module {
 
-    public const LICENSE_OPTION_KEY = 'ws_license_data';
-    private const LEGACY_LICENSE_OPTION_KEY = 'fvw_license_data';
+    public const LICENSE_OPTION_KEY = 'wsma_license_data';
+    private const LEGACY_LICENSE_OPTION_KEY = 'ws_license_data';
+    private const LEGACY_LICENSE_OPTION_KEY_V0 = 'fvw_license_data';
 
     public function should_load(): bool {
         return true;
@@ -31,9 +32,12 @@ final class WS_License_Manager implements WS_Module {
 
         $saved = get_option(self::LICENSE_OPTION_KEY, false);
         if ($saved === false) {
-            // Migrate silently from the pre-rename option key so an already
+            // Migrate silently from the pre-rename option key(s) so an already
             // activated Pro license doesn't appear inactive after the rename.
             $legacy = get_option(self::LEGACY_LICENSE_OPTION_KEY, []);
+            if (empty($legacy)) {
+                $legacy = get_option(self::LEGACY_LICENSE_OPTION_KEY_V0, []);
+            }
             if (!empty($legacy)) {
                 update_option(self::LICENSE_OPTION_KEY, $legacy);
             }
@@ -52,7 +56,7 @@ final class WS_License_Manager implements WS_Module {
     }
 
     public function register_settings(): void {
-        register_setting('ws_license_group', self::LICENSE_OPTION_KEY, [
+        register_setting('wsma_license_group', self::LICENSE_OPTION_KEY, [
             'sanitize_callback' => [$this, 'sanitize_and_validate']
         ]);
     }
@@ -93,13 +97,13 @@ final class WS_License_Manager implements WS_Module {
      */
     private static function validate_remote_key(string $key): array {
         // Real remote verification logic (EDD / Freemius / Custom Endpoint)
-        $api_url = apply_filters('ws_license_api_url', 'https://api.francescoverolino.com/v1/license/verify');
+        $api_url = apply_filters('wsma_license_api_url', 'https://api.francescoverolino.com/v1/license/verify');
 
         $response = wp_remote_post($api_url, [
             'timeout' => 15,
             'body'    => [
                 'license' => $key,
-                'item_name' => 'Workshop Suite',
+                'item_name' => 'WSMaker',
                 'url'       => home_url(),
             ],
         ]);

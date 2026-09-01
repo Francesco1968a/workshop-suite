@@ -10,15 +10,15 @@ if (!defined('ABSPATH')) exit;
  * partecipante/iscrizione posts from Fluent Forms submissions.
  *
  * `wv_find_categoria_by_url()` was DEFINED here in the legacy snippet — now
- * ported to `WS_Data::find_categoria_by_url()` (also used by
+ * ported to `WSMA_Data::find_categoria_by_url()` (also used by
  * FVW_Shortcode_Prossimo). All other `wv_*` calls replaced with the
- * `WS_Data::` equivalents already ported this session.
+ * `WSMA_Data::` equivalents already ported this session.
  *
- * Mail #1 (Risposta) on submission is sent via WS_Mail_Templates
+ * Mail #1 (Risposta) on submission is sent via WSMA_Mail_Templates
  * (ported from legacy snippet 19), which also owns the category-level
  * template fields and per-iscrizione tracking fields.
  */
-final class WS_Fluent_Forms_Intake implements WS_Module {
+final class WSMA_Fluent_Forms_Intake implements WSMA_Module {
 
     public const FORM_ID = 3;
 
@@ -34,11 +34,12 @@ final class WS_Fluent_Forms_Intake implements WS_Module {
 
     /** @return array{id:int,label:string}[] */
     public static function eventi_per_categoria_array(int $term_id): array {
-        $oggi = date('Y-m-d');
+        $oggi = current_time('Y-m-d');
         $eq = new WP_Query([
-            'post_type' => 'evento',
+            'post_type' => 'wsma_evento',
             'posts_per_page' => -1,
-            'tax_query' => [['taxonomy' => 'categoria_evento', 'field' => 'term_id', 'terms' => $term_id]],
+            'no_found_rows' => true,
+            'tax_query' => [['taxonomy' => 'wsma_categoria_evento', 'field' => 'term_id', 'terms' => $term_id]],
             'meta_key' => 'data_evento',
             'orderby' => 'meta_value', 'order' => 'ASC',
             'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']],
@@ -47,8 +48,8 @@ final class WS_Fluent_Forms_Intake implements WS_Module {
         while ($eq->have_posts()) {
             $eq->the_post();
             $id = get_the_ID();
-            $s = WS_Data::stato_posti($id);
-            $label = WS_Data::format_periodo($id);
+            $s = WSMA_Data::stato_posti($id);
+            $label = WSMA_Data::format_periodo($id);
             if ($s['sold_out']) {
                 $label .= ' — Sold Out';
             } else {
@@ -71,29 +72,28 @@ final class WS_Fluent_Forms_Intake implements WS_Module {
         if (!$post) return;
 
         $url = get_permalink($post->ID);
-        $term = WS_Data::find_categoria_by_url($url);
+        $term = WSMA_Data::find_categoria_by_url($url);
         if (!$term) return;
 
         $eventi = self::eventi_per_categoria_array($term->term_id);
 
         // Arricchisci ogni evento con il "periodo pulito" (senza info posti/sold out)
         foreach ($eventi as &$ev) {
-            $ev['periodo'] = WS_Data::format_periodo($ev['id']);
+            $ev['periodo'] = WSMA_Data::format_periodo($ev['id']);
         }
         unset($ev);
-        ?>
-        <script>
-          window.WV_EVENTS   = <?php echo wp_json_encode($eventi, JSON_HEX_TAG | JSON_HEX_AMP); ?>;
-          window.WV_CATEGORY = <?php echo wp_json_encode($term->name, JSON_HEX_TAG | JSON_HEX_AMP); ?>;
-        </script>
-        <?php
+
+        WSMA_Data::enqueue_inline_script(
+            'window.WV_EVENTS = ' . wp_json_encode($eventi, JSON_HEX_TAG | JSON_HEX_AMP) . ';'
+            . 'window.WV_CATEGORY = ' . wp_json_encode($term->name, JSON_HEX_TAG | JSON_HEX_AMP) . ';'
+        );
     }
 
     /** JS nel footer: crea select visibile prima del hidden field e copia il valore. */
     public function inject_visible_select_script(): void {
         if (is_admin()) return;
-        ?>
-        <script>
+
+        WSMA_Data::enqueue_inline_script(<<<'JS'
         (function(){
           function init(){
             if (typeof window.WV_EVENTS === 'undefined') return; // non è una pagina categoria
@@ -159,8 +159,8 @@ final class WS_Fluent_Forms_Intake implements WS_Module {
             init();
           }
         })();
-        </script>
-        <?php
+        JS
+        );
     }
 
     /** Hook submission form Fluent → crea iscrizione + manda Mail #1. */
@@ -169,16 +169,22 @@ final class WS_Fluent_Forms_Intake implements WS_Module {
         if ($form_id !== self::FORM_ID) return;
 
         $evento_id = (int) ($formData['evento_scelto'] ?? 0);
-        if (!$evento_id || get_post_type($evento_id) !== 'evento') {
-            error_log("[WV CRM] Submission #{$entryId}: evento_scelto non valido → skip.");
+        if (!$evento_id || get_post_type($evento_id) !== 'wsma_evento') {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- gated behind WP_DEBUG above; not run in production.
+                error_log("[WV CRM] Submission #{$entryId}: evento_scelto non valido → skip.");
+            }
             return;
         }
-        if (WS_Data::evento_concluso($evento_id)) {
-            error_log("[WV CRM] Submission #{$entryId}: evento {$evento_id} concluso → skip.");
+        if (WSMA_Data::evento_concluso($evento_id)) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- gated behind WP_DEBUG above; not run in production.
+                error_log("[WV CRM] Submission #{$entryId}: evento {$evento_id} concluso → skip.");
+            }
             return;
         }
 
-        $terms = get_the_terms($evento_id, 'categoria_evento');
+        $terms = get_the_terms($evento_id, 'wsma_categoria_evento');
         $term = $terms ? $terms[0] : null;
         if (!$term) return;
 
@@ -203,44 +209,44 @@ final class WS_Fluent_Forms_Intake implements WS_Module {
 
         $titolo = trim($first_name . ' ' . $last_name);
 
-        $pid = WS_Data::find_partecipante_by_email($email);
+        $pid = WSMA_Data::find_partecipante_by_email($email);
         if (!$pid) {
-            $pid = wp_insert_post(['post_type'=>'partecipante','post_status'=>'publish','post_title'=>$titolo]);
+            $pid = wp_insert_post(['post_type'=>'wsma_partecipante','post_status'=>'publish','post_title'=>$titolo]);
             if (!$pid || is_wp_error($pid)) return;
         }
-        WS_Data::update_field('nome', $first_name, $pid);
-        WS_Data::update_field('cognome', $last_name, $pid);
-        WS_Data::update_field('telefono', $phone, $pid);
-        WS_Data::update_field('email', $email, $pid);
-        if ($citta) WS_Data::update_field('citta', $citta, $pid);
+        WSMA_Data::update_field('nome', $first_name, $pid);
+        WSMA_Data::update_field('cognome', $last_name, $pid);
+        WSMA_Data::update_field('telefono', $phone, $pid);
+        WSMA_Data::update_field('email', $email, $pid);
+        if ($citta) WSMA_Data::update_field('citta', $citta, $pid);
         wp_update_post(['ID' => $pid, 'post_title' => $titolo]);
 
-        $existing_isc = WS_Data::find_iscrizione($pid, $evento_id);
+        $existing_isc = WSMA_Data::find_iscrizione($pid, $evento_id);
         if ($existing_isc) {
-            $old_msg = (string) WS_Data::get_field('messaggio_originale', $existing_isc);
+            $old_msg = (string) WSMA_Data::get_field('messaggio_originale', $existing_isc);
             $stamp   = current_time('d/m/Y H:i');
             $new_msg = $old_msg ? ($old_msg . "\n\n— [{$stamp}] Nuovo messaggio dal form —\n" . $message) : $message;
-            WS_Data::update_field('messaggio_originale', $new_msg, $existing_isc);
-            WS_Data::update_field('note', $new_msg, $existing_isc);
+            WSMA_Data::update_field('messaggio_originale', $new_msg, $existing_isc);
+            WSMA_Data::update_field('note', $new_msg, $existing_isc);
             return;
         }
 
         $isc = wp_insert_post([
-            'post_type'   => 'iscrizione',
+            'post_type'   => 'wsma_iscrizione',
             'post_status' => 'publish',
-            'post_title'  => $titolo . ' → ' . WS_Data::evento_label($evento_id),
+            'post_title'  => $titolo . ' → ' . WSMA_Data::evento_label($evento_id),
         ]);
         if (!$isc || is_wp_error($isc)) return;
 
-        WS_Data::update_field('partecipante', $pid, $isc);
-        WS_Data::update_field('evento', $evento_id, $isc);
-        WS_Data::update_field('stato', 'richiesta', $isc);
-        WS_Data::update_field('anticipo', 0, $isc);
-        WS_Data::update_field('saldo', 0, $isc);
-        WS_Data::update_field('messaggio_originale', $message, $isc);
-        WS_Data::update_field('note', $message, $isc);
+        WSMA_Data::update_field('partecipante', $pid, $isc);
+        WSMA_Data::update_field('evento', $evento_id, $isc);
+        WSMA_Data::update_field('stato', 'richiesta', $isc);
+        WSMA_Data::update_field('anticipo', 0, $isc);
+        WSMA_Data::update_field('saldo', 0, $isc);
+        WSMA_Data::update_field('messaggio_originale', $message, $isc);
+        WSMA_Data::update_field('note', $message, $isc);
         update_post_meta($isc, 'num_persone', $num_persone);
 
-        WS_Mail_Templates::send_template_email($isc, 'mail_risposta');
+        WSMA_Mail_Templates::send_template_email($isc, 'mail_risposta');
     }
 }

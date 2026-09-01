@@ -9,25 +9,25 @@ if (!defined('ABSPATH')) exit;
  * No AI or FluentCRM involved in the legacy code — it used plain
  * per-category ACF templates rendered via `wv_render_template()` (a
  * placeholder-substitution function, same family as
- * `WS_Data::render_template()`), with a fallback to a hardcoded Italian
+ * `WSMA_Data::render_template()`), with a fallback to a hardcoded Italian
  * default body. That part is a clean, behavior-preserving port.
  *
  * BEHAVIOR CHANGE (user-confirmed 2026-08-17): the legacy code only
  * created a DRAFT for manual review/send (`wv_crea_bozza()`, defined by an
  * unrelated legacy snippet); this port sends automatically via cron using
- * the same direct-send pattern as Conferma (WS_Rest_Riepilogo) and T-15
- * (WS_T15_Reminder): WS_Data::render_template() + WS_Mail_Inbox::send_reply(),
+ * the same direct-send pattern as Conferma (WSMA_Rest_Riepilogo) and T-15
+ * (WSMA_T15_Reminder): WSMA_Data::render_template() + WSMA_Mail_Inbox::send_reply(),
  * logging to `wv_thread`, updating `mail_ringraziamento_sent_at` on success.
  *
  * The `oggetto_ringraziamento` / `mail_ringraziamento` ACF fields on
  * categoria_evento are a NEW field group not registered anywhere else in
- * the plugin — no collision with existing WS_Post_Types fields.
+ * the plugin — no collision with existing WSMA_Post_Types fields.
  *
  * The admin UI (settings + pending-list + send/skip actions) is a REST API
  * here, consumed by the Vue panel `panels/Ringraziamento.vue` registered
- * via WS_Shortcode_Ringraziamento — see that class for the shortcode.
+ * via WSMA_Shortcode_Ringraziamento — see that class for the shortcode.
  */
-final class WS_Ringraziamento implements WS_Module {
+final class WSMA_Ringraziamento implements WSMA_Module {
 
     public const DAYS_OFFSET = 2;
     public const META_SENT = 'mail_ringraziamento_sent_at';
@@ -75,13 +75,13 @@ final class WS_Ringraziamento implements WS_Module {
     }
 
     private function riga(WP_Post $isc): array {
-        $p = WS_Data::get_field('partecipante', $isc->ID);
-        $e = WS_Data::get_field('evento', $isc->ID);
+        $p = WSMA_Data::get_field('partecipante', $isc->ID);
+        $e = WSMA_Data::get_field('evento', $isc->ID);
         return [
             'isc_id' => $isc->ID,
-            'nome' => $p ? trim(WS_Data::get_field('nome', $p) . ' ' . WS_Data::get_field('cognome', $p)) : '?',
+            'nome' => $p ? trim(WSMA_Data::get_field('nome', $p) . ' ' . WSMA_Data::get_field('cognome', $p)) : '?',
             'evento' => $e ? get_the_title($e) : '?',
-            'email' => $p ? WS_Data::get_field('email', $p) : '',
+            'email' => $p ? WSMA_Data::get_field('email', $p) : '',
         ];
     }
 
@@ -97,7 +97,7 @@ final class WS_Ringraziamento implements WS_Module {
         $next_cron = wp_next_scheduled(self::CRON_HOOK);
 
         return new WP_REST_Response([
-            'autosend' => get_option('wv_ringraziamento_autosend', '1') === '1',
+            'autosend' => get_option('wsma_ringraziamento_autosend', '1') === '1',
             'oggi' => $oggi,
             'prossimi' => $prossimi,
             'next_cron' => $next_cron ? date_i18n('d/m/Y H:i', $next_cron) : null,
@@ -105,13 +105,13 @@ final class WS_Ringraziamento implements WS_Module {
     }
 
     public function save_impostazioni(WP_REST_Request $request): WP_REST_Response {
-        update_option('wv_ringraziamento_autosend', $request->get_param('autosend') ? '1' : '0');
+        update_option('wsma_ringraziamento_autosend', $request->get_param('autosend') ? '1' : '0');
         return new WP_REST_Response(['ok' => true]);
     }
 
     public function invia_una(WP_REST_Request $request): WP_REST_Response|WP_Error {
         $isc_id = (int) $request['id'];
-        if (get_post_type($isc_id) !== 'iscrizione') {
+        if (get_post_type($isc_id) !== 'wsma_iscrizione') {
             return new WP_Error('not_found', 'Iscrizione non trovata', ['status' => 404]);
         }
         if (!$this->send_one($isc_id)) {
@@ -122,10 +122,10 @@ final class WS_Ringraziamento implements WS_Module {
 
     public function salta_una(WP_REST_Request $request): WP_REST_Response|WP_Error {
         $isc_id = (int) $request['id'];
-        if (get_post_type($isc_id) !== 'iscrizione') {
+        if (get_post_type($isc_id) !== 'wsma_iscrizione') {
             return new WP_Error('not_found', 'Iscrizione non trovata', ['status' => 404]);
         }
-        WS_Data::update_field(self::META_SENT, current_time('mysql'), $isc_id);
+        WSMA_Data::update_field(self::META_SENT, current_time('mysql'), $isc_id);
         return new WP_REST_Response(['ok' => true]);
     }
 
@@ -149,16 +149,16 @@ final class WS_Ringraziamento implements WS_Module {
                 ['key' => 'field_cat_ogg_ring', 'label' => 'Oggetto', 'name' => 'oggetto_ringraziamento', 'type' => 'text'],
                 ['key' => 'field_cat_mail_ring', 'label' => 'Corpo', 'name' => 'mail_ringraziamento', 'type' => 'textarea', 'rows' => 10],
             ],
-            'location' => [[['param' => 'taxonomy', 'operator' => '==', 'value' => 'categoria_evento']]],
+            'location' => [[['param' => 'taxonomy', 'operator' => '==', 'value' => 'wsma_categoria_evento']]],
         ]);
     }
 
     /** @return int[] iscrizione IDs — Confermate, evento concluso esattamente N giorni fa, non ancora inviate. */
     public static function pending(int $days_after = self::DAYS_OFFSET): array {
-        $target_date = date('Y-m-d', strtotime("-{$days_after} days"));
+        $target_date = wp_date('Y-m-d', strtotime("-{$days_after} days"));
 
         $eventi = get_posts([
-            'post_type'      => 'evento',
+            'post_type'      => 'wsma_evento',
             'posts_per_page' => -1,
             'meta_query'     => [
                 ['key' => 'data_fine', 'value' => $target_date, 'compare' => '='],
@@ -169,7 +169,7 @@ final class WS_Ringraziamento implements WS_Module {
         if (empty($eventi)) return [];
 
         return get_posts([
-            'post_type'      => 'iscrizione',
+            'post_type'      => 'wsma_iscrizione',
             'posts_per_page' => -1,
             'meta_query'     => [
                 'relation' => 'AND',
@@ -183,7 +183,7 @@ final class WS_Ringraziamento implements WS_Module {
     }
 
     public function process(int $days_after = self::DAYS_OFFSET): int {
-        if (get_option('wv_ringraziamento_autosend', '1') !== '1') return 0;
+        if (get_option('wsma_ringraziamento_autosend', '1') !== '1') return 0;
 
         $n = 0;
         foreach (self::pending($days_after) as $isc) {
@@ -194,49 +194,49 @@ final class WS_Ringraziamento implements WS_Module {
 
     public function send_one(int $isc_id): bool {
         if (!$isc_id) return false;
-        if (WS_Data::get_field(self::META_SENT, $isc_id)) return false;
+        if (WSMA_Data::get_field(self::META_SENT, $isc_id)) return false;
 
-        $pid = (int) WS_Data::get_field('partecipante', $isc_id);
-        $eid = (int) WS_Data::get_field('evento', $isc_id);
+        $pid = (int) WSMA_Data::get_field('partecipante', $isc_id);
+        $eid = (int) WSMA_Data::get_field('evento', $isc_id);
         if (!$pid || !$eid) return false;
 
-        $email = WS_Data::get_field('email', $pid);
+        $email = WSMA_Data::get_field('email', $pid);
         if (!$email) return false;
 
-        $terms = get_the_terms($eid, 'categoria_evento');
+        $terms = get_the_terms($eid, 'wsma_categoria_evento');
         $cat_id = $terms ? $terms[0]->term_id : 0;
 
-        $oggetto_tpl = $cat_id ? WS_Data::get_field('oggetto_ringraziamento', 'categoria_evento_' . $cat_id) : '';
-        $mail_tpl = $cat_id ? WS_Data::get_field('mail_ringraziamento', 'categoria_evento_' . $cat_id) : '';
+        $oggetto_tpl = $cat_id ? WSMA_Data::get_field('oggetto_ringraziamento', 'categoria_evento_' . $cat_id) : '';
+        $mail_tpl = $cat_id ? WSMA_Data::get_field('mail_ringraziamento', 'categoria_evento_' . $cat_id) : '';
 
         if (!$mail_tpl) {
             $body = $this->default_body($isc_id);
             $subject = $oggetto_tpl
-                ? WS_Data::render_template($oggetto_tpl, $isc_id)
-                : ('Grazie per aver reso speciale ' . WS_Data::format_periodo($eid));
+                ? WSMA_Data::render_template($oggetto_tpl, $isc_id)
+                : ('Grazie per aver reso speciale ' . WSMA_Data::format_periodo($eid));
         } else {
-            $subject = WS_Data::render_template($oggetto_tpl ?: 'Grazie!', $isc_id);
-            $body = WS_Data::render_template($mail_tpl, $isc_id);
+            $subject = WSMA_Data::render_template($oggetto_tpl ?: 'Grazie!', $isc_id);
+            $body = WSMA_Data::render_template($mail_tpl, $isc_id);
         }
 
         if (!$body) return false;
 
-        $result = WS_Mail_Inbox::send_reply($email, $subject, $body);
+        $result = WSMA_Mail_Inbox::send_reply($email, $subject, $body);
         if (!$result['ok']) return false;
 
-        WS_Data::update_field(self::META_SENT, current_time('mysql'), $isc_id);
-        WS_Data::append_thread($isc_id, 'out', $subject, $body);
+        WSMA_Data::update_field(self::META_SENT, current_time('mysql'), $isc_id);
+        WSMA_Data::append_thread($isc_id, 'out', $subject, $body);
 
         return true;
     }
 
     public function default_body(int $isc_id): string {
-        $pid = WS_Data::get_field('partecipante', $isc_id);
-        $nome = $pid ? WS_Data::get_field('nome', $pid) : '';
-        $eid = WS_Data::get_field('evento', $isc_id);
-        $terms = $eid ? get_the_terms($eid, 'categoria_evento') : null;
+        $pid = WSMA_Data::get_field('partecipante', $isc_id);
+        $nome = $pid ? WSMA_Data::get_field('nome', $pid) : '';
+        $eid = WSMA_Data::get_field('evento', $isc_id);
+        $terms = $eid ? get_the_terms($eid, 'wsma_categoria_evento') : null;
         $cat_name = $terms ? $terms[0]->name : 'questa esperienza';
-        $periodo = $eid ? WS_Data::format_periodo($eid) : '';
+        $periodo = $eid ? WSMA_Data::format_periodo($eid) : '';
 
         return "Ciao {$nome},\n\n"
              . "grazie per aver reso speciale {$cat_name} del {$periodo}.\n\n"

@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit;
 /**
  * REST controller for instant toggle of Modules & Add-ons.
  */
-final class WS_Rest_Modules_Toggle {
+final class WSMA_Rest_Modules_Toggle {
 
     public static function init(): void {
         add_action('rest_api_init', [__CLASS__, 'register_routes']);
@@ -28,19 +28,19 @@ final class WS_Rest_Modules_Toggle {
             return new WP_REST_Response(['error' => 'Invalid module key'], 400);
         }
 
-        $current = WS_Settings::get_all();
+        $current = WSMA_Settings::get_all();
         if (!isset($current['active_modules']) || !is_array($current['active_modules'])) {
             $current['active_modules'] = [];
         }
 
         $current['active_modules'][$mod_key] = $active ? 1 : 0;
-        WS_Settings::update_all($current);
+        WSMA_Settings::update_all($current);
 
         return new WP_REST_Response([
             'success' => true,
             'module'  => $mod_key,
             'active'  => $active,
-            'message' => $active ? __('Modulo attivato con successo', 'workshop-suite') : __('Modulo disattivato', 'workshop-suite'),
+            'message' => $active ? __('Modulo attivato con successo', 'wsmaker') : __('Modulo disattivato', 'wsmaker'),
         ], 200);
     }
 }

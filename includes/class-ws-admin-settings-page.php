@@ -3,9 +3,9 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Native WP Admin settings page for Workshop Suite.
+ * Native WP Admin settings page for WSMaker.
  */
-final class WS_Admin_Settings_Page implements WS_Module {
+final class WSMA_Admin_Settings_Page implements WSMA_Module {
 
     public function should_load(): bool {
         return is_admin();
@@ -14,7 +14,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
     public function register(): void {
         add_action('admin_menu', [$this, 'add_menu_page'], 10);
         add_action('admin_menu', [$this, 'add_trailing_submenus'], 99);
-        add_action('admin_head', [$this, 'inject_admin_menu_separator_css']);
+        add_action('admin_enqueue_scripts', [$this, 'inject_admin_menu_separator_css']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_settings_page_styles']);
         add_action('admin_init', [$this, 'register_settings']);
         add_action('admin_init', [$this, 'handle_mail_settings_save']);
         add_action('admin_init', [$this, 'handle_proponente_settings_save']);
@@ -24,8 +25,9 @@ final class WS_Admin_Settings_Page implements WS_Module {
     public function handle_modules_settings_save(): void {
         if (isset($_POST['ws_save_modules_action']) && check_admin_referer('ws_save_modules_nonce')) {
             if (current_user_can('manage_options')) {
-                $current = WS_Settings::get_all();
-                $submitted_modules = $_POST['ws_modules'] ?? [];
+                $current = WSMA_Settings::get_all();
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- only checked with !empty() below (cast to 1/0), never output or stored raw.
+                $submitted_modules = isset($_POST['ws_modules']) ? (array) wp_unslash($_POST['ws_modules']) : [];
                 
                 $known_modules = [
                     'courses_academy', 'voucher_pdf', 'ai_assistant', 'multi_docente', 
@@ -39,9 +41,9 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 }
 
                 $current['active_modules'] = $updated_active;
-                WS_Settings::update_all($current);
+                WSMA_Settings::update_all($current);
 
-                wp_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=modules&updated=1'));
+                wp_safe_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=modules&updated=1'));
                 exit;
             }
         }
@@ -50,8 +52,9 @@ final class WS_Admin_Settings_Page implements WS_Module {
     public function handle_proponente_settings_save(): void {
         if (isset($_POST['ws_save_proponente_action']) && check_admin_referer('ws_save_proponente_nonce')) {
             if (current_user_can('manage_options')) {
-                $current = WS_Settings::get_all();
-                $data = $_POST['ws_proponente'] ?? [];
+                $current = WSMA_Settings::get_all();
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each field is sanitized individually below (sanitize_text_field/sanitize_email/esc_url_raw/etc).
+                $data = isset($_POST['ws_proponente']) ? (array) wp_unslash($_POST['ws_proponente']) : [];
 
                 $current['proponente_nome']      = sanitize_text_field($data['proponente_nome'] ?? '');
                 $current['proponente_ruolo']     = sanitize_text_field($data['proponente_ruolo'] ?? '');
@@ -69,8 +72,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 $current['proponente_tiktok']    = sanitize_text_field($data['proponente_tiktok'] ?? '');
                 $current['proponente_x']         = sanitize_text_field($data['proponente_x'] ?? '');
 
-                WS_Settings::update_all($current);
-                wp_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=proponente&updated=1'));
+                WSMA_Settings::update_all($current);
+                wp_safe_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=proponente&updated=1'));
                 exit;
             }
         }
@@ -79,45 +82,84 @@ final class WS_Admin_Settings_Page implements WS_Module {
     public function handle_mail_settings_save(): void {
         if (isset($_POST['ws_save_mail_action']) && check_admin_referer('ws_save_mail_nonce')) {
             if (current_user_can('manage_options')) {
-                WS_Mail_Inbox::save_settings($_POST['ws_mail'] ?? []);
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each field is sanitized inside WSMA_Mail_Inbox::save_settings().
+                WSMA_Mail_Inbox::save_settings(isset($_POST['ws_mail']) ? (array) wp_unslash($_POST['ws_mail']) : []);
 
                 // Save anti-spam and rate limiting options
                 if (isset($_POST['ws_security'])) {
-                    $sec = $_POST['ws_security'];
-                    $current_settings = WS_Settings::get_all();
+                    // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each field is sanitized individually below (!empty()/absint-style (int) cast).
+                    $sec = (array) wp_unslash($_POST['ws_security']);
+                    $current_settings = WSMA_Settings::get_all();
                     $current_settings['intake_rate_limit_enabled']  = !empty($sec['intake_rate_limit_enabled']) ? 1 : 0;
                     $current_settings['intake_rate_limit_requests'] = max(1, (int) ($sec['intake_rate_limit_requests'] ?? 5));
                     $current_settings['intake_rate_limit_window']   = max(10, (int) ($sec['intake_rate_limit_window'] ?? 60));
                     $current_settings['intake_honeypot_enabled']    = !empty($sec['intake_honeypot_enabled']) ? 1 : 0;
-                    WS_Settings::update_all($current_settings);
+                    $current_settings['intake_geolocation_enabled'] = !empty($sec['intake_geolocation_enabled']) ? 1 : 0;
+                    $current_settings['intake_geolocation_api_url'] = esc_url_raw(trim((string) ($sec['intake_geolocation_api_url'] ?? '')));
+                    WSMA_Settings::update_all($current_settings);
                 }
 
-                wp_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=mail&updated=1'));
+                wp_safe_redirect(admin_url('admin.php?page=workshop-suite-settings&tab=mail&updated=1'));
                 exit;
             }
         }
     }
 
+    /**
+     * Registered on admin_enqueue_scripts (not admin_head, which fires
+     * after WordPress's own admin_print_styles point) — applies to the
+     * left sidebar menu on every admin page, so no page-check gating.
+     */
+    /**
+     * All the settings-page-only CSS that used to print as raw <style>
+     * tags directly inside render_page() (called too late for that,
+     * during content rendering — same reasoning as
+     * inject_admin_menu_separator_css() above). One consolidated method,
+     * gated on the settings page overall rather than per-tab, since the
+     * unused rules for a tab that isn't currently shown are harmless.
+     */
+    public function enqueue_settings_page_styles(): void {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page-slug check to decide whether to enqueue styles, no form data is processed here.
+        if (empty($_GET['page']) || sanitize_key(wp_unslash($_GET['page'])) !== 'workshop-suite-settings') return;
+
+        WSMA_Data::enqueue_inline_style(
+            // General tab: tipi di evento theme-aware inputs.
+            '.ws-theme-light #ws-event-types-container input { background: #ffffff !important; color: #0f172a !important; border: 1px solid #cbd5e1 !important; }'
+            . '.ws-theme-light #ws-event-types-container button { background: #fff1f2 !important; border-color: #f43f5e !important; color: #e11d48 !important; }'
+            . '.ws-theme-dark #ws-event-types-container input { background: rgba(255,255,255,0.05) !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.2) !important; }'
+            // Modules tab: FluentCRM combo dropdown.
+            . '.ws-combo-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 2px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; max-height: 160px; overflow-y: auto; z-index: 100001; box-shadow: 0 8px 24px rgba(0,0,0,.12); }'
+            . '.ws-combo-dropdown .ws-combo-item { padding: 7px 10px; font-size: 13px; cursor: pointer; }'
+            . '.ws-combo-dropdown .ws-combo-item:hover, .ws-combo-dropdown .ws-combo-item.ws-combo-item--active { background: #f1f5f9; }'
+            . '.ws-combo-dropdown .ws-combo-empty { padding: 7px 10px; font-size: 12px; color: #94a3b8; }'
+            // Modules tab: module-card toggle switch.
+            . '.ws-toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }'
+            . '.ws-toggle-switch input { opacity: 0; width: 0; height: 0; }'
+            . '.ws-toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #c3c4c7; transition: .2s; border-radius: 24px; }'
+            . '.ws-toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }'
+            . '.ws-toggle-switch input:checked + .ws-toggle-slider { background-color: #2271b1; }'
+            . '.ws-toggle-switch input:checked + .ws-toggle-slider:before { transform: translateX(20px); }'
+        );
+    }
+
     public function inject_admin_menu_separator_css(): void {
-        ?>
-        <style id="ws-admin-menu-divider-css">
-            #adminmenu .toplevel_page_workshop-suite-dashboard .wp-submenu li.ws-menu-separator {
-                border-top: 1px solid rgba(240, 246, 252, 0.18) !important;
-                margin-top: 6px !important;
-                padding-top: 4px !important;
-            }
-            #adminmenu .toplevel_page_workshop-suite-dashboard .wp-submenu li.ws-menu-separator a {
-                font-weight: 600 !important;
-            }
-        </style>
-        <?php
+        WSMA_Data::enqueue_inline_style(
+            '#adminmenu .toplevel_page_workshop-suite-dashboard .wp-submenu li.ws-menu-separator {'
+            . 'border-top: 1px solid rgba(240, 246, 252, 0.18) !important;'
+            . 'margin-top: 6px !important;'
+            . 'padding-top: 4px !important;'
+            . '}'
+            . '#adminmenu .toplevel_page_workshop-suite-dashboard .wp-submenu li.ws-menu-separator a {'
+            . 'font-weight: 600 !important;'
+            . '}'
+        );
     }
 
     public function add_menu_page(): void {
         // Main Top Level Menu -> Loads Vue Dashboard
         add_menu_page(
-            __('Workshop Suite Dashboard', 'workshop-suite'),
-            __('Workshop Suite', 'workshop-suite'),
+            __('WSMaker Dashboard', 'wsmaker'),
+            __('WSMaker', 'wsmaker'),
             'manage_options',
             'workshop-suite-dashboard',
             [$this, 'render_dashboard'],
@@ -128,8 +170,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu 1: Dashboard
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Dashboard', 'workshop-suite'),
-            __('Dashboard', 'workshop-suite'),
+            __('Dashboard', 'wsmaker'),
+            __('Dashboard', 'wsmaker'),
             'manage_options',
             'workshop-suite-dashboard',
             [$this, 'render_dashboard']
@@ -138,8 +180,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu 2: Categories & Types
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Categories & Types', 'workshop-suite'),
-            __('Categories & Types', 'workshop-suite'),
+            __('Categories & Types', 'wsmaker'),
+            __('Categories & Types', 'wsmaker'),
             'manage_options',
             'workshop-suite-categorie',
             [$this, 'render_riepilogo']
@@ -148,8 +190,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu 3: Events & Registrations
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Events & Registrations', 'workshop-suite'),
-            __('Events & Registrations', 'workshop-suite'),
+            __('Events & Registrations', 'wsmaker'),
+            __('Events & Registrations', 'wsmaker'),
             'manage_options',
             'workshop-suite-eventi',
             [$this, 'render_eventi_partecipanti']
@@ -162,11 +204,11 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Partecipanti, filtered to Modalità=virtuale) is core functionality.
 
         // Submenu 4: Poster Templates (Conditional module)
-        if (WS_Settings::is_module_active('poster_studio', true)) {
+        if (WSMA_Settings::is_module_active('poster_studio', true)) {
             add_submenu_page(
                 'workshop-suite-dashboard',
-                __('Poster Templates', 'workshop-suite'),
-                __('Poster Templates', 'workshop-suite'),
+                __('Poster Templates', 'wsmaker'),
+                __('Poster Templates', 'wsmaker'),
                 'manage_options',
                 'workshop-suite-locandine',
                 [$this, 'render_locandine']
@@ -176,8 +218,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu 5: Contacts & Participants
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Contacts & Participants', 'workshop-suite'),
-            __('Contacts & Participants', 'workshop-suite'),
+            __('Contacts & Participants', 'wsmaker'),
+            __('Contacts & Participants', 'wsmaker'),
             'manage_options',
             'workshop-suite-partecipanti',
             [$this, 'render_partecipanti']
@@ -186,8 +228,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu 6: Mail Inbox
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Mail Inbox', 'workshop-suite'),
-            __('Mail Inbox', 'workshop-suite'),
+            __('Mail Inbox', 'wsmaker'),
+            __('Mail Inbox', 'wsmaker'),
             'manage_options',
             'workshop-suite-messaggi',
             [$this, 'render_messaggi']
@@ -196,8 +238,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu 7: Admin Calendar
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Admin Calendar', 'workshop-suite'),
-            __('Admin Calendar', 'workshop-suite'),
+            __('Admin Calendar', 'wsmaker'),
+            __('Admin Calendar', 'wsmaker'),
             'manage_options',
             'workshop-suite-calendario',
             [$this, 'render_calendario']
@@ -206,8 +248,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu 8: Events Archive
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Events Archive', 'workshop-suite'),
-            __('Events Archive', 'workshop-suite'),
+            __('Events Archive', 'wsmaker'),
+            __('Events Archive', 'wsmaker'),
             'manage_options',
             'workshop-suite-archivio',
             [$this, 'render_archivio']
@@ -220,8 +262,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu: Moduli & Add-on (con separatore visuale sopra)
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Moduli & Add-on', 'workshop-suite'),
-            __('Moduli & Add-on', 'workshop-suite'),
+            __('Moduli & Add-on', 'wsmaker'),
+            __('Moduli & Add-on', 'wsmaker'),
             'manage_options',
             'admin.php?page=workshop-suite-settings&tab=modules'
         );
@@ -229,8 +271,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
         // Submenu: Settings
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Settings', 'workshop-suite'),
-            __('Settings', 'workshop-suite'),
+            __('Settings', 'wsmaker'),
+            __('Settings', 'wsmaker'),
             'manage_options',
             'workshop-suite-settings',
             [$this, 'render_page']
@@ -252,8 +294,8 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
     /** Enqueues one Vue bundle's JS/CSS + WS_CONFIG, without emitting any markup. */
     private function enqueue_panel_assets(string $handle, string $js_file, string $css_file, array $extra_config = []): void {
-        $asset_js  = WS_PATH . $js_file;
-        $asset_css = WS_PATH . $css_file;
+        $asset_js  = WSMA_PATH . $js_file;
+        $asset_css = WSMA_PATH . $css_file;
 
         // Ensure the Vue ESM script loads with type="module".
         // This filter is normally registered by the matching FVW_Shortcode_* class,
@@ -270,16 +312,16 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
         wp_enqueue_script(
             $handle,
-            WS_URL . $js_file,
+            WSMA_URL . $js_file,
             [],
-            file_exists($asset_js) ? (string) filemtime($asset_js) : WS_VERSION,
+            file_exists($asset_js) ? (string) filemtime($asset_js) : WSMA_VERSION,
             true
         );
 
         if (file_exists($asset_css)) {
             wp_enqueue_style(
                 $handle,
-                WS_URL . $css_file,
+                WSMA_URL . $css_file,
                 [],
                 (string) filemtime($asset_css)
             );
@@ -288,7 +330,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
         $config = array_merge([
             'restUrl'       => esc_url_raw(rest_url('workshop-suite/v1/')),
             'nonce'         => wp_create_nonce('wp_rest'),
-            'brandName'     => WS_Settings::get('site_brand_name', 'Workshop Suite'),
+            'brandName'     => WSMA_Settings::get('site_brand_name', 'WSMaker'),
         ], $extra_config);
         wp_localize_script($handle, 'WS_CONFIG', $config);
         wp_localize_script($handle, 'FVW_CONFIG', $config);
@@ -310,6 +352,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
     }
 
     public function render_riepilogo(): void {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sets a default initial route for the Vue app, no form data is processed.
         if (!isset($_GET['vista'])) {
             $_GET['vista'] = 'categorie';
         }
@@ -324,6 +367,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
      * instead of a parallel system.
      */
     public function render_aula_virtuale(): void {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sets a default initial route for the Vue app, no form data is processed.
         if (!isset($_GET['vista'])) {
             $_GET['vista'] = 'eventi';
         }
@@ -331,6 +375,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
     }
 
     public function render_eventi_partecipanti(): void {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sets a default initial route for the Vue app, no form data is processed.
         if (!isset($_GET['vista'])) {
             $_GET['vista'] = 'eventi';
         }
@@ -377,48 +422,30 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
     public function render_event_types_panel(): void {
         if (!current_user_can('manage_options')) return;
-        $settings = WS_Settings::get_all();
-        $default_theme = WS_Settings::get('default_theme_mode', 'dark');
+        $settings = WSMA_Settings::get_all();
+        $default_theme = WSMA_Settings::get('default_theme_mode', 'dark');
         ?>
         <div class="wrap ws-theme-wrapper ws-theme-<?php echo esc_attr($default_theme); ?> ws-dashboard-wrapper" id="ws-dashboard-wrapper">
             
             <div class="ws-theme-switch-bar">
-                <span class="ws-s1"><?php esc_html_e('Tema:', 'workshop-suite'); ?></span>
-                <button type="button" class="ws-theme-btn <?php echo $default_theme === 'dark' ? 'active' : ''; ?>" id="btn-theme-dark" onclick="fvwSetTheme('dark')">🌙 Dark</button>
-                <button type="button" class="ws-theme-btn <?php echo $default_theme === 'light' ? 'active' : ''; ?>" id="btn-theme-light" onclick="fvwSetTheme('light')">☀️ Light</button>
+                <span class="ws-s1"><?php esc_html_e('Tema:', 'wsmaker'); ?></span>
+                <button type="button" class="ws-theme-btn <?php echo esc_attr($default_theme === 'dark' ? 'active' : ''); ?>" id="btn-theme-dark" onclick="fvwSetTheme('dark')">🌙 Dark</button>
+                <button type="button" class="ws-theme-btn <?php echo esc_attr($default_theme === 'light' ? 'active' : ''); ?>" id="btn-theme-light" onclick="fvwSetTheme('light')">☀️ Light</button>
             </div>
 
             <div class="ws-s2">
-                <h2 class="ws-s3"><?php esc_html_e('🏷️ Tipi di Evento', 'workshop-suite'); ?></h2>
-                <p class="ws-s4"><?php esc_html_e('Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi.', 'workshop-suite'); ?></p>
-
-                <style>
-                .ws-theme-light #ws-event-types-container input {
-                    background: #ffffff !important;
-                    color: #0f172a !important;
-                    border: 1px solid #cbd5e1 !important;
-                }
-                .ws-theme-light #ws-event-types-container button {
-                    background: #fff1f2 !important;
-                    border-color: #f43f5e !important;
-                    color: #e11d48 !important;
-                }
-                .ws-theme-dark #ws-event-types-container input {
-                    background: rgba(255,255,255,0.05) !important;
-                    color: #ffffff !important;
-                    border: 1px solid rgba(255,255,255,0.2) !important;
-                }
-                </style>
+                <h2 class="ws-s3"><?php esc_html_e('🏷️ Tipi di Evento', 'wsmaker'); ?></h2>
+                <p class="ws-s4"><?php esc_html_e('Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi.', 'wsmaker'); ?></p>
 
                 <form method="post" action="options.php">
                     <?php settings_fields('ws_settings_group'); ?>
                     
-                    <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[site_brand_name]" value="<?php echo esc_attr($settings['site_brand_name']); ?>">
-                    <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_name]" value="<?php echo esc_attr($settings['sender_name']); ?>">
-                    <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_email]" value="<?php echo esc_attr($settings['sender_email']); ?>">
-                    <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[currency_symbol]" value="<?php echo esc_attr($settings['currency_symbol']); ?>">
-                    <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[default_theme_mode]" value="<?php echo esc_attr($settings['default_theme_mode']); ?>">
-                    <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[enable_t15_reminders]" value="<?php echo esc_attr($settings['enable_t15_reminders']); ?>">
+                    <input type="hidden" name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[site_brand_name]" value="<?php echo esc_attr($settings['site_brand_name']); ?>">
+                    <input type="hidden" name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[sender_name]" value="<?php echo esc_attr($settings['sender_name']); ?>">
+                    <input type="hidden" name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[sender_email]" value="<?php echo esc_attr($settings['sender_email']); ?>">
+                    <input type="hidden" name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[currency_symbol]" value="<?php echo esc_attr($settings['currency_symbol']); ?>">
+                    <input type="hidden" name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[default_theme_mode]" value="<?php echo esc_attr($settings['default_theme_mode']); ?>">
+                    <input type="hidden" name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[enable_t15_reminders]" value="<?php echo esc_attr($settings['enable_t15_reminders']); ?>">
 
                     <div class="ws-s5" id="ws-event-types-container">
                         <?php 
@@ -426,70 +453,64 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         foreach ($types as $t) : 
                         ?>
                             <div class="ws-type-row ws-s6">
-                                <input name="<?php echo WS_Settings::OPTION_KEY; ?>[event_types][]" type="text" value="<?php echo esc_attr($t); ?>" class="regular-text ws-flex-input" placeholder="Es. Workshop">
+                                <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[event_types][]" type="text" value="<?php echo esc_attr($t); ?>" class="regular-text ws-flex-input" placeholder="Es. Workshop">
                                 <button type="button" class="button button-secondary ws-s7" onclick="this.parentNode.remove()">✕ Rimuovi</button>
                             </div>
                         <?php endforeach; ?>
                     </div>
 
                     <div class="ws-s8">
-                        <button type="button" class="button button-secondary" onclick="fvwAddEventTypeRow()">+ <?php esc_html_e('Aggiungi Tipo Evento', 'workshop-suite'); ?></button>
-                        <?php submit_button(__('Salva Tipi Evento', 'workshop-suite'), 'primary', 'submit', false); ?>
+                        <button type="button" class="button button-secondary" onclick="fvwAddEventTypeRow()">+ <?php esc_html_e('Aggiungi Tipo Evento', 'wsmaker'); ?></button>
+                        <?php submit_button(__('Salva Tipi Evento', 'wsmaker'), 'primary', 'submit', false); ?>
                     </div>
                 </form>
             </div>
         </div>
 
-        <script>
-        function fvwAddEventTypeRow() {
-            var container = document.getElementById('ws-event-types-container');
-            var row = document.createElement('div');
-            row.className = 'ws-type-row';
-            row.style.cssText = 'display:flex;gap:10px;align-items:center;';
-            row.innerHTML = '<input name="<?php echo WS_Settings::OPTION_KEY; ?>[event_types][]" type="text" value="" class="regular-text ws-flex-input" placeholder="Es. Corso Online">' +
-                            '<button type="button" class="button button-secondary ws-s7" onclick="this.parentNode.remove()">✕ Rimuovi</button>';
-            container.appendChild(row);
-        }
-        function fvwSetTheme(theme) {
-            var wrapper = document.getElementById('ws-dashboard-wrapper');
-            var btnDark = document.getElementById('btn-theme-dark');
-            var btnLight = document.getElementById('btn-theme-light');
-
-            if (theme === 'light') {
-                wrapper.classList.remove('ws-theme-dark');
-                wrapper.classList.add('ws-theme-light');
-                if (btnLight) btnLight.classList.add('active');
-                if (btnDark) btnDark.classList.remove('active');
-            } else {
-                wrapper.classList.remove('ws-theme-light');
-                wrapper.classList.add('ws-theme-dark');
-                if (btnDark) btnDark.classList.add('active');
-                if (btnLight) btnLight.classList.remove('active');
-            }
-            localStorage.setItem('ws_user_theme', theme);
-        }
-        (function() {
-            var saved = localStorage.getItem('ws_user_theme');
-            if (saved === 'light' || saved === 'dark') {
-                fvwSetTheme(saved);
-            }
-        })();
-        </script>
+        <?php
+        WSMA_Data::enqueue_inline_script(
+            'function fvwAddEventTypeRow() {'
+            . 'var container = document.getElementById("ws-event-types-container");'
+            . 'var row = document.createElement("div");'
+            . 'row.className = "ws-type-row";'
+            . 'row.style.cssText = "display:flex;gap:10px;align-items:center;";'
+            . 'row.innerHTML = \'<input name="' . esc_js(WSMA_Settings::OPTION_KEY) . '[event_types][]" type="text" value="" class="regular-text ws-flex-input" placeholder="Es. Corso Online">\' +'
+            . '\'<button type="button" class="button button-secondary ws-s7" onclick="this.parentNode.remove()">✕ Rimuovi</button>\';'
+            . 'container.appendChild(row);'
+            . '}'
+            . 'function fvwSetTheme(theme) {'
+            . 'var wrapper = document.getElementById("ws-dashboard-wrapper");'
+            . 'var btnDark = document.getElementById("btn-theme-dark");'
+            . 'var btnLight = document.getElementById("btn-theme-light");'
+            . 'if (theme === "light") {'
+            . 'wrapper.classList.remove("ws-theme-dark"); wrapper.classList.add("ws-theme-light");'
+            . 'if (btnLight) btnLight.classList.add("active"); if (btnDark) btnDark.classList.remove("active");'
+            . '} else {'
+            . 'wrapper.classList.remove("ws-theme-light"); wrapper.classList.add("ws-theme-dark");'
+            . 'if (btnDark) btnDark.classList.add("active"); if (btnLight) btnLight.classList.remove("active");'
+            . '}'
+            . 'localStorage.setItem("ws_user_theme", theme);'
+            . '}'
+            . '(function() {'
+            . 'var saved = localStorage.getItem("ws_user_theme");'
+            . 'if (saved === "light" || saved === "dark") { fvwSetTheme(saved); }'
+            . '})();'
+        );
+        ?>
         <?php
     }
 
     public function register_settings(): void {
-        register_setting('ws_settings_group', WS_Settings::OPTION_KEY, [
+        register_setting('ws_settings_group', WSMA_Settings::OPTION_KEY, [
             'sanitize_callback' => function ($input) {
                 if (!is_array($input)) return [];
-                $current = WS_Settings::get_all();
+                $current = WSMA_Settings::get_all();
                 $current['site_brand_name']      = sanitize_text_field($input['site_brand_name'] ?? '');
                 $current['sender_name']          = sanitize_text_field($input['sender_name'] ?? '');
                 $current['sender_email']         = sanitize_email($input['sender_email'] ?? '');
                 $current['currency_symbol']      = sanitize_text_field($input['currency_symbol'] ?? '€');
                 $current['enable_t15_reminders'] = !empty($input['enable_t15_reminders']) ? 1 : 0;
                 $current['default_theme_mode']   = in_array($input['default_theme_mode'] ?? '', ['dark', 'light'], true) ? $input['default_theme_mode'] : 'dark';
-                $current['custom_css']           = wp_strip_all_tags($input['custom_css'] ?? '');
                 return $current;
             }
         ]);
@@ -498,229 +519,228 @@ final class WS_Admin_Settings_Page implements WS_Module {
     public function render_page(): void {
         if (!current_user_can('manage_options')) return;
 
-        $tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only tab-selection param for the settings page UI, no form data is processed.
+        $tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'general';
 
         if ($tab === 'proponente') {
             wp_enqueue_media();
         }
 
-        $asset_css = WS_PATH . 'assets/dist/admin.css';
+        $asset_css = WSMA_PATH . 'assets/dist/admin.css';
         if (file_exists($asset_css)) {
-            wp_enqueue_style('ws-admin-settings-css', WS_URL . 'assets/dist/admin.css', [], (string) filemtime($asset_css));
+            wp_enqueue_style('ws-admin-settings-css', WSMA_URL . 'assets/dist/admin.css', [], (string) filemtime($asset_css));
         }
 
-        $settings = WS_Settings::get_all();
-        $license  = WS_License_Manager::get_license_data();
+        $settings = WSMA_Settings::get_all();
+        $license  = WSMA_License_Manager::get_license_data();
         ?>
         <div class="wrap ws-admin-wrap">
-            <h1 class="wp-heading-inline"><?php esc_html_e('Workshop Suite Settings', 'workshop-suite'); ?></h1>
+            <h1 class="wp-heading-inline"><?php esc_html_e('WSMaker Settings', 'wsmaker'); ?></h1>
             <hr class="wp-header-end">
             
             <nav class="nav-tab-wrapper wp-clearfix ws-s9">
-                <a href="?page=workshop-suite-settings&tab=general" class="nav-tab <?php echo $tab === 'general' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('General', 'workshop-suite'); ?></a>
-                <a href="?page=workshop-suite-settings&tab=modules" class="nav-tab <?php echo $tab === 'modules' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Modules & Add-ons', 'workshop-suite'); ?></a>
-                <a href="?page=workshop-suite-settings&tab=proponente" class="nav-tab <?php echo $tab === 'proponente' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Trainer Profile / Bio', 'workshop-suite'); ?></a>
-                <a href="?page=workshop-suite-settings&tab=mail" class="nav-tab <?php echo $tab === 'mail' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Mail Configuration', 'workshop-suite'); ?></a>
-                <a href="?page=workshop-suite-settings&tab=custom_css" class="nav-tab <?php echo $tab === 'custom_css' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Custom CSS Code', 'workshop-suite'); ?></a>
-                <a href="?page=workshop-suite-settings&tab=shortcodes" class="nav-tab <?php echo $tab === 'shortcodes' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Shortcodes', 'workshop-suite'); ?></a>
-                <a href="?page=workshop-suite-settings&tab=license" class="nav-tab <?php echo $tab === 'license' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('License', 'workshop-suite'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=general" class="nav-tab <?php echo $tab === 'general' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('General', 'wsmaker'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=modules" class="nav-tab <?php echo $tab === 'modules' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Modules & Add-ons', 'wsmaker'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=proponente" class="nav-tab <?php echo $tab === 'proponente' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Trainer Profile / Bio', 'wsmaker'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=mail" class="nav-tab <?php echo $tab === 'mail' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Mail Configuration', 'wsmaker'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=shortcodes" class="nav-tab <?php echo $tab === 'shortcodes' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Shortcodes', 'wsmaker'); ?></a>
+                <a href="?page=workshop-suite-settings&tab=license" class="nav-tab <?php echo $tab === 'license' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('License', 'wsmaker'); ?></a>
             </nav>
 
             <?php if ($tab === 'general') : ?>
                 <form method="post" action="options.php">
                     <?php settings_fields('ws_settings_group'); ?>
-                    <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[custom_css]" value="<?php echo esc_attr($settings['custom_css'] ?? ''); ?>">
-                    
+
                     <table class="form-table" role="presentation">
                         <tbody>
                             <tr>
                                 <th scope="row">
-                                    <label for="site_brand_name"><?php esc_html_e('Nome Brand / Organizzazione', 'workshop-suite'); ?></label>
+                                    <label for="site_brand_name"><?php esc_html_e('Nome Brand / Organizzazione', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
-                                    <input name="<?php echo WS_Settings::OPTION_KEY; ?>[site_brand_name]" type="text" id="site_brand_name" value="<?php echo esc_attr($settings['site_brand_name']); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e('Usato nelle firme email automatiche e nei calendari ICS.', 'workshop-suite'); ?></p>
+                                    <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[site_brand_name]" type="text" id="site_brand_name" value="<?php echo esc_attr($settings['site_brand_name']); ?>" class="regular-text">
+                                    <p class="description"><?php esc_html_e('Usato nelle firme email automatiche e nei calendari ICS.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <th scope="row">
-                                    <label for="sender_name"><?php esc_html_e('Nome Mittente Email', 'workshop-suite'); ?></label>
+                                    <label for="sender_name"><?php esc_html_e('Nome Mittente Email', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
-                                    <input name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_name]" type="text" id="sender_name" value="<?php echo esc_attr($settings['sender_name']); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e('Nome visualizzato dal destinatario come mittente delle notifiche.', 'workshop-suite'); ?></p>
+                                    <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[sender_name]" type="text" id="sender_name" value="<?php echo esc_attr($settings['sender_name']); ?>" class="regular-text">
+                                    <p class="description"><?php esc_html_e('Nome visualizzato dal destinatario come mittente delle notifiche.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <th scope="row">
-                                    <label for="sender_email"><?php esc_html_e('Email Mittente Risposte', 'workshop-suite'); ?></label>
+                                    <label for="sender_email"><?php esc_html_e('Email Organizzazione', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
-                                    <input name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_email]" type="email" id="sender_email" value="<?php echo esc_attr($settings['sender_email']); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e('Indirizzo predefinito da cui partiranno le mail di risposta e promemoria.', 'workshop-suite'); ?></p>
+                                    <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[sender_email]" type="email" id="sender_email" value="<?php echo esc_attr($settings['sender_email']); ?>" class="regular-text">
+                                    <p class="description"><?php esc_html_e('Indirizzo da cui partiranno le mail di risposta/promemoria, ed a cui arriveranno gli avvisi di nuove richieste dal form di iscrizione.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <th scope="row">
-                                    <label for="currency_symbol"><?php esc_html_e('Simbolo Valuta', 'workshop-suite'); ?></label>
+                                    <label for="currency_symbol"><?php esc_html_e('Simbolo Valuta', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
-                                    <input name="<?php echo WS_Settings::OPTION_KEY; ?>[currency_symbol]" type="text" id="currency_symbol" value="<?php echo esc_attr($settings['currency_symbol']); ?>" class="small-text">
-                                    <p class="description"><?php esc_html_e('Simbolo valuta mostrato nei form di iscrizione (es. €).', 'workshop-suite'); ?></p>
+                                    <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[currency_symbol]" type="text" id="currency_symbol" value="<?php echo esc_attr($settings['currency_symbol']); ?>" class="small-text">
+                                    <p class="description"><?php esc_html_e('Simbolo valuta mostrato nei form di iscrizione (es. €).', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <th scope="row">
-                                    <label for="default_theme_mode"><?php esc_html_e('Tema Frontend Predefinito', 'workshop-suite'); ?></label>
+                                    <label for="default_theme_mode"><?php esc_html_e('Tema Frontend Predefinito', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
-                                    <select name="<?php echo WS_Settings::OPTION_KEY; ?>[default_theme_mode]" id="default_theme_mode">
-                                        <option value="dark" <?php selected('dark', $settings['default_theme_mode']); ?>><?php esc_html_e('Tema Dark (Scuro)', 'workshop-suite'); ?></option>
-                                        <option value="light" <?php selected('light', $settings['default_theme_mode']); ?>><?php esc_html_e('Tema Light (Chiaro)', 'workshop-suite'); ?></option>
+                                    <select name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[default_theme_mode]" id="default_theme_mode">
+                                        <option value="dark" <?php selected('dark', $settings['default_theme_mode']); ?>><?php esc_html_e('Tema Dark (Scuro)', 'wsmaker'); ?></option>
+                                        <option value="light" <?php selected('light', $settings['default_theme_mode']); ?>><?php esc_html_e('Tema Light (Chiaro)', 'wsmaker'); ?></option>
                                     </select>
-                                    <p class="description"><?php esc_html_e('Stile grafico applicato agli shortcode e ai moduli pubblici nel frontend del sito.', 'workshop-suite'); ?></p>
+                                    <p class="description"><?php esc_html_e('Stile grafico applicato agli shortcode e ai moduli pubblici nel frontend del sito.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
-                                <th scope="row"><?php esc_html_e('Automazioni Promemoria', 'workshop-suite'); ?></th>
+                                <th scope="row"><?php esc_html_e('Automazioni Promemoria', 'wsmaker'); ?></th>
                                 <td>
                                     <fieldset>
                                         <label for="enable_t15_reminders">
-                                            <input name="<?php echo WS_Settings::OPTION_KEY; ?>[enable_t15_reminders]" type="checkbox" id="enable_t15_reminders" value="1" <?php checked(1, $settings['enable_t15_reminders']); ?>>
-                                            <?php esc_html_e('Abilita invio automatico promemoria a 15 giorni dall\'evento (T-15)', 'workshop-suite'); ?>
+                                            <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[enable_t15_reminders]" type="checkbox" id="enable_t15_reminders" value="1" <?php checked(1, $settings['enable_t15_reminders']); ?>>
+                                            <?php esc_html_e('Abilita invio automatico promemoria a 15 giorni dall\'evento (T-15)', 'wsmaker'); ?>
                                         </label>
-                                        <p class="description"><?php esc_html_e('Invia in automatico una mail riassuntiva ai partecipanti confermati 15 giorni prima della data inizio.', 'workshop-suite'); ?></p>
+                                        <p class="description"><?php esc_html_e('Invia in automatico una mail riassuntiva ai partecipanti confermati 15 giorni prima della data inizio.', 'wsmaker'); ?></p>
                                     </fieldset>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <?php submit_button(__('Salva Impostazioni', 'workshop-suite')); ?>
+                    <?php submit_button(__('Salva Impostazioni', 'wsmaker')); ?>
                 </form>
             <?php elseif ($tab === 'modules') : 
                 $is_pro_active = defined('WS_PRO_VERSION');
                 $active_mods = (array) ($settings['active_modules'] ?? []);
                 $available_modules = [
+                    'global_hub_pro' => [
+                        'icon'        => '🌐',
+                        'title'       => __('Woorkshoop Global Hub & World Map Sync', 'wsmaker'),
+                        'desc'        => __('Sincronizza in automatico i tuoi workshop ed eventi sulla directory globale woorkshoop.space / wsmaker.pro e sulla mappa interattiva mondiale.', 'wsmaker'),
+                        'badge'       => 'GLOBAL HUB',
+                        'is_pro'      => false,
+                        'default'     => 1,
+                    ],
                     'courses_academy' => [
                         'icon'        => '🎬',
-                        'title'       => __('Courses & Video Academy (LMS)', 'workshop-suite'),
-                        'desc'        => __('Piattaforma videocorsi on-demand, masterclass registrate, gestione moduli/lezioni con player video avanzato e streaming Zoom/Meet.', 'workshop-suite'),
-                        'badge'       => 'ACADEMY',
+                        'title'       => __('Workshop Online & LMS', 'wsmaker'),
+                        'desc'        => __('Piattaforma videocorsi on-demand, masterclass registrate, gestione moduli/lezioni con player video avanzato e streaming Zoom/Meet.', 'wsmaker'),
+                        'badge'       => 'LMS',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'voucher_pdf' => [
                         'icon'        => '🎟️',
-                        'title'       => __('Voucher di Partecipazione & PDF Pass', 'workshop-suite'),
-                        'desc'        => __('Genera e invia in automatico all\'email di conferma il Voucher/Pass PDF personalizzato con QR-code e dettagli logistici per il corsista.', 'workshop-suite'),
+                        'title'       => __('Voucher di Partecipazione & PDF Pass', 'wsmaker'),
+                        'desc'        => __('Genera e invia in automatico all\'email di conferma il Voucher/Pass PDF personalizzato con QR-code e dettagli logistici per il corsista.', 'wsmaker'),
                         'badge'       => 'CONFIRMATION',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'ai_assistant' => [
                         'icon'        => '🤖',
-                        'title'       => __('AI Workshop Assistant & Copywriter', 'workshop-suite'),
-                        'desc'        => __('Assistente AI per generare descrizioni accattivanti dei corsi, programmi didattici, testi per i post di Instagram e risposte email agli allievi.', 'workshop-suite'),
+                        'title'       => __('AI Workshop Assistant & Copywriter', 'wsmaker'),
+                        'desc'        => __('Assistente AI per generare descrizioni accattivanti dei corsi, programmi didattici, testi per i post di Instagram e risposte email agli allievi.', 'wsmaker'),
                         'badge'       => 'AI ENGINE',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'stripe_payments' => [
                         'icon'        => '💳',
-                        'title'       => __('Pagamenti Nativi Stripe & Apple Pay', 'workshop-suite'),
-                        'desc'        => __('Incasso istantaneo di anticipi o saldi tramite carta di credito, Apple Pay e Google Pay con zero plugin intermedi.', 'workshop-suite'),
+                        'title'       => __('Pagamenti Nativi Stripe & Apple Pay', 'wsmaker'),
+                        'desc'        => __('Incasso istantaneo di anticipi o saldi tramite carta di credito, Apple Pay e Google Pay con zero plugin intermedi.', 'wsmaker'),
                         'badge'       => 'PAYMENTS',
-                        'is_pro'      => true,
-                        'default'     => 0,
-                    ],
-                    'multi_docente' => [
-                        'icon'        => '🏢',
-                        'title'       => __('Multi-Docente & Faculty Mode (Scuole)', 'workshop-suite'),
-                        'desc'        => __('Permette di assegnare workshop a docenti o istruttori specifici, con schede bio dedicate e gestione faculty per scuole e accademie.', 'workshop-suite'),
-                        'badge'       => 'FACULTY',
-                        'is_pro'      => true,
-                        'default'     => 0,
-                    ],
-                    'sms_whatsapp_gateway' => [
-                        'icon'        => '📱',
-                        'title'       => __('SMS & WhatsApp Automation Gateway', 'workshop-suite'),
-                        'desc'        => __('Invio automatico di conferme immediate e promemoria urgenti tramite SMS o WhatsApp API (Twilio / Meta Gateway).', 'workshop-suite'),
-                        'badge'       => 'MESSAGING',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'calendar_sync' => [
                         'icon'        => '📅',
-                        'title'       => __('Google Calendar & Apple iCal Auto-Sync', 'workshop-suite'),
-                        'desc'        => __('Feed ICS dinamico che sincronizza in tempo reale le date dei workshop sul calendario personale del docente e dei partecipanti.', 'workshop-suite'),
+                        'title'       => __('Google Calendar & Apple iCal Auto-Sync', 'wsmaker'),
+                        'desc'        => __('Feed ICS dinamico che sincronizza in tempo reale le date dei workshop sul calendario personale del docente e dei partecipanti.', 'wsmaker'),
                         'badge'       => 'CALENDAR',
-                        'is_pro'      => false,
-                        'default'     => 1,
-                    ],
-                    'fluentcrm_marketing' => [
-                        'icon'        => '✉️',
-                        'title'       => __('FluentCRM & Email Marketing Bridge', 'workshop-suite'),
-                        'desc'        => __('Sincronizza in automatico i partecipanti nei funnel e nelle liste email di FluentCRM o Mailchimp per newsletter e promozioni.', 'workshop-suite'),
-                        'badge'       => 'MARKETING',
-                        'is_pro'      => false,
+                        'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'webhooks' => [
                         'icon'        => '🔌',
-                        'title'       => __('Webhook & Connettori Zapier / Make', 'workshop-suite'),
-                        'desc'        => __('Invia payload JSON in tempo reale a Make.com, Zapier, Zoho CRM o Google Sheets ad ogni nuova iscrizione o conferma pagamento.', 'workshop-suite'),
+                        'title'       => __('Webhook & Connettori Zapier / Make', 'wsmaker'),
+                        'desc'        => __('Invia payload JSON in tempo reale a Make.com, Zapier, Zoho CRM o Google Sheets ad ogni nuova iscrizione o conferma pagamento.', 'wsmaker'),
                         'badge'       => 'INTEGRATION',
-                        'is_pro'      => false,
+                        'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'poster_studio' => [
                         'icon'        => '🎨',
-                        'title'       => __('Poster Studio & Social Banner Builder', 'workshop-suite'),
-                        'desc'        => __('Generatore grafico in-browser di locandine pronte per Instagram Feed (1:1), Stories (9:16) e Facebook con rendering HTML5 Canvas.', 'workshop-suite'),
+                        'title'       => __('Poster Studio & Social Banner Builder', 'wsmaker'),
+                        'desc'        => __('Generatore grafico in-browser di locandine pronte per Instagram Feed (1:1), Stories (9:16) e Facebook con rendering HTML5 Canvas.', 'wsmaker'),
                         'badge'       => 'GRAPHIC',
-                        'is_pro'      => false,
-                        'default'     => 1,
+                        'is_pro'      => true,
+                        'default'     => 0,
+                    ],
+                    'analytics' => [
+                        'icon'        => '📊',
+                        'title'       => __('Statistiche & Analytics', 'wsmaker'),
+                        'desc'        => __('Estende il pannello Riepilogo con incassi (30 giorni e totali) suddivisi per categoria, e — se il modulo Marketing è attivo — coupon emessi/utilizzati e sconto concesso.', 'wsmaker'),
+                        'badge'       => 'ANALYTICS',
+                        'is_pro'      => true,
+                        'default'     => 0,
+                    ],
+                    'marketing' => [
+                        'icon'        => '🎁',
+                        'title'       => __('Marketing: Fidelity & Coupon', 'wsmaker'),
+                        'desc'        => __('Coupon manuali per offerte speciali (Earlybird ecc.) e programma fedeltà automatico: chi partecipa a più eventi/corsi negli ultimi 12 mesi riceve uno sconto crescente. Funziona sia con i pagamenti Stripe nativi che con WooCommerce.', 'wsmaker'),
+                        'badge'       => 'MARKETING',
+                        'is_pro'      => true,
+                        'default'     => 0,
+                    ],
+                    'fluentcrm' => [
+                        'icon'        => '📇',
+                        'title'       => __('Connettore FluentCRM', 'wsmaker'),
+                        'desc'        => __('Aggiunge automaticamente ogni nuova richiesta dal form di iscrizione come contatto FluentCRM, con tag e/o lista configurabili.', 'wsmaker'),
+                        'badge'       => 'CRM',
+                        'is_pro'      => true,
+                        'default'     => 0,
                     ],
                     'woocommerce' => [
                         'icon'        => '🛒',
-                        'title'       => __('Integrazione Carrello WooCommerce', 'workshop-suite'),
-                        'desc'        => __('Sincronizza i workshop come prodotti nel carrello WooCommerce per utilizzare i tuoi gateway e la fatturazione elettronica.', 'workshop-suite'),
+                        'title'       => __('Integrazione Carrello WooCommerce', 'wsmaker'),
+                        'desc'        => __('Sincronizza i workshop come prodotti nel carrello WooCommerce per utilizzare i tuoi gateway e la fatturazione elettronica.', 'wsmaker'),
                         'badge'       => 'ECOMMERCE',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
-                    'whatsapp_widget' => [
-                        'icon'        => '💬',
-                        'title'       => __('WhatsApp Floating Quick Chat', 'workshop-suite'),
-                        'desc'        => __('Pulsante galleggiante moderno e leggero per permettere ai visitatori di fare domande dirette sul workshop via WhatsApp.', 'workshop-suite'),
-                        'badge'       => 'LEAD GEN',
-                        'is_pro'      => false,
-                        'default'     => 1,
-                    ],
-                    'global_hub_pro' => [
-                        'icon'        => '🌐',
-                        'title'       => __('Woorkshoop Global Hub & World Map Sync', 'workshop-suite'),
-                        'desc'        => __('Sincronizza in automatico i tuoi workshop ed eventi sulla directory globale woorkshoop.space / workshopsuite.pro e sulla mappa interattiva mondiale.', 'workshop-suite'),
-                        'badge'       => 'GLOBAL HUB',
-                        'is_pro'      => false,
-                        'default'     => 1,
+                    'academy' => [
+                        'icon'        => '🏫',
+                        'title'       => __('Academy: Multi-Docente & Ruoli', 'wsmaker'),
+                        'desc'        => __('Account Docente/Manager con permessi separati, categorie e corsi assegnati per docente, con isolamento dati completo tra docenti.', 'wsmaker'),
+                        'badge'       => 'ACADEMY',
+                        'is_pro'      => true,
+                        'default'     => 0,
                     ],
                 ];
             ?>
                 <?php if (!$is_pro_active) : ?>
                     <div class="ws-s10">
                         <div>
-                            <span class="ws-s11">Workshop Suite Free</span>
-                            <h3 class="ws-s12">Sblocca il Potere Completo con Workshop Suite PRO</h3>
+                            <span class="ws-s11">WSMaker Free</span>
+                            <h3 class="ws-s12">Sblocca il Potere Completo con WSMaker PRO</h3>
                             <p class="ws-s13">Installa l'Add-on PRO per sbloccare la Piattaforma Corsi Didattici, Live Streaming Zoom, Pagamenti Stripe, AI Copywriter e Voucher PDF.</p>
                         </div>
-                        <a href="https://workshopsuite.pro/#pricing" target="_blank" class="button button-primary ws-s14">
+                        <a href="https://wsmaker.pro/#pricing" target="_blank" class="button button-primary ws-s14">
                             Sblocca Tutti i Moduli PRO (99€) →
                         </a>
                     </div>
@@ -735,14 +755,18 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             $is_locked = ($mod_data['is_pro'] && !$is_pro_active);
                             $is_active = $is_locked ? false : (isset($active_mods[$mod_key]) ? !empty($active_mods[$mod_key]) : $mod_data['default']);
                         ?>
-                            <div class="ws-card-native ws-mod-card <?php echo $is_locked ? 'ws-mod-card--locked' : ($is_active ? 'ws-mod-card--active' : 'ws-mod-card--inactive'); ?>">
+                            <div class="ws-card-native ws-mod-card <?php echo esc_attr($is_locked ? 'ws-mod-card--locked' : ($is_active ? 'ws-mod-card--active' : 'ws-mod-card--inactive')); ?><?php echo esc_attr($mod_data['is_pro'] ? ' ws-mod-card--pro' : ''); ?><?php echo esc_attr($mod_key === 'academy' ? ' ws-mod-card--academy' : ''); ?>">
                                 <div>
                                     <div class="ws-s16">
                                         <div class="ws-s17">
                                             <span class="ws-s18"><?php echo esc_html($mod_data['icon']); ?></span>
                                             <?php if ($mod_data['is_pro']): ?>
-                                                <span class="ws-pro-badge <?php echo $is_pro_active ? 'ws-pro-badge--unlocked' : 'ws-pro-badge--locked'; ?>">
-                                                    <?php echo $is_pro_active ? '✓ PRO UNLOCKED' : '🔒 PRO REQUIRED'; ?>
+                                                <span class="ws-pro-badge <?php echo esc_attr($is_pro_active ? 'ws-pro-badge--unlocked' : 'ws-pro-badge--locked'); ?>">
+                                                    <?php if ($is_pro_active): ?>
+                                                        <?php echo esc_html($mod_key === 'academy' ? '✓ PRO & ACADEMY UNLOCKED' : '✓ PRO UNLOCKED'); ?>
+                                                    <?php else: ?>
+                                                        🔒 PRO REQUIRED
+                                                    <?php endif; ?>
                                                 </span>
                                             <?php else: ?>
                                                 <span class="ws-s19">
@@ -753,7 +777,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
                                         <!-- Toggle Switch -->
                                         <?php if ($is_locked): ?>
-                                            <a class="ws-s20" href="https://workshopsuite.pro/#pricing" target="_blank">
+                                            <a class="ws-s20" href="https://wsmaker.pro/#pricing" target="_blank">
                                                 🔒 Sblocca PRO
                                             </a>
                                         <?php else: ?>
@@ -764,7 +788,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                         <?php endif; ?>
                                     </div>
 
-                                    <h3 class="ws-mod-title<?php echo $is_locked ? ' ws-mod-title--locked' : ''; ?>">
+                                    <h3 class="ws-mod-title<?php echo esc_attr($is_locked ? ' ws-mod-title--locked' : ''); ?>">
                                         <?php echo esc_html($mod_data['title']); ?>
                                     </h3>
                                     <p class="ws-s21">
@@ -773,79 +797,122 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                 </div>
 
                                 <div class="ws-s22">
-                                    <span class="ws-mod-status-label ws-mod-status <?php echo $is_locked ? 'ws-mod-status--locked' : ($is_active ? 'ws-mod-status--active' : 'ws-mod-status--inactive'); ?>">
-                                        ● <?php echo $is_locked ? esc_html__('Richiede PRO', 'workshop-suite') : ($is_active ? esc_html__('Attivo', 'workshop-suite') : esc_html__('Disattivato', 'workshop-suite')); ?>
+                                    <span class="ws-mod-status-label ws-mod-status <?php echo esc_attr($is_locked ? 'ws-mod-status--locked' : ($is_active ? 'ws-mod-status--active' : 'ws-mod-status--inactive')); ?>">
+                                        ● <?php echo $is_locked ? esc_html__('Richiede PRO', 'wsmaker') : ($is_active ? esc_html__('Attivo', 'wsmaker') : esc_html__('Disattivato', 'wsmaker')); ?>
                                     </span>
                                     <span class="ws-s23">
                                         <code>ws-mod-<?php echo esc_html($mod_key); ?></code>
                                     </span>
+                                    <?php if ($mod_key === 'fluentcrm' && !$is_locked): ?>
+                                        <button type="button" class="button button-small ws-fluentcrm-configure-btn" style="margin-left:auto;<?php echo $is_active ? '' : 'display:none;'; ?>" onclick="wsOpenFluentCrmModal()">⚙️ <?php esc_html_e('Configura', 'wsmaker'); ?></button>
+                                    <?php endif; ?>
+                                    <?php if ($mod_key === 'stripe_payments' && !$is_locked): ?>
+                                        <button type="button" class="button button-small ws-stripe-configure-btn" style="margin-left:auto;<?php echo $is_active ? '' : 'display:none;'; ?>" onclick="wsOpenStripeModal()">⚙️ <?php esc_html_e('Configura', 'wsmaker'); ?></button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
 
-                    <style>
-                    .ws-toggle-switch {
-                        position: relative;
-                        display: inline-block;
-                        width: 44px;
-                        height: 24px;
-                        flex-shrink: 0;
-                    }
-                    .ws-toggle-switch input {
-                        opacity: 0;
-                        width: 0;
-                        height: 0;
-                    }
-                    .ws-toggle-slider {
-                        position: absolute;
-                        cursor: pointer;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background-color: #c3c4c7;
-                        transition: .2s;
-                        border-radius: 24px;
-                    }
-                    .ws-toggle-slider:before {
-                        position: absolute;
-                        content: "";
-                        height: 18px;
-                        width: 18px;
-                        left: 3px;
-                        bottom: 3px;
-                        background-color: white;
-                        transition: .2s;
-                        border-radius: 50%;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-                    }
-                    .ws-toggle-switch input:checked + .ws-toggle-slider {
-                        background-color: #2271b1;
-                    }
-                    .ws-toggle-switch input:checked + .ws-toggle-slider:before {
-                        transform: translateX(20px);
-                    }
-                    </style>
+                    <!-- FluentCRM config modal -->
+                    <div id="ws-fluentcrm-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100000;align-items:center;justify-content:center;">
+                        <div style="background:#fff;border-radius:12px;width:100%;max-width:460px;padding:24px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                                <h2 style="margin:0;font-size:18px;">📇 <?php esc_html_e('Connettore FluentCRM', 'wsmaker'); ?></h2>
+                                <span id="ws-fluentcrm-detected-badge" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;"></span>
+                            </div>
+                            <p style="font-size:13px;color:#64748b;margin-top:4px;">
+                                <?php esc_html_e('Ogni nuova richiesta dal form di iscrizione viene aggiunta come contatto, con il tag e/o la lista qui sotto (creati automaticamente se non esistono).', 'wsmaker'); ?>
+                            </p>
+
+                            <div style="margin:18px 0 14px;position:relative;">
+                                <label style="display:block;font-weight:600;margin-bottom:6px;font-size:13px;">Tag</label>
+                                <input type="text" id="ws-fluentcrm-tag" autocomplete="off" placeholder="WSMaker" style="width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;">
+                                <div id="ws-fluentcrm-tag-dropdown" class="ws-combo-dropdown"></div>
+                                <p class="description" style="margin:4px 0 0;">Lascia vuoto per non applicare nessun tag.</p>
+                            </div>
+                            <div style="position:relative;">
+                                <label style="display:block;font-weight:600;margin-bottom:6px;font-size:13px;">Lista</label>
+                                <input type="text" id="ws-fluentcrm-list" autocomplete="off" placeholder="(opzionale)" style="width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;">
+                                <div id="ws-fluentcrm-list-dropdown" class="ws-combo-dropdown"></div>
+                                <p class="description" style="margin:4px 0 0;">Lascia vuoto per non aggiungere a nessuna lista.</p>
+                            </div>
+
+                            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:22px;">
+                                <button type="button" class="button" onclick="wsCloseFluentCrmModal()"><?php esc_html_e('Annulla', 'wsmaker'); ?></button>
+                                <button type="button" class="button button-primary" onclick="wsSaveFluentCrmModal()">💾 <?php esc_html_e('Salva', 'wsmaker'); ?></button>
+                            </div>
+                            <p id="ws-fluentcrm-modal-msg" style="font-size:12px;margin:10px 0 0;"></p>
+                        </div>
+                    </div>
+
+                    <!-- Stripe config modal -->
+                    <div id="ws-stripe-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100000;align-items:center;justify-content:center;overflow-y:auto;padding:30px 0;">
+                        <div style="background:#fff;border-radius:12px;width:100%;max-width:520px;padding:24px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+                            <h2 style="margin:0 0 6px;font-size:18px;">💳 <?php esc_html_e('Stripe', 'wsmaker'); ?></h2>
+                            <p style="font-size:13px;color:#64748b;margin-top:4px;">
+                                <?php esc_html_e('Pagamento acconto/saldo workshop tramite Stripe Checkout (pagina ospitata da Stripe — Apple Pay/Google Pay compaiono automaticamente quando supportati).', 'wsmaker'); ?>
+                            </p>
+
+                            <div style="margin:16px 0;">
+                                <label style="display:block;font-weight:600;margin-bottom:8px;font-size:13px;">Modalità</label>
+                                <label style="margin-right:16px;font-size:13px;"><input type="radio" name="ws-stripe-mode" id="ws-stripe-mode-test" value="test"> Test</label>
+                                <label style="font-size:13px;"><input type="radio" name="ws-stripe-mode" id="ws-stripe-mode-live" value="live"> Live (pagamenti reali)</label>
+                            </div>
+
+                            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+                                <h4 style="margin:0 0 10px;font-size:13px;">Chiavi Test</h4>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">Publishable key</label>
+                                <input type="text" id="ws-stripe-test-pk" placeholder="pk_test_..." style="width:100%;padding:7px 9px;border:1px solid #cbd5e1;border-radius:6px;margin-bottom:10px;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">Secret key</label>
+                                <input type="password" id="ws-stripe-test-sk" placeholder="sk_test_..." style="width:100%;padding:7px 9px;border:1px solid #cbd5e1;border-radius:6px;" autocomplete="off">
+                                <label style="font-size:12px;color:#64748b;display:block;margin-top:4px;" id="ws-stripe-test-sk-clear-wrap"><input type="checkbox" id="ws-stripe-test-sk-clear"> Rimuovi</label>
+                            </div>
+
+                            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+                                <h4 style="margin:0 0 10px;font-size:13px;">Chiavi Live</h4>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">Publishable key</label>
+                                <input type="text" id="ws-stripe-live-pk" placeholder="pk_live_..." style="width:100%;padding:7px 9px;border:1px solid #cbd5e1;border-radius:6px;margin-bottom:10px;">
+                                <label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">Secret key</label>
+                                <input type="password" id="ws-stripe-live-sk" placeholder="sk_live_..." style="width:100%;padding:7px 9px;border:1px solid #cbd5e1;border-radius:6px;" autocomplete="off">
+                                <label style="font-size:12px;color:#64748b;display:block;margin-top:4px;" id="ws-stripe-live-sk-clear-wrap"><input type="checkbox" id="ws-stripe-live-sk-clear"> Rimuovi</label>
+                            </div>
+
+                            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+                                <h4 style="margin:0 0 8px;font-size:13px;">Webhook</h4>
+                                <p style="font-size:12px;color:#64748b;margin:0 0 8px;">Su Stripe → Sviluppatori → Webhook, crea un endpoint verso questo URL, evento <code>checkout.session.completed</code>:</p>
+                                <div id="ws-stripe-webhook-url" style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 10px;font-family:monospace;font-size:12px;margin-bottom:10px;word-break:break-all;"></div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:4px;">Signing secret</label>
+                                <input type="password" id="ws-stripe-webhook-secret" placeholder="whsec_..." style="width:100%;padding:7px 9px;border:1px solid #cbd5e1;border-radius:6px;" autocomplete="off">
+                                <label style="font-size:12px;color:#64748b;display:block;margin-top:4px;" id="ws-stripe-webhook-secret-clear-wrap"><input type="checkbox" id="ws-stripe-webhook-secret-clear"> Rimuovi</label>
+                            </div>
+
+                            <div style="display:flex;justify-content:flex-end;gap:8px;">
+                                <button type="button" class="button" onclick="wsCloseStripeModal()"><?php esc_html_e('Annulla', 'wsmaker'); ?></button>
+                                <button type="button" class="button button-primary" onclick="wsSaveStripeModal()">💾 <?php esc_html_e('Salva', 'wsmaker'); ?></button>
+                            </div>
+                            <p id="ws-stripe-modal-msg" style="font-size:12px;margin:10px 0 0;"></p>
+                        </div>
+                    </div>
 
                     <div class="ws-card-native" style="margin-top: 24px; padding: 20px; border-left: 4px solid #00d2b4; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                         <div>
                             <h4 style="margin: 0 0 6px 0; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                <span>🌐</span> <?php esc_html_e('Sincronizzazione Manuale Global Hub & Mappa Mondiale', 'workshop-suite'); ?>
+                                <span>🌐</span> <?php esc_html_e('Sincronizzazione Manuale Global Hub & Mappa Mondiale', 'wsmaker'); ?>
                             </h4>
                             <p style="margin: 0; font-size: 13px; color: #64748b;">
-                                <?php esc_html_e('Invia in un colpo solo tutti i tuoi workshop ed eventi pubblicati alla directory workshopsuite.pro e alla mappa interattiva.', 'workshop-suite'); ?>
+                                <?php esc_html_e('Invia in un colpo solo tutti i tuoi workshop ed eventi pubblicati alla directory wsmaker.pro e alla mappa interattiva.', 'wsmaker'); ?>
                             </p>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <span id="ws-sync-hub-msg" style="font-size: 13px; font-weight: 600;"></span>
                             <button type="button" class="button button-primary" id="btn-sync-hub-now" onclick="wsSyncHubNow(this)" style="background: linear-gradient(135deg, #0088ff, #00d2b4); border-color: transparent; color: #fff; font-weight: 600; padding: 4px 14px; height: 34px;">
-                                🚀 <?php esc_html_e('Sincronizza tutti i Workshop con l\'Hub adesso', 'workshop-suite'); ?>
+                                🚀 <?php esc_html_e('Sincronizza tutti i Workshop con l\'Hub adesso', 'wsmaker'); ?>
                             </button>
                         </div>
                     </div>
 
-                    <script>
+                    <?php ob_start(); ?>
                     function wsToggleModuleLive(checkbox, modKey) {
                         const card = checkbox.closest('.ws-card-native');
                         const statusLabel = card.querySelector('.ws-mod-status-label');
@@ -857,11 +924,15 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             statusLabel.style.color = isActive ? '#10b981' : '#94a3b8';
                         }
 
-                        fetch('<?php echo esc_url_raw(rest_url('workshop-suite/v1/modules/toggle')); ?>', {
+                        card.querySelectorAll('[class*="-configure-btn"]').forEach(btn => {
+                            btn.style.display = isActive ? '' : 'none';
+                        });
+
+                        fetch('<?php echo esc_url(rest_url('workshop-suite/v1/modules/toggle')); ?>', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'
+                                'X-WP-Nonce': '<?php echo esc_js(wp_create_nonce('wp_rest')); ?>'
                             },
                             body: JSON.stringify({
                                 module: modKey,
@@ -875,6 +946,185 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         .catch(err => console.error('Error toggling module:', err));
                     }
 
+                    function wsComboSetup(input, dropdown, getOptions) {
+                        function escapeHtml(s) {
+                            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                        }
+                        function renderList(opts) {
+                            if (!opts.length) {
+                                dropdown.innerHTML = '<div class="ws-combo-empty">Nessun suggerimento — puoi digitarne uno nuovo</div>';
+                            } else {
+                                dropdown.innerHTML = opts.map(o => `<div class="ws-combo-item">${escapeHtml(o)}</div>`).join('');
+                            }
+                            dropdown.style.display = 'block';
+                        }
+                        function renderAll() {
+                            renderList(getOptions());
+                        }
+                        function renderFiltered() {
+                            const q = input.value.trim().toLowerCase();
+                            renderList(getOptions().filter(o => !q || o.toLowerCase().includes(q)));
+                        }
+                        input.addEventListener('focus', renderAll);
+                        input.addEventListener('click', renderAll);
+                        input.addEventListener('input', renderFiltered);
+                        dropdown.addEventListener('mousedown', (e) => {
+                            const item = e.target.closest('.ws-combo-item');
+                            if (!item) return;
+                            e.preventDefault();
+                            input.value = item.textContent;
+                            dropdown.style.display = 'none';
+                        });
+                        document.addEventListener('click', (e) => {
+                            if (e.target !== input && !dropdown.contains(e.target)) {
+                                dropdown.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    let wsFluentCrmTagOptions = [];
+                    let wsFluentCrmListOptions = [];
+                    let wsFluentCrmComboReady = false;
+
+                    function wsOpenFluentCrmModal() {
+                        const overlay = document.getElementById('ws-fluentcrm-modal-overlay');
+                        const msg = document.getElementById('ws-fluentcrm-modal-msg');
+                        msg.textContent = '';
+                        overlay.style.display = 'flex';
+
+                        if (!wsFluentCrmComboReady) {
+                            wsComboSetup(
+                                document.getElementById('ws-fluentcrm-tag'),
+                                document.getElementById('ws-fluentcrm-tag-dropdown'),
+                                () => wsFluentCrmTagOptions
+                            );
+                            wsComboSetup(
+                                document.getElementById('ws-fluentcrm-list'),
+                                document.getElementById('ws-fluentcrm-list-dropdown'),
+                                () => wsFluentCrmListOptions
+                            );
+                            wsFluentCrmComboReady = true;
+                        }
+
+                        fetch('<?php echo esc_url(rest_url('workshop-suite/v1/fluentcrm/options')); ?>', {
+                            headers: { 'X-WP-Nonce': '<?php echo esc_js(wp_create_nonce('wp_rest')); ?>' }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            const badge = document.getElementById('ws-fluentcrm-detected-badge');
+                            if (data.detected) {
+                                badge.textContent = '● Rilevato';
+                                badge.style.background = '#ecfdf5';
+                                badge.style.color = '#065f46';
+                            } else {
+                                badge.textContent = '○ Non rilevato';
+                                badge.style.background = '#f1f5f9';
+                                badge.style.color = '#64748b';
+                            }
+
+                            document.getElementById('ws-fluentcrm-tag').value = data.settings.tag || '';
+                            document.getElementById('ws-fluentcrm-list').value = data.settings.list || '';
+                            wsFluentCrmTagOptions = data.tags || [];
+                            wsFluentCrmListOptions = data.lists || [];
+                        })
+                        .catch(() => { msg.textContent = 'Errore nel caricamento.'; msg.style.color = '#ef4444'; });
+                    }
+
+                    function wsCloseFluentCrmModal() {
+                        document.getElementById('ws-fluentcrm-modal-overlay').style.display = 'none';
+                        document.getElementById('ws-fluentcrm-tag-dropdown').style.display = 'none';
+                        document.getElementById('ws-fluentcrm-list-dropdown').style.display = 'none';
+                    }
+
+                    function wsSaveFluentCrmModal() {
+                        const msg = document.getElementById('ws-fluentcrm-modal-msg');
+                        msg.textContent = 'Salvataggio...';
+                        msg.style.color = '#64748b';
+
+                        fetch('<?php echo esc_url(rest_url('workshop-suite/v1/fluentcrm/save')); ?>', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-WP-Nonce': '<?php echo esc_js(wp_create_nonce('wp_rest')); ?>'
+                            },
+                            body: JSON.stringify({
+                                tag: document.getElementById('ws-fluentcrm-tag').value,
+                                list: document.getElementById('ws-fluentcrm-list').value
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(() => {
+                            msg.textContent = '✅ Salvato.';
+                            msg.style.color = '#10b981';
+                            setTimeout(wsCloseFluentCrmModal, 700);
+                        })
+                        .catch(() => { msg.textContent = 'Errore di rete.'; msg.style.color = '#ef4444'; });
+                    }
+
+                    function wsOpenStripeModal() {
+                        const overlay = document.getElementById('ws-stripe-modal-overlay');
+                        const msg = document.getElementById('ws-stripe-modal-msg');
+                        msg.textContent = '';
+                        overlay.style.display = 'flex';
+
+                        fetch('<?php echo esc_url(rest_url('workshop-suite/v1/stripe/options')); ?>', {
+                            headers: { 'X-WP-Nonce': '<?php echo esc_js(wp_create_nonce('wp_rest')); ?>' }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            document.getElementById('ws-stripe-mode-' + (data.mode === 'live' ? 'live' : 'test')).checked = true;
+                            document.getElementById('ws-stripe-test-pk').value = data.test_publishable_key || '';
+                            document.getElementById('ws-stripe-live-pk').value = data.live_publishable_key || '';
+                            document.getElementById('ws-stripe-webhook-url').textContent = data.webhook_url || '';
+
+                            ['test-sk', 'live-sk', 'webhook-secret'].forEach((suffix, i) => {
+                                const hasKey = [data.has_test_secret_key, data.has_live_secret_key, data.has_webhook_secret][i];
+                                const input = document.getElementById('ws-stripe-' + suffix);
+                                input.value = '';
+                                input.placeholder = hasKey ? '•••••••••••••••• (già impostata)' : input.dataset.placeholder || input.placeholder;
+                                document.getElementById('ws-stripe-' + suffix + '-clear-wrap').style.display = hasKey ? '' : 'none';
+                                document.getElementById('ws-stripe-' + suffix + '-clear').checked = false;
+                            });
+                        })
+                        .catch(() => { msg.textContent = 'Errore nel caricamento.'; msg.style.color = '#ef4444'; });
+                    }
+
+                    function wsCloseStripeModal() {
+                        document.getElementById('ws-stripe-modal-overlay').style.display = 'none';
+                    }
+
+                    function wsSaveStripeModal() {
+                        const msg = document.getElementById('ws-stripe-modal-msg');
+                        msg.textContent = 'Salvataggio...';
+                        msg.style.color = '#64748b';
+
+                        fetch('<?php echo esc_url(rest_url('workshop-suite/v1/stripe/save')); ?>', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-WP-Nonce': '<?php echo esc_js(wp_create_nonce('wp_rest')); ?>'
+                            },
+                            body: JSON.stringify({
+                                mode: document.getElementById('ws-stripe-mode-live').checked ? 'live' : 'test',
+                                test_publishable_key: document.getElementById('ws-stripe-test-pk').value,
+                                live_publishable_key: document.getElementById('ws-stripe-live-pk').value,
+                                test_secret_key: document.getElementById('ws-stripe-test-sk').value,
+                                live_secret_key: document.getElementById('ws-stripe-live-sk').value,
+                                webhook_secret: document.getElementById('ws-stripe-webhook-secret').value,
+                                clear_test_secret_key: document.getElementById('ws-stripe-test-sk-clear').checked,
+                                clear_live_secret_key: document.getElementById('ws-stripe-live-sk-clear').checked,
+                                clear_webhook_secret: document.getElementById('ws-stripe-webhook-secret-clear').checked
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(() => {
+                            msg.textContent = '✅ Salvato.';
+                            msg.style.color = '#10b981';
+                            setTimeout(wsCloseStripeModal, 700);
+                        })
+                        .catch(() => { msg.textContent = 'Errore di rete.'; msg.style.color = '#ef4444'; });
+                    }
+
                     function wsSyncHubNow(btn) {
                         const msgEl = document.getElementById('ws-sync-hub-msg');
                         btn.disabled = true;
@@ -884,11 +1134,11 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             msgEl.style.color = '#2271b1';
                         }
 
-                        fetch('<?php echo esc_url_raw(rest_url('workshop-suite/v1/admin/sync-hub-now')); ?>', {
+                        fetch('<?php echo esc_url(rest_url('workshop-suite/v1/admin/sync-hub-now')); ?>', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'
+                                'X-WP-Nonce': '<?php echo esc_js(wp_create_nonce('wp_rest')); ?>'
                             }
                         })
                         .then(res => res.json())
@@ -909,10 +1159,10 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             }
                         });
                     }
-                    </script>
+                    <?php WSMA_Data::enqueue_inline_script(ob_get_clean()); ?>
 
                     <div class="ws-s24">
-                        <?php submit_button(__('Salva Stato Moduli', 'workshop-suite')); ?>
+                        <?php submit_button(__('Salva Stato Moduli', 'wsmaker')); ?>
                     </div>
                 </form>
             <?php elseif ($tab === 'proponente') : 
@@ -926,9 +1176,10 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     'Portoghese' => '🇵🇹 Português (Portoghese)',
                 ];
             ?>
-                <?php if (isset($_GET['updated']) && $_GET['updated'] === '1') : ?>
+                <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only success-message flag after a redirect, no form data is processed. ?>
+                <?php if (isset($_GET['updated']) && sanitize_text_field(wp_unslash($_GET['updated'])) === '1') : ?>
                     <div class="notice notice-success is-dismissible">
-                        <p><?php esc_html_e('Profilo del proponente e scheda Bio salvati con successo.', 'workshop-suite'); ?></p>
+                        <p><?php esc_html_e('Profilo del proponente e scheda Bio salvati con successo.', 'wsmaker'); ?></p>
                     </div>
                 <?php endif; ?>
 
@@ -941,12 +1192,12 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         <!-- Colonna 1: Bio & Dati Personali -->
                         <div class="ws-card-native">
                             <h2 class="ws-s26">
-                                👤 <?php esc_html_e('Dati Docente / Proponente', 'workshop-suite'); ?>
+                                👤 <?php esc_html_e('Dati Docente / Proponente', 'wsmaker'); ?>
                             </h2>
 
                             <!-- Foto Profilo con Uploader WP Media -->
                             <div class="ws-s27">
-                                <label class="ws-s28"><?php esc_html_e('Foto Profilo / Avatar', 'workshop-suite'); ?></label>
+                                <label class="ws-s28"><?php esc_html_e('Foto Profilo / Avatar', 'wsmaker'); ?></label>
                                 <div class="ws-s29">
                                     <div class="ws-s30" id="ws-photo-preview-wrap">
                                         <?php if (!empty($settings['proponente_foto'])) : ?>
@@ -958,9 +1209,9 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     </div>
                                     <div class="ws-s33">
                                         <input type="hidden" name="ws_proponente[proponente_foto]" id="ws_proponente_foto" value="<?php echo esc_attr($settings['proponente_foto']); ?>">
-                                        <button type="button" class="button button-secondary" id="ws-upload-photo-btn"><?php esc_html_e('Carica / Scegli Foto', 'workshop-suite'); ?></button>
-                                        <button type="button" class="button button-link-delete ws-remove-photo-btn<?php echo empty($settings['proponente_foto']) ? ' ws-hidden' : ''; ?>" id="ws-remove-photo-btn"><?php esc_html_e('Rimuovi', 'workshop-suite'); ?></button>
-                                        <p class="description ws-s34"><?php esc_html_e('Consigliata immagine quadrata ad alta risoluzione (min. 400x400 px).', 'workshop-suite'); ?></p>
+                                        <button type="button" class="button button-secondary" id="ws-upload-photo-btn"><?php esc_html_e('Carica / Scegli Foto', 'wsmaker'); ?></button>
+                                        <button type="button" class="button button-link-delete ws-remove-photo-btn<?php echo empty($settings['proponente_foto']) ? ' ws-hidden' : ''; ?>" id="ws-remove-photo-btn"><?php esc_html_e('Rimuovi', 'wsmaker'); ?></button>
+                                        <p class="description ws-s34"><?php esc_html_e('Consigliata immagine quadrata ad alta risoluzione (min. 400x400 px).', 'wsmaker'); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -968,32 +1219,32 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
-                                        <th scope="row"><label for="prop_nome"><?php esc_html_e('Nome & Cognome', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="prop_nome"><?php esc_html_e('Nome & Cognome', 'wsmaker'); ?></label></th>
                                         <td>
                                             <input name="ws_proponente[proponente_nome]" type="text" id="prop_nome" value="<?php echo esc_attr($settings['proponente_nome']); ?>" class="regular-text" placeholder="Es. Francesco Verolino">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="prop_ruolo"><?php esc_html_e('Titolo / Ruolo', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="prop_ruolo"><?php esc_html_e('Titolo / Ruolo', 'wsmaker'); ?></label></th>
                                         <td>
                                             <input name="ws_proponente[proponente_ruolo]" type="text" id="prop_ruolo" value="<?php echo esc_attr($settings['proponente_ruolo']); ?>" class="regular-text" placeholder="Es. Masterclass Trainer & Docente">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="prop_citta"><?php esc_html_e('Sede / Città Base', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="prop_citta"><?php esc_html_e('Sede / Città Base', 'wsmaker'); ?></label></th>
                                         <td>
                                             <input name="ws_proponente[proponente_citta]" type="text" id="prop_citta" value="<?php echo esc_attr($settings['proponente_citta']); ?>" class="regular-text" placeholder="Es. Napoli, Italia">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="prop_bio"><?php esc_html_e('Biografia / Presentazione', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="prop_bio"><?php esc_html_e('Biografia / Presentazione', 'wsmaker'); ?></label></th>
                                         <td>
-                                            <textarea name="ws_proponente[proponente_bio]" id="prop_bio" rows="6" class="large-text" placeholder="<?php esc_attr_e('Descrivi la tua esperienza, il tuo approccio didattico e i traguardi raggiunti...', 'workshop-suite'); ?>"><?php echo esc_textarea($settings['proponente_bio']); ?></textarea>
-                                            <p class="description"><?php esc_html_e('Questa biografia verrà mostrata nella scheda docente sul tuo sito e sul portale mondiale Workshop Hub.', 'workshop-suite'); ?></p>
+                                            <textarea name="ws_proponente[proponente_bio]" id="prop_bio" rows="6" class="large-text" placeholder="<?php esc_attr_e('Descrivi la tua esperienza, il tuo approccio didattico e i traguardi raggiunti...', 'wsmaker'); ?>"><?php echo esc_textarea($settings['proponente_bio']); ?></textarea>
+                                            <p class="description"><?php esc_html_e('Questa biografia verrà mostrata nella scheda docente sul tuo sito e sul portale mondiale Workshop Hub.', 'wsmaker'); ?></p>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><?php esc_html_e('Lingue Parlate', 'workshop-suite'); ?></th>
+                                        <th scope="row"><?php esc_html_e('Lingue Parlate', 'wsmaker'); ?></th>
                                         <td>
                                             <div class="ws-s36">
                                                 <?php foreach ($lingue_disponibili as $key => $label) : ?>
@@ -1003,7 +1254,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                                     </label>
                                                 <?php endforeach; ?>
                                             </div>
-                                            <p class="description ws-s38"><?php esc_html_e('Indica le lingue in cui puoi condurre i workshop o comunicare con i corsisti.', 'workshop-suite'); ?></p>
+                                            <p class="description ws-s38"><?php esc_html_e('Indica le lingue in cui puoi condurre i workshop o comunicare con i corsisti.', 'wsmaker'); ?></p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -1016,24 +1267,24 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             <!-- Card Contatti -->
                             <div class="ws-card-native">
                                 <h2 class="ws-s26">
-                                    🌐 <?php esc_html_e('Contatti & Presenza Web', 'workshop-suite'); ?>
+                                    🌐 <?php esc_html_e('Contatti & Presenza Web', 'wsmaker'); ?>
                                 </h2>
                                 <table class="form-table ws-s35" role="presentation">
                                     <tbody>
                                         <tr>
-                                            <th scope="row"><label for="prop_sito"><?php esc_html_e('Sito Web Ufficiale', 'workshop-suite'); ?></label></th>
+                                            <th scope="row"><label for="prop_sito"><?php esc_html_e('Sito Web Ufficiale', 'wsmaker'); ?></label></th>
                                             <td>
                                                 <input name="ws_proponente[proponente_sito]" type="url" id="prop_sito" value="<?php echo esc_attr($settings['proponente_sito']); ?>" class="regular-text" placeholder="https://tuosito.com">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th scope="row"><label for="prop_email"><?php esc_html_e('Email Pubblica', 'workshop-suite'); ?></label></th>
+                                            <th scope="row"><label for="prop_email"><?php esc_html_e('Email Pubblica', 'wsmaker'); ?></label></th>
                                             <td>
                                                 <input name="ws_proponente[proponente_email]" type="email" id="prop_email" value="<?php echo esc_attr($settings['proponente_email']); ?>" class="regular-text" placeholder="info@tuosito.com">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th scope="row"><label for="prop_tel"><?php esc_html_e('Telefono / WhatsApp', 'workshop-suite'); ?></label></th>
+                                            <th scope="row"><label for="prop_tel"><?php esc_html_e('Telefono / WhatsApp', 'wsmaker'); ?></label></th>
                                             <td>
                                                 <input name="ws_proponente[proponente_telefono]" type="text" id="prop_tel" value="<?php echo esc_attr($settings['proponente_telefono']); ?>" class="regular-text" placeholder="+39 333 1234567">
                                             </td>
@@ -1045,7 +1296,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                             <!-- Card Social Links -->
                             <div class="ws-card-native">
                                 <h2 class="ws-s26">
-                                    📱 <?php esc_html_e('Canali Social', 'workshop-suite'); ?>
+                                    📱 <?php esc_html_e('Canali Social', 'wsmaker'); ?>
                                 </h2>
                                 <table class="form-table ws-s35" role="presentation">
                                     <tbody>
@@ -1091,18 +1342,19 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
                             <!-- Card Shortcode -->
                             <div class="ws-card-native ws-s40">
-                                <h2 class="ws-s41"><?php esc_html_e('💡 Come mostrare la Bio nel sito', 'workshop-suite'); ?></h2>
-                                <p class="ws-s42"><?php esc_html_e('Incolla questo shortcode in qualsiasi pagina, articolo o footer:', 'workshop-suite'); ?></p>
+                                <h2 class="ws-s41"><?php esc_html_e('💡 Come mostrare la Bio nel sito', 'wsmaker'); ?></h2>
+                                <p class="ws-s42"><?php esc_html_e('Incolla questo shortcode in qualsiasi pagina, articolo o footer:', 'wsmaker'); ?></p>
                                 <code class="ws-s43">[ws_proponente]</code>
                             </div>
 
                         </div>
                     </div>
 
-                    <?php submit_button(__('Salva Profilo Proponente', 'workshop-suite')); ?>
+                    <?php submit_button(__('Salva Profilo Proponente', 'wsmaker')); ?>
                 </form>
 
-                <script>
+                <?php
+                WSMA_Data::enqueue_inline_script(<<<'JS'
                 document.addEventListener('DOMContentLoaded', function() {
                     var btnUpload = document.getElementById('ws-upload-photo-btn');
                     var btnRemove = document.getElementById('ws-remove-photo-btn');
@@ -1145,14 +1397,17 @@ final class WS_Admin_Settings_Page implements WS_Module {
                         });
                     }
                 });
-                </script>
-            <?php elseif ($tab === 'mail') : 
-                $mail_settings = WS_Mail_Inbox::get_public_settings();
+                JS
+                );
+                ?>
+            <?php elseif ($tab === 'mail') :
+                $mail_settings = WSMA_Mail_Inbox::get_public_settings();
                 $has_password  = !empty($mail_settings['has_password']);
             ?>
-                <?php if (isset($_GET['updated']) && $_GET['updated'] === '1') : ?>
+                <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only success-message flag after a redirect, no form data is processed. ?>
+                <?php if (isset($_GET['updated']) && sanitize_text_field(wp_unslash($_GET['updated'])) === '1') : ?>
                     <div class="notice notice-success is-dismissible">
-                        <p><?php esc_html_e('Impostazioni della casella mail salvate e protette con crittografia AES-256.', 'workshop-suite'); ?></p>
+                        <p><?php esc_html_e('Impostazioni della casella mail salvate e protette con crittografia AES-256.', 'wsmaker'); ?></p>
                     </div>
                 <?php endif; ?>
 
@@ -1163,20 +1418,20 @@ final class WS_Admin_Settings_Page implements WS_Module {
                     <div class="ws-s44">
                         <!-- Column 1: IMAP (Reading) -->
                         <div class="ws-card-native">
-                            <h2 class="ws-s26"><?php esc_html_e('Lettura Mail (IMAP)', 'workshop-suite'); ?></h2>
+                            <h2 class="ws-s26"><?php esc_html_e('Lettura Mail (IMAP)', 'wsmaker'); ?></h2>
                             
                             <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
-                                        <th scope="row"><label for="imap_host"><?php esc_html_e('Host IMAP', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="imap_host"><?php esc_html_e('Host IMAP', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[host]" type="text" id="imap_host" value="<?php echo esc_attr($mail_settings['host']); ?>" class="regular-text" placeholder="imap.zoho.com"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="imap_port"><?php esc_html_e('Porta IMAP', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="imap_port"><?php esc_html_e('Porta IMAP', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[port]" type="number" id="imap_port" value="<?php echo esc_attr($mail_settings['port']); ?>" class="small-text" placeholder="993"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="imap_enc"><?php esc_html_e('Crittografia', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="imap_enc"><?php esc_html_e('Crittografia', 'wsmaker'); ?></label></th>
                                         <td>
                                             <select name="ws_mail[encryption]" id="imap_enc">
                                                 <option value="ssl" <?php selected('ssl', $mail_settings['encryption']); ?>>SSL</option>
@@ -1186,15 +1441,15 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="imap_username"><?php esc_html_e('Utente IMAP', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="imap_username"><?php esc_html_e('Utente IMAP', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[username]" type="text" id="imap_username" value="<?php echo esc_attr($mail_settings['username']); ?>" class="regular-text" placeholder="info@domain.com"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="imap_password"><?php esc_html_e('Password Account', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="imap_password"><?php esc_html_e('Password Account', 'wsmaker'); ?></label></th>
                                         <td>
-                                            <input name="ws_mail[password]" type="password" id="imap_password" value="" class="regular-text" placeholder="<?php echo $has_password ? '•••••••• (Inalterata)' : 'Inserisci password'; ?>">
+                                            <input name="ws_mail[password]" type="password" id="imap_password" value="" class="regular-text" placeholder="<?php echo esc_attr($has_password ? __('•••••••• (Inalterata)', 'wsmaker') : __('Inserisci password', 'wsmaker')); ?>">
                                             <?php if ($has_password) : ?>
-                                                <p class="description ws-s45">🔒 <?php esc_html_e('Password protetta con cifratura OpenSSL AES-256.', 'workshop-suite'); ?></p>
+                                                <p class="description ws-s45">🔒 <?php esc_html_e('Password protetta con cifratura OpenSSL AES-256.', 'wsmaker'); ?></p>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
@@ -1204,28 +1459,28 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
                         <!-- Column 2: SMTP & Sender (Writing) -->
                         <div class="ws-card-native">
-                            <h2 class="ws-s26"><?php esc_html_e('Invio Mail (SMTP / Mittente)', 'workshop-suite'); ?></h2>
+                            <h2 class="ws-s26"><?php esc_html_e('Invio Mail (SMTP / Mittente)', 'wsmaker'); ?></h2>
                             
                             <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
-                                        <th scope="row"><label for="reply_from_name"><?php esc_html_e('Nome Mittente', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="reply_from_name"><?php esc_html_e('Nome Mittente', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[reply_from_name]" type="text" id="reply_from_name" value="<?php echo esc_attr($mail_settings['reply_from_name']); ?>" class="regular-text" placeholder="Francesco Verolino"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="reply_from_email"><?php esc_html_e('Email Mittente', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="reply_from_email"><?php esc_html_e('Email Mittente', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[reply_from_email]" type="email" id="reply_from_email" value="<?php echo esc_attr($mail_settings['reply_from_email']); ?>" class="regular-text" placeholder="workshop@domain.com"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="smtp_host"><?php esc_html_e('Host SMTP', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="smtp_host"><?php esc_html_e('Host SMTP', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[smtp_host]" type="text" id="smtp_host" value="<?php echo esc_attr($mail_settings['smtp_host']); ?>" class="regular-text" placeholder="smtp.zoho.com"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="smtp_port"><?php esc_html_e('Porta SMTP', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="smtp_port"><?php esc_html_e('Porta SMTP', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[smtp_port]" type="number" id="smtp_port" value="<?php echo esc_attr($mail_settings['smtp_port']); ?>" class="small-text" placeholder="587"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="smtp_enc"><?php esc_html_e('Crittografia', 'workshop-suite'); ?></label></th>
+                                        <th scope="row"><label for="smtp_enc"><?php esc_html_e('Crittografia', 'wsmaker'); ?></label></th>
                                         <td>
                                             <select name="ws_mail[smtp_encryption]" id="smtp_enc">
                                                 <option value="tls" <?php selected('tls', $mail_settings['smtp_encryption']); ?>>TLS</option>
@@ -1241,117 +1496,106 @@ final class WS_Admin_Settings_Page implements WS_Module {
 
                     <!-- Anti-Spam & Rate Limiting Section -->
                     <div class="ws-card-native ws-s46">
-                        <h2 class="ws-s26"><?php esc_html_e('Protezione Anti-Spam & Rate Limit Iscrizioni', 'workshop-suite'); ?></h2>
-                        <p class="description ws-s47"><?php esc_html_e('Proteggi il server e l\'endpoint delle iscrizioni da invii automatici di bot e attacchi flood.', 'workshop-suite'); ?></p>
+                        <h2 class="ws-s26"><?php esc_html_e('Protezione Anti-Spam & Rate Limit Iscrizioni', 'wsmaker'); ?></h2>
+                        <p class="description ws-s47"><?php esc_html_e('Proteggi il server e l\'endpoint delle iscrizioni da invii automatici di bot e attacchi flood.', 'wsmaker'); ?></p>
                         
                         <table class="form-table ws-s35" role="presentation">
                             <tbody>
                                 <tr>
-                                    <th scope="row"><?php esc_html_e('Rate Limiting IP', 'workshop-suite'); ?></th>
+                                    <th scope="row"><?php esc_html_e('Rate Limiting IP', 'wsmaker'); ?></th>
                                     <td>
                                         <label for="intake_rate_limit_enabled">
                                             <input name="ws_security[intake_rate_limit_enabled]" type="checkbox" id="intake_rate_limit_enabled" value="1" <?php checked(1, $settings['intake_rate_limit_enabled'] ?? 1); ?>>
-                                            <?php esc_html_e('Attiva limitazione richieste per indirizzo IP', 'workshop-suite'); ?>
+                                            <?php esc_html_e('Attiva limitazione richieste per indirizzo IP', 'wsmaker'); ?>
                                         </label>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><label for="intake_rate_limit_requests"><?php esc_html_e('Soglia Massima Richieste', 'workshop-suite'); ?></label></th>
+                                    <th scope="row"><label for="intake_rate_limit_requests"><?php esc_html_e('Soglia Massima Richieste', 'wsmaker'); ?></label></th>
                                     <td>
                                         <input name="ws_security[intake_rate_limit_requests]" type="number" id="intake_rate_limit_requests" value="<?php echo esc_attr($settings['intake_rate_limit_requests'] ?? 5); ?>" class="small-text" min="1" max="100">
-                                        <span class="description"><?php esc_html_e('Numero massimo di iscrizioni consentite dallo stesso IP (default: 5).', 'workshop-suite'); ?></span>
+                                        <span class="description"><?php esc_html_e('Numero massimo di iscrizioni consentite dallo stesso IP (default: 5).', 'wsmaker'); ?></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><label for="intake_rate_limit_window"><?php esc_html_e('Finestra Temporale (secondi)', 'workshop-suite'); ?></label></th>
+                                    <th scope="row"><label for="intake_rate_limit_window"><?php esc_html_e('Finestra Temporale (secondi)', 'wsmaker'); ?></label></th>
                                     <td>
                                         <input name="ws_security[intake_rate_limit_window]" type="number" id="intake_rate_limit_window" value="<?php echo esc_attr($settings['intake_rate_limit_window'] ?? 60); ?>" class="small-text" min="10" max="3600">
-                                        <span class="description"><?php esc_html_e('Intervallo di tempo per il calcolo del limite (default: 60 secondi).', 'workshop-suite'); ?></span>
+                                        <span class="description"><?php esc_html_e('Intervallo di tempo per il calcolo del limite (default: 60 secondi).', 'wsmaker'); ?></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><?php esc_html_e('Protezione Honeypot', 'workshop-suite'); ?></th>
+                                    <th scope="row"><?php esc_html_e('Protezione Honeypot', 'wsmaker'); ?></th>
                                     <td>
                                         <label for="intake_honeypot_enabled">
                                             <input name="ws_security[intake_honeypot_enabled]" type="checkbox" id="intake_honeypot_enabled" value="1" <?php checked(1, $settings['intake_honeypot_enabled'] ?? 1); ?>>
-                                            <?php esc_html_e('Blocca invii con campo trappola compilato (anti-bot invisibile)', 'workshop-suite'); ?>
+                                            <?php esc_html_e('Blocca invii con campo trappola compilato (anti-bot invisibile)', 'wsmaker'); ?>
                                         </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><?php esc_html_e('Geolocalizzazione IP', 'wsmaker'); ?></th>
+                                    <td>
+                                        <label for="intake_geolocation_enabled">
+                                            <input name="ws_security[intake_geolocation_enabled]" type="checkbox" id="intake_geolocation_enabled" value="1" <?php checked(1, $settings['intake_geolocation_enabled'] ?? 0); ?>>
+                                            <?php esc_html_e('Aggiungi città/paese dedotti dall\'IP nella mail di notifica (invia l\'IP a ip-api.com)', 'wsmaker'); ?>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="intake_geolocation_api_url"><?php esc_html_e('URL servizio geolocalizzazione', 'wsmaker'); ?></label></th>
+                                    <td>
+                                        <input name="ws_security[intake_geolocation_api_url]" type="url" id="intake_geolocation_api_url" value="<?php echo esc_attr($settings['intake_geolocation_api_url'] ?? ''); ?>" class="regular-text" placeholder="https://tuoservizio.esempio.com/lookup">
+                                        <p class="description"><?php esc_html_e('Facoltativo. Lascia vuoto per usare ip-api.com (gratuito, adatto a un uso non commerciale). Se hai un tuo provider di geolocalizzazione (per un uso commerciale conforme ai termini, o per volumi elevati), inserisci qui il suo URL: deve accettare l\'IP e rispondere con un JSON contenente i campi "city" e "country".', 'wsmaker'); ?></p>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <?php submit_button(__('Salva Configurazione Posta & Sicurezza', 'workshop-suite')); ?>
+                    <?php submit_button(__('Salva Configurazione Posta & Sicurezza', 'wsmaker')); ?>
                 </form>
-            <?php elseif ($tab === 'custom_css') : ?>
-                <div class="ws-card-native">
-                    <h2 class="ws-s35"><?php esc_html_e('Codice CSS Personalizzato', 'workshop-suite'); ?></h2>
-                    <p class="description ws-s48">
-                        <?php esc_html_e('A destra puoi aggiungere regole CSS personalizzate che sovrascriveranno lo stile dell\'applicazione. A sinistra è visibile il codice CSS predefinito di riferimento.', 'workshop-suite'); ?>
-                    </p>
-
-                    <div class="ws-s49">
-                        <div>
-                            <label class="ws-s50"><?php esc_html_e('Codice Esistente (CSS Predefinito)', 'workshop-suite'); ?></label>
-                            <textarea readonly class="large-text code ws-s51"><?php 
-                                $default_css_file = WS_PATH . 'assets/dist/admin.css';
-                                echo file_exists($default_css_file) ? esc_html(file_get_contents($default_css_file)) : '/* CSS predefinito non trovato */'; 
-                            ?></textarea>
-                        </div>
-                        <div>
-                            <form method="post" action="options.php">
-                                <?php settings_fields('ws_settings_group'); ?>
-                                <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[site_brand_name]" value="<?php echo esc_attr($settings['site_brand_name']); ?>">
-                                <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_name]" value="<?php echo esc_attr($settings['sender_name']); ?>">
-                                <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[sender_email]" value="<?php echo esc_attr($settings['sender_email']); ?>">
-                                <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[currency_symbol]" value="<?php echo esc_attr($settings['currency_symbol']); ?>">
-                                <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[enable_t15_reminders]" value="<?php echo esc_attr($settings['enable_t15_reminders']); ?>">
-                                <input type="hidden" name="<?php echo WS_Settings::OPTION_KEY; ?>[default_theme_mode]" value="<?php echo esc_attr($settings['default_theme_mode']); ?>">
-
-                                <label class="ws-s50"><?php esc_html_e('Codice Custom (CSS Personalizzato)', 'workshop-suite'); ?></label>
-                                <textarea name="<?php echo WS_Settings::OPTION_KEY; ?>[custom_css]" class="large-text code ws-css-editor" placeholder="/* Scrivi qui il tuo codice CSS personalizzato */"><?php echo esc_html($settings['custom_css'] ?? ''); ?></textarea>
-                                
-                                <div class="ws-s52">
-                                    <?php submit_button(__('Salva Codice Custom', 'workshop-suite'), 'primary', 'submit', false); ?>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             <?php elseif ($tab === 'shortcodes') : ?>
                 <div class="ws-card-native">
-                    <h2 class="ws-s35"><?php esc_html_e('Elenco Shortcode Disponibili', 'workshop-suite'); ?></h2>
+                    <h2 class="ws-s35"><?php esc_html_e('Elenco Shortcode Disponibili', 'wsmaker'); ?></h2>
                     <p class="description ws-s48">
-                        <?php esc_html_e('Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di Workshop Suite.', 'workshop-suite'); ?>
+                        <?php esc_html_e('Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di WSMaker.', 'wsmaker'); ?>
                     </p>
 
                     <?php
                     $shortcodes = [
+                        // ── Pagina & contenuto workshop ──
                         ['tag' => '[ws_workshop_page slug="..."]', 'alias' => null, 'title' => 'Pagina Workshop Predefinita (consigliato)', 'desc' => 'Pagina completa generata automaticamente: hero image, intro, programma, requisiti, note importanti, poi eventi in programma e form iscrizione. Compilabile dal form Categoria.', 'badge' => 'Pubblico'],
                         ['tag' => '[ws_workshop_text slug="..." field="intro"]', 'alias' => null, 'title' => 'Blocco di testo/foto Categoria (singolo)', 'desc' => 'Incorpora un solo campo (field: intro, program, requirements, important_notes, city, country, address, photo) per comporre una pagina su misura invece della [ws_workshop_page] completa.', 'badge' => 'Pubblico'],
-                        ['tag' => '[ws_aula_virtuale evento_id="..."]', 'alias' => null, 'title' => 'Aula Virtuale', 'desc' => 'Incorpora la videochiamata dell\'evento (Jitsi integrato, o pulsante verso Zoom/Meet/altro). Creata automaticamente quando l\'evento è impostato su Modalità = Aula virtuale.', 'badge' => 'Pubblico'],
-                        ['tag' => '[fv_form_iscrizione]', 'alias' => '[fvw_form_iscrizione] / [ws_form_iscrizione]', 'title' => 'Form Iscrizione Workshop Standalone', 'desc' => 'Mostra il modulo d\'iscrizione reattivo frontend per permettere ai candidati di registrarsi ai workshop disponibili.', 'badge' => 'Pubblico'],
-                        ['tag' => '[ws_proponente]', 'alias' => '[workshop_suite_bio]', 'title' => 'Scheda Profilo Docente / Bio', 'desc' => 'Mostra la scheda biografica del docente/proponente completa di foto, bio, badge lingue parlate, social e contatti diretti.', 'badge' => 'Pubblico'],
-                        ['tag' => '[workshop_programma]', 'alias' => null, 'title' => 'Programma Evento', 'desc' => 'Visualizza il programma dettagliato, gli orari e i posti disponibili per un determinato workshop.', 'badge' => 'Pubblico'],
-                        ['tag' => '[workshop_prossimo]', 'alias' => null, 'title' => 'Prossimo Workshop in Arrivo', 'desc' => 'Mostra un box evidenziato con la scheda del prossimo evento in programma.', 'badge' => 'Pubblico'],
                         ['tag' => '[eventi_categoria slug="..."]', 'alias' => null, 'title' => 'Griglia Eventi per Categoria', 'desc' => 'Visualizza l\'elenco di tutti gli eventi associati ad una specifica categoria. Già incluso in [ws_workshop_page], usalo da solo solo se componi la pagina a mano.', 'badge' => 'Pubblico'],
+                        ['tag' => '[workshop_prossimo]', 'alias' => null, 'title' => 'Prossimo Workshop in Arrivo', 'desc' => 'Mostra un box evidenziato con la scheda del prossimo evento in programma.', 'badge' => 'Pubblico'],
+                        ['tag' => '[workshop_programma]', 'alias' => null, 'title' => 'Programma Evento', 'desc' => 'Visualizza il programma dettagliato, gli orari e i posti disponibili per un determinato workshop.', 'badge' => 'Pubblico'],
+                        ['tag' => '[ws_prezzo slug="..."]', 'alias' => null, 'title' => 'Prezzo Categoria', 'desc' => 'Stampa il prezzo di listino della categoria (rilevata automaticamente dalla pagina, o via attributo slug).', 'badge' => 'Pubblico'],
+                        ['tag' => '[ws_acconto slug="..."]', 'alias' => null, 'title' => 'Acconto Richiesto Categoria', 'desc' => 'Stampa l\'importo dell\'acconto richiesto per prenotare la categoria.', 'badge' => 'Pubblico'],
+                        // ── Prenotazione & pagamento ──
+                        ['tag' => '[fv_form_iscrizione]', 'alias' => '[fvw_form_iscrizione] / [ws_form_iscrizione]', 'title' => 'Form Iscrizione Workshop Standalone', 'desc' => 'Mostra il modulo d\'iscrizione reattivo frontend per permettere ai candidati di registrarsi ai workshop disponibili.', 'badge' => 'Pubblico'],
+                        ['tag' => '[ws_acquista slug="..."]', 'alias' => null, 'title' => 'Pulsante Acquista (WooCommerce / Stripe)', 'desc' => 'Si adatta da solo: se l\'evento ha un prodotto WooCommerce collegato mostra il link diretto al prodotto, altrimenti — se Stripe è configurato e la categoria richiede un acconto — mostra un mini-form che crea la prenotazione e apre subito il checkout.', 'badge' => 'PRO'],
+                        ['tag' => '[ws_pagamento iscrizione_id="..." tipo="acconto|saldo"]', 'alias' => null, 'title' => 'Pulsante Pagamento Manuale Stripe', 'desc' => 'Pulsante "Paga ora" per una specifica iscrizione già esistente — usalo se vuoi costruire a mano una pagina/link di pagamento invece di affidarti al link automatico in mail.', 'badge' => 'PRO'],
+                        ['tag' => '[ws_aula_virtuale evento_id="..."]', 'alias' => null, 'title' => 'Aula Virtuale', 'desc' => 'Incorpora la videochiamata dell\'evento (Jitsi integrato, o pulsante verso Zoom/Meet/altro). Creata automaticamente quando l\'evento è impostato su Modalità = Aula virtuale.', 'badge' => 'Pubblico'],
                         ['tag' => '[workshop_ringraziamento]', 'alias' => null, 'title' => 'Pagina di Ringraziamento Post-Iscrizione', 'desc' => 'Pagina di conferma visualizzata all\'utente dopo l\'invio della candidatura.', 'badge' => 'Pubblico'],
+                        // ── Altro contenuto pubblico ──
+                        ['tag' => '[ws_proponente]', 'alias' => '[workshop_suite_bio]', 'title' => 'Scheda Profilo Docente / Bio', 'desc' => 'Mostra la scheda biografica del docente/proponente completa di foto, bio, badge lingue parlate, social e contatti diretti.', 'badge' => 'Pubblico'],
+                        // ── Pannelli amministrazione frontend (richiedono login) ──
                         ['tag' => '[workshop_admin]', 'alias' => null, 'title' => 'Dashboard Amministrazione Frontend', 'desc' => 'Pannello completo di gestione bacheca per amministratori (richiede login).', 'badge' => 'Admin'],
                         ['tag' => '[workshop_riepilogo]', 'alias' => null, 'title' => 'Riepilogo Partecipazioni / Eventi', 'desc' => 'Tabella di gestione iscrizioni, pagamenti anticipi e saldi (richiede login).', 'badge' => 'Admin'],
                         ['tag' => '[workshop_partecipanti]', 'alias' => null, 'title' => 'Anagrafica Partecipanti', 'desc' => 'Gestione completa dei contatti e dello storico clienti (richiede login).', 'badge' => 'Admin'],
                         ['tag' => '[workshop_messaggi]', 'alias' => null, 'title' => 'Mail Box / Comunicazioni', 'desc' => 'Pannello di invio e gestione mail ai partecipanti (richiede login).', 'badge' => 'Admin'],
                         ['tag' => '[workshop_calendario]', 'alias' => null, 'title' => 'Admin Calendar & Sync ICS', 'desc' => 'Pannello per la sottoscrizione ai feed del calendario iCal/ICS (richiede login).', 'badge' => 'Admin'],
-                        ['tag' => '[workshop_archivio]', 'alias' => null, 'title' => 'Archivio Storico Eventi', 'desc' => 'Consultazione dei workshop passati e conclusi (richiede login).', 'badge' => 'Admin']
+                        ['tag' => '[workshop_archivio]', 'alias' => null, 'title' => 'Archivio Storico Eventi', 'desc' => 'Consultazione dei workshop passati e conclusi (richiede login).', 'badge' => 'Admin'],
                     ];
                     ?>
                     <table class="widefat striped ws-s53">
                         <thead>
                             <tr>
-                                <th class="ws-s54"><?php esc_html_e('Funzionalità', 'workshop-suite'); ?></th>
-                                <th class="ws-s55"><?php esc_html_e('Descrizione', 'workshop-suite'); ?></th>
-                                <th class="ws-s56"><?php esc_html_e('Shortcode Tag', 'workshop-suite'); ?></th>
-                                <th class="ws-s57"><?php esc_html_e('Azione', 'workshop-suite'); ?></th>
+                                <th class="ws-s54"><?php esc_html_e('Funzionalità', 'wsmaker'); ?></th>
+                                <th class="ws-s55"><?php esc_html_e('Descrizione', 'wsmaker'); ?></th>
+                                <th class="ws-s56"><?php esc_html_e('Shortcode Tag', 'wsmaker'); ?></th>
+                                <th class="ws-s57"><?php esc_html_e('Azione', 'wsmaker'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1360,7 +1604,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     <td>
                                         <strong><?php echo esc_html($sc['title']); ?></strong>
                                         <br>
-                                        <span class="ws-badge-native ws-sc-badge <?php echo $sc['badge'] === 'Admin' ? 'ws-sc-badge--admin' : 'ws-sc-badge--default'; ?>">
+                                        <span class="ws-badge-native ws-sc-badge <?php echo esc_attr($sc['badge'] === 'Admin' ? 'ws-sc-badge--admin' : ($sc['badge'] === 'PRO' ? 'ws-sc-badge--pro' : 'ws-sc-badge--default')); ?>">
                                             <?php echo esc_html($sc['badge']); ?>
                                         </span>
                                     </td>
@@ -1373,7 +1617,7 @@ final class WS_Admin_Settings_Page implements WS_Module {
                                     </td>
                                     <td class="ws-s59">
                                         <button type="button" class="button button-small" onclick="navigator.clipboard.writeText('<?php echo esc_js($sc['tag']); ?>'); this.innerText='✓ Copiato!'; setTimeout(() => this.innerText='Copia', 2000);">
-                                            <?php esc_html_e('Copia', 'workshop-suite'); ?>
+                                            <?php esc_html_e('Copia', 'wsmaker'); ?>
                                         </button>
                                     </td>
                                 </tr>
@@ -1383,36 +1627,36 @@ final class WS_Admin_Settings_Page implements WS_Module {
                 </div>
             <?php else : ?>
                 <form method="post" action="options.php">
-                    <?php settings_fields('ws_license_group'); ?>
+                    <?php settings_fields('wsma_license_group'); ?>
                     
                     <table class="form-table" role="presentation">
                         <tbody>
                             <tr>
-                                <th scope="row"><label for="ws_license_key"><?php esc_html_e('Chiave di Licenza', 'workshop-suite'); ?></label></th>
+                                <th scope="row"><label for="ws_license_key"><?php esc_html_e('Chiave di Licenza', 'wsmaker'); ?></label></th>
                                 <td>
-                                    <input name="<?php echo WS_License_Manager::LICENSE_OPTION_KEY; ?>[key]" type="password" id="ws_license_key" value="<?php echo esc_attr($license['key']); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e('Inserisci la chiave di licenza acquistata per abilitare il supporto e gli aggiornamenti automatici.', 'workshop-suite'); ?></p>
+                                    <input name="<?php echo esc_attr(WSMA_License_Manager::LICENSE_OPTION_KEY); ?>[key]" type="password" id="ws_license_key" value="<?php echo esc_attr($license['key']); ?>" class="regular-text">
+                                    <p class="description"><?php esc_html_e('Inserisci la chiave di licenza acquistata per abilitare il supporto e gli aggiornamenti automatici.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th scope="row"><?php esc_html_e('Stato Licenza', 'workshop-suite'); ?></th>
+                                <th scope="row"><?php esc_html_e('Stato Licenza', 'wsmaker'); ?></th>
                                 <td>
                                     <?php if ($license['status'] === 'active') : ?>
                                         <span class="dashicons dashicons-yes-alt ws-s60"></span>
-                                        <strong class="ws-s45"><?php esc_html_e('ATTIVA', 'workshop-suite'); ?></strong> (Piano: <?php echo esc_html(strtoupper($license['type'])); ?>)
+                                        <strong class="ws-s45"><?php esc_html_e('ATTIVA', 'wsmaker'); ?></strong> (Piano: <?php echo esc_html(strtoupper($license['type'])); ?>)
                                         <?php if ($license['expires']) : ?>
-                                            — <?php /* translators: %s: license expiration date */ printf(esc_html__('Scade il: %s', 'workshop-suite'), esc_html($license['expires'])); ?>
+                                            — <?php /* translators: %s: license expiration date */ printf(esc_html__('Scade il: %s', 'wsmaker'), esc_html($license['expires'])); ?>
                                         <?php endif; ?>
                                     <?php else : ?>
                                         <span class="dashicons dashicons-dismiss ws-s61"></span>
-                                        <strong class="ws-s62"><?php esc_html_e('NON ATTIVA / NON VALIDA', 'workshop-suite'); ?></strong>
+                                        <strong class="ws-s62"><?php esc_html_e('NON ATTIVA / NON VALIDA', 'wsmaker'); ?></strong>
                                     <?php endif; ?>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <?php submit_button(__('Salva e Verifica Licenza', 'workshop-suite')); ?>
+                    <?php submit_button(__('Salva e Verifica Licenza', 'wsmaker')); ?>
                 </form>
             <?php endif; ?>
         </div>

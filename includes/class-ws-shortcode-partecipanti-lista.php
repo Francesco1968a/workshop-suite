@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) exit;
  * Snippets entry must be deactivated (never deleted) so only one of the two
  * registers `workshop_partecipanti_lista`.
  */
-final class WS_Shortcode_Partecipanti_Lista extends WS_Shortcode_Base {
+final class WSMA_Shortcode_Partecipanti_Lista extends WSMA_Shortcode_Base {
 
     protected function handle(): string  { return 'ws-partecipanti-lista'; }
     protected function js_file(): string  { return 'assets/dist/partecipanti-lista.js'; }

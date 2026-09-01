@@ -9,9 +9,9 @@ if (!defined('ABSPATH')) exit;
  * shortcode's handler had no corresponding UI button anywhere in its own
  * template (dead/unreachable code) — not ported here since nothing in the
  * new UI can trigger it either; the real "Conferma" button lives in
- * workshop_riepilogo and is served by WS_Rest_Riepilogo::conferma_iscrizione().
+ * workshop_riepilogo and is served by WSMA_Rest_Riepilogo::conferma_iscrizione().
  */
-final class WS_Rest_Admin implements WS_Module {
+final class WSMA_Rest_Admin implements WSMA_Module {
 
     public function should_load(): bool {
         return true;
@@ -22,7 +22,7 @@ final class WS_Rest_Admin implements WS_Module {
     }
 
     public function register_routes(): void {
-        $perm = fn() => current_user_can('manage_options');
+        $perm = fn() => current_user_can('manage_options') || current_user_can('ws_access_panel');
         $ns = 'workshop-suite/v1';
 
         register_rest_route($ns, '/admin/partecipanti-tab', ['methods' => 'GET', 'callback' => [$this, 'get_partecipanti_tab'], 'permission_callback' => $perm]);
@@ -51,32 +51,33 @@ final class WS_Rest_Admin implements WS_Module {
     }
 
     public function sync_hub_now(WP_REST_Request $request): WP_REST_Response {
-        if (!class_exists('WS_Hub_Sync')) {
-            require_once WS_PATH . 'includes/class-ws-hub-sync.php';
+        if (!class_exists('WSMA_Hub_Sync')) {
+            require_once WSMA_PATH . 'includes/class-ws-hub-sync.php';
         }
-        $results = WS_Hub_Sync::sync_all_published_events();
+        $results = WSMA_Hub_Sync::sync_all_published_events();
         return new WP_REST_Response([
             'success' => true,
             'synced'  => $results['synced'] ?? 0,
             'failed'  => $results['failed'] ?? 0,
-            'msg'     => sprintf(__('Sincronizzazione completata: %d workshop inviati all\'Hub con successo!', 'workshop-suite'), $results['synced'] ?? 0),
+            /* translators: %d: number of workshops synced */
+            'msg'     => sprintf(__('Sincronizzazione completata: %d workshop inviati all\'Hub con successo!', 'wsmaker'), $results['synced'] ?? 0),
         ], 200);
     }
 
     // ───────────────────────── shared read helpers ─────────────────────────
 
     private function evento_option(int $id): array {
-        $s = WS_Data::stato_posti($id);
+        $s = WSMA_Data::stato_posti($id);
         $prezzo = 0.0;
         $acconto = 0.0;
-        $terms = get_the_terms($id, 'categoria_evento');
+        $terms = get_the_terms($id, 'wsma_categoria_evento');
         if ($terms && !is_wp_error($terms)) {
-            $prezzo = (float) WS_Data::get_field('prezzo', 'categoria_evento_' . $terms[0]->term_id);
-            $acconto = (float) WS_Data::get_field('acconto', 'categoria_evento_' . $terms[0]->term_id);
+            $prezzo = (float) WSMA_Data::get_field('prezzo', 'categoria_evento_' . $terms[0]->term_id);
+            $acconto = (float) WSMA_Data::get_field('acconto', 'categoria_evento_' . $terms[0]->term_id);
         }
         return [
             'id' => $id,
-            'label' => WS_Data::evento_label($id),
+            'label' => WSMA_Data::evento_label($id),
             'disponibili' => $s['disponibili'],
             'sold_out' => $s['sold_out'],
             'prezzo' => $prezzo,
@@ -85,7 +86,7 @@ final class WS_Rest_Admin implements WS_Module {
     }
 
     private function oggi(): string {
-        return date('Y-m-d');
+        return current_time('Y-m-d');
     }
 
     /**
@@ -95,7 +96,7 @@ final class WS_Rest_Admin implements WS_Module {
      */
     private function maybe_generate_jitsi_room(string $piattaforma, string $link_virtuale, int $post_id): string {
         if ($link_virtuale || $piattaforma !== 'jitsi') return $link_virtuale;
-        $slug = sanitize_title(parse_url(home_url(), PHP_URL_HOST) ?: 'workshop');
+        $slug = sanitize_title(wp_parse_url(home_url(), PHP_URL_HOST) ?: 'workshop');
         $room = $slug . '-' . $post_id . '-' . substr(md5(wp_generate_password(12, false)), 0, 8);
         return 'https://meet.jit.si/' . $room;
     }
@@ -117,7 +118,7 @@ final class WS_Rest_Admin implements WS_Module {
 
         $page_id = wp_insert_post([
             'post_type' => 'page',
-            'post_title' => WS_Data::evento_label($evento_id) ?: __('Aula virtuale', 'workshop-suite'),
+            'post_title' => WSMA_Data::evento_label($evento_id) ?: __('Aula virtuale', 'wsmaker'),
             'post_content' => '[ws_aula_virtuale evento_id="' . $evento_id . '"]',
             'post_status' => 'publish',
         ], true);
@@ -133,29 +134,32 @@ final class WS_Rest_Admin implements WS_Module {
         $oggi = $this->oggi();
 
         $in_programma = [];
-        $eq = new WP_Query(['post_type' => 'evento', 'posts_per_page' => -1, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
-            'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']]]);
+        $args1 = apply_filters('wsma_scope_query_args', ['post_type' => 'wsma_evento', 'posts_per_page' => -1, 'no_found_rows' => true, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
+            'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']]], 'wsma_evento');
+        $eq = new WP_Query($args1);
         foreach ($eq->posts as $ev) $in_programma[] = $this->evento_option($ev->ID);
 
         $conclusi = [];
-        $eq2 = new WP_Query(['post_type' => 'evento', 'posts_per_page' => -1, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'DESC',
-            'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '<', 'type' => 'DATE']]]);
+        $args2 = apply_filters('wsma_scope_query_args', ['post_type' => 'wsma_evento', 'posts_per_page' => -1, 'no_found_rows' => true, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'DESC',
+            'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '<', 'type' => 'DATE']]], 'wsma_evento');
+        $eq2 = new WP_Query($args2);
         foreach ($eq2->posts as $ev) {
-            $conclusi[] = ['id' => $ev->ID, 'label' => WS_Data::evento_label($ev->ID)];
+            $conclusi[] = ['id' => $ev->ID, 'label' => WSMA_Data::evento_label($ev->ID)];
         }
 
         $partecipanti = [];
-        $pq = new WP_Query(['post_type' => 'partecipante', 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC']);
+        $args3 = apply_filters('wsma_scope_query_args', ['post_type' => 'wsma_partecipante', 'posts_per_page' => -1, 'no_found_rows' => true, 'orderby' => 'title', 'order' => 'ASC'], 'wsma_partecipante');
+        $pq = new WP_Query($args3);
         if (!empty($pq->posts)) {
             update_postmeta_cache(wp_list_pluck($pq->posts, 'ID'));
             foreach ($pq->posts as $p) {
                 $partecipanti[] = [
                     'id' => $p->ID,
-                    'nome' => WS_Data::get_field('nome', $p->ID) ?: '',
-                    'cognome' => WS_Data::get_field('cognome', $p->ID) ?: '',
-                    'email' => WS_Data::get_field('email', $p->ID) ?: '',
-                    'telefono' => WS_Data::get_field('telefono', $p->ID) ?: '',
-                    'citta' => WS_Data::get_field('citta', $p->ID) ?: '',
+                    'nome' => WSMA_Data::get_field('nome', $p->ID) ?: '',
+                    'cognome' => WSMA_Data::get_field('cognome', $p->ID) ?: '',
+                    'email' => WSMA_Data::get_field('email', $p->ID) ?: '',
+                    'telefono' => WSMA_Data::get_field('telefono', $p->ID) ?: '',
+                    'citta' => WSMA_Data::get_field('citta', $p->ID) ?: '',
                 ];
             }
         }
@@ -184,45 +188,48 @@ final class WS_Rest_Admin implements WS_Module {
         if (!$evento_id || !$email || !$nome) {
             return new WP_Error('invalid', 'Evento, email e nome sono obbligatori.', ['status' => 400]);
         }
+        if (!apply_filters('wsma_scope_can_access_evento', true, $evento_id)) {
+            return new WP_Error('forbidden', 'Non hai accesso a questo evento.', ['status' => 403]);
+        }
 
         $aggiorna_anagrafica = !empty($request->get_param('aggiorna_anagrafica'));
 
-        $pid = $existing ?: WS_Data::find_partecipante_by_email($email);
+        $pid = $existing ?: WSMA_Data::find_partecipante_by_email($email);
         $is_new = false;
         if (!$pid) {
             $is_new = true;
-            $pid = wp_insert_post(['post_type' => 'partecipante', 'post_status' => 'publish', 'post_title' => trim($nome . ' ' . $cognome)]);
+            $pid = wp_insert_post(['post_type' => 'wsma_partecipante', 'post_status' => 'publish', 'post_title' => trim($nome . ' ' . $cognome)]);
         }
 
         // Always update metadata if it's a new participant, or if explicitly requested, or populate only missing empty fields
         if ($is_new || $aggiorna_anagrafica) {
-            WS_Data::update_field('nome', $nome, $pid);
-            WS_Data::update_field('cognome', $cognome, $pid);
-            if ($tel) WS_Data::update_field('telefono', $tel, $pid);
-            if ($email) WS_Data::update_field('email', $email, $pid);
-            if ($citta) WS_Data::update_field('citta', $citta, $pid);
+            WSMA_Data::update_field('nome', $nome, $pid);
+            WSMA_Data::update_field('cognome', $cognome, $pid);
+            if ($tel) WSMA_Data::update_field('telefono', $tel, $pid);
+            if ($email) WSMA_Data::update_field('email', $email, $pid);
+            if ($citta) WSMA_Data::update_field('citta', $citta, $pid);
             wp_update_post(['ID' => $pid, 'post_title' => trim($nome . ' ' . $cognome)]);
         } else {
             // Fill in missing fields only without overwriting existing non-empty values
-            if (!WS_Data::get_field('nome', $pid) && $nome) WS_Data::update_field('nome', $nome, $pid);
-            if (!WS_Data::get_field('cognome', $pid) && $cognome) WS_Data::update_field('cognome', $cognome, $pid);
-            if (!WS_Data::get_field('telefono', $pid) && $tel) WS_Data::update_field('telefono', $tel, $pid);
-            if (!WS_Data::get_field('email', $pid) && $email) WS_Data::update_field('email', $email, $pid);
-            if (!WS_Data::get_field('citta', $pid) && $citta) WS_Data::update_field('citta', $citta, $pid);
+            if (!WSMA_Data::get_field('nome', $pid) && $nome) WSMA_Data::update_field('nome', $nome, $pid);
+            if (!WSMA_Data::get_field('cognome', $pid) && $cognome) WSMA_Data::update_field('cognome', $cognome, $pid);
+            if (!WSMA_Data::get_field('telefono', $pid) && $tel) WSMA_Data::update_field('telefono', $tel, $pid);
+            if (!WSMA_Data::get_field('email', $pid) && $email) WSMA_Data::update_field('email', $email, $pid);
+            if (!WSMA_Data::get_field('citta', $pid) && $citta) WSMA_Data::update_field('citta', $citta, $pid);
         }
 
-        if (WS_Data::find_iscrizione($pid, $evento_id)) {
+        if (WSMA_Data::find_iscrizione($pid, $evento_id)) {
             return new WP_REST_Response(['msg' => 'Questa persona è già iscritta a questo evento.']);
         }
 
-        $isc = wp_insert_post(['post_type' => 'iscrizione', 'post_status' => 'publish',
-            'post_title' => $nome . ' ' . $cognome . ' → ' . WS_Data::evento_label($evento_id)]);
-        WS_Data::update_field('partecipante', $pid, $isc);
-        WS_Data::update_field('evento', $evento_id, $isc);
-        WS_Data::update_field('stato', $stato_iniziale, $isc);
-        WS_Data::update_field('anticipo', $anticipo, $isc);
-        WS_Data::update_field('saldo', $saldo, $isc);
-        WS_Data::update_field('note', $note, $isc);
+        $isc = wp_insert_post(['post_type' => 'wsma_iscrizione', 'post_status' => 'publish',
+            'post_title' => $nome . ' ' . $cognome . ' → ' . WSMA_Data::evento_label($evento_id)]);
+        WSMA_Data::update_field('partecipante', $pid, $isc);
+        WSMA_Data::update_field('evento', $evento_id, $isc);
+        WSMA_Data::update_field('stato', $stato_iniziale, $isc);
+        WSMA_Data::update_field('anticipo', $anticipo, $isc);
+        WSMA_Data::update_field('saldo', $saldo, $isc);
+        WSMA_Data::update_field('note', $note, $isc);
         update_post_meta($isc, 'num_persone', $num_persone);
 
         $msg = $stato_iniziale === 'confermato'
@@ -238,58 +245,70 @@ final class WS_Rest_Admin implements WS_Module {
         $edit_ev = (int) $request->get_param('edit_ev');
         $edit_isc = (int) $request->get_param('edit_isc');
 
+        if ($edit_ev && !apply_filters('wsma_scope_can_access_evento', true, $edit_ev)) {
+            return new WP_REST_Response(['error' => 'Non hai accesso a questo evento.'], 403);
+        }
+        if ($edit_isc && !apply_filters('wsma_scope_can_access_iscrizione', true, $edit_isc)) {
+            return new WP_REST_Response(['error' => 'Non hai accesso a questa iscrizione.'], 403);
+        }
+
         $categorie = [];
-        foreach (get_terms(['taxonomy' => 'categoria_evento', 'hide_empty' => false]) as $t) {
+        foreach (get_terms(['taxonomy' => 'wsma_categoria_evento', 'hide_empty' => false]) as $t) {
             $categorie[] = ['id' => $t->term_id, 'name' => $t->name];
         }
 
         $editing_evento = null;
         if ($edit_ev) {
-            $terms = get_the_terms($edit_ev, 'categoria_evento');
+            $terms = get_the_terms($edit_ev, 'wsma_categoria_evento');
             $editing_evento = [
                 'id' => $edit_ev,
                 'categoria_id' => $terms ? $terms[0]->term_id : 0,
-                'data_evento' => WS_Data::get_field('data_evento', $edit_ev) ?: '',
-                'data_fine' => WS_Data::get_field('data_fine', $edit_ev) ?: '',
-                'ora_inizio' => WS_Data::get_field('ora_inizio', $edit_ev) ?: '',
-                'ora_fine' => WS_Data::get_field('ora_fine', $edit_ev) ?: '',
-                'posti_totali' => (int) WS_Data::get_field('posti_totali', $edit_ev) ?: 5,
-                'modalita' => WS_Data::get_field('modalita', $edit_ev) ?: 'fisico',
-                'piattaforma_virtuale' => WS_Data::get_field('piattaforma_virtuale', $edit_ev) ?: 'jitsi',
-                'link_virtuale' => WS_Data::get_field('link_virtuale', $edit_ev) ?: '',
-                'enable_hub_sync' => (bool) WS_Data::get_field('enable_hub_sync', $edit_ev),
-                'indirizzo_geocoding' => (string) WS_Data::get_field('indirizzo_geocoding', $edit_ev) ?: '',
-                'event_latitude' => (string) WS_Data::get_field('event_latitude', $edit_ev) ?: '',
-                'event_longitude' => (string) WS_Data::get_field('event_longitude', $edit_ev) ?: '',
-                'hub_status' => (string) WS_Data::get_field('hub_status', $edit_ev) ?: 'non_sincronizzato',
+                'data_evento' => WSMA_Data::get_field('data_evento', $edit_ev) ?: '',
+                'data_fine' => WSMA_Data::get_field('data_fine', $edit_ev) ?: '',
+                'ora_inizio' => WSMA_Data::get_field('ora_inizio', $edit_ev) ?: '',
+                'ora_fine' => WSMA_Data::get_field('ora_fine', $edit_ev) ?: '',
+                'posti_totali' => (int) WSMA_Data::get_field('posti_totali', $edit_ev) ?: 5,
+                'modalita' => WSMA_Data::get_field('modalita', $edit_ev) ?: 'fisico',
+                'piattaforma_virtuale' => WSMA_Data::get_field('piattaforma_virtuale', $edit_ev) ?: 'jitsi',
+                'link_virtuale' => WSMA_Data::get_field('link_virtuale', $edit_ev) ?: '',
+                'enable_hub_sync' => (bool) WSMA_Data::get_field('enable_hub_sync', $edit_ev),
+                'indirizzo_geocoding' => (string) WSMA_Data::get_field('indirizzo_geocoding', $edit_ev) ?: '',
+                'event_latitude' => (string) WSMA_Data::get_field('event_latitude', $edit_ev) ?: '',
+                'event_longitude' => (string) WSMA_Data::get_field('event_longitude', $edit_ev) ?: '',
+                'hub_status' => (string) WSMA_Data::get_field('hub_status', $edit_ev) ?: 'non_sincronizzato',
+                // Injection point for PRO's WooCommerce connector (evento
+                // lives in core, the connector doesn't) — mirrors the
+                // ws_scope_* filter convention used above for Academy.
+                'wc_extra' => apply_filters('wsma_evento_admin_wc_fields', ['active' => false, 'products' => [], 'product_id' => 0], $edit_ev),
             ];
         }
 
         $editing_iscrizione = null;
         if ($edit_isc) {
-            $p = WS_Data::get_field('partecipante', $edit_isc);
-            $curr_eid = (int) WS_Data::get_field('evento', $edit_isc);
-            $curr_terms = get_the_terms($curr_eid, 'categoria_evento');
+            $p = WSMA_Data::get_field('partecipante', $edit_isc);
+            $curr_eid = (int) WSMA_Data::get_field('evento', $edit_isc);
+            $curr_terms = get_the_terms($curr_eid, 'wsma_categoria_evento');
             $curr_cat = ($curr_terms && !is_wp_error($curr_terms)) ? $curr_terms[0]->term_id : 0;
 
-            $ev_args = ['post_type' => 'evento', 'posts_per_page' => -1, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
+            $ev_args = ['post_type' => 'wsma_evento', 'posts_per_page' => -1, 'no_found_rows' => true, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
                 'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']]];
-            if ($curr_cat) $ev_args['tax_query'] = [['taxonomy' => 'categoria_evento', 'field' => 'term_id', 'terms' => $curr_cat]];
+            if ($curr_cat) $ev_args['tax_query'] = [['taxonomy' => 'wsma_categoria_evento', 'field' => 'term_id', 'terms' => $curr_cat]];
+            $ev_args = apply_filters('wsma_scope_query_args', $ev_args, 'wsma_evento');
             $ev_tutti = new WP_Query($ev_args);
             $eventi_stessa_categoria = [];
             foreach ($ev_tutti->posts as $ev) $eventi_stessa_categoria[] = $this->evento_option($ev->ID);
 
             $editing_iscrizione = [
                 'id' => $edit_isc,
-                'nome' => $p ? trim(WS_Data::get_field('nome', $p) . ' ' . WS_Data::get_field('cognome', $p)) : get_the_title($edit_isc),
-                'stato' => WS_Data::get_field('stato', $edit_isc) === 'confermato' ? 'confermato' : 'richiesta',
-                'stato_pagamento' => in_array((string) WS_Data::get_field('stato_pagamento', $edit_isc), ['in_attesa', 'acconto_pagato', 'saldato'], true)
-                    ? WS_Data::get_field('stato_pagamento', $edit_isc) : 'in_attesa',
+                'nome' => $p ? trim(WSMA_Data::get_field('nome', $p) . ' ' . WSMA_Data::get_field('cognome', $p)) : get_the_title($edit_isc),
+                'stato' => WSMA_Data::get_field('stato', $edit_isc) === 'confermato' ? 'confermato' : 'richiesta',
+                'stato_pagamento' => in_array((string) WSMA_Data::get_field('stato_pagamento', $edit_isc), ['in_attesa', 'acconto_pagato', 'saldato'], true)
+                    ? WSMA_Data::get_field('stato_pagamento', $edit_isc) : 'in_attesa',
                 'curr_evento_id' => $curr_eid,
                 'num_persone' => max(1, (int) get_post_meta($edit_isc, 'num_persone', true) ?: 1),
-                'anticipo' => (float) WS_Data::get_field('anticipo', $edit_isc),
-                'saldo' => (float) WS_Data::get_field('saldo', $edit_isc),
-                'note' => (string) WS_Data::get_field('note', $edit_isc),
+                'anticipo' => (float) WSMA_Data::get_field('anticipo', $edit_isc),
+                'saldo' => (float) WSMA_Data::get_field('saldo', $edit_isc),
+                'note' => (string) WSMA_Data::get_field('note', $edit_isc),
                 'eventi_stessa_categoria' => $eventi_stessa_categoria,
             ];
         }
@@ -300,28 +319,29 @@ final class WS_Rest_Admin implements WS_Module {
         $modalita_filter = sanitize_text_field((string) $request->get_param('modalita'));
 
         if ($edit_isc) {
-            $isc_eid = (int) WS_Data::get_field('evento', $edit_isc);
-            $eq = new WP_Query(['post_type' => 'evento', 'posts_per_page' => 1, 'post__in' => [$isc_eid]]);
+            $isc_eid = (int) WSMA_Data::get_field('evento', $edit_isc);
+            $eq = new WP_Query(['post_type' => 'wsma_evento', 'posts_per_page' => 1, 'no_found_rows' => true, 'post__in' => [$isc_eid]]);
         } else {
             $meta_query = [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']];
             if (in_array($modalita_filter, ['fisico', 'virtuale'], true)) {
                 $meta_query[] = ['key' => 'modalita', 'value' => $modalita_filter];
             }
-            $eq = new WP_Query(['post_type' => 'evento', 'posts_per_page' => -1, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
-                'meta_query' => $meta_query]);
+            $main_args = apply_filters('wsma_scope_query_args', ['post_type' => 'wsma_evento', 'posts_per_page' => -1, 'no_found_rows' => true, 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
+                'meta_query' => $meta_query], 'wsma_evento');
+            $eq = new WP_Query($main_args);
         }
         $eventi = [];
         foreach ($eq->posts as $ev) {
             $id = $ev->ID;
-            $s = WS_Data::stato_posti($id);
-            $terms = get_the_terms($id, 'categoria_evento');
+            $s = WSMA_Data::stato_posti($id);
+            $terms = get_the_terms($id, 'wsma_categoria_evento');
             $term = ($terms && !is_wp_error($terms)) ? $terms[0] : null;
             $cat_id = $term ? $term->term_id : 0;
             $cat_name = $term ? $term->name : '';
-            $cat_tipo = $cat_id ? (string) (WS_Data::get_field('tipo_categoria', 'categoria_evento_' . $cat_id) ?: get_term_meta($cat_id, 'tipo_categoria', true)) : '';
-            $cat_foto = $cat_id ? (string) (WS_Data::get_field('foto_categoria', 'categoria_evento_' . $cat_id) ?: get_term_meta($cat_id, 'foto_categoria', true)) : '';
-            $d_inizio = (string) WS_Data::get_field('data_evento', $id);
-            $d_fine = (string) WS_Data::get_field('data_fine', $id);
+            $cat_tipo = $cat_id ? (string) (WSMA_Data::get_field('tipo_categoria', 'categoria_evento_' . $cat_id) ?: get_term_meta($cat_id, 'tipo_categoria', true)) : '';
+            $cat_foto = $cat_id ? (string) (WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $cat_id) ?: get_term_meta($cat_id, 'foto_categoria', true)) : '';
+            $d_inizio = (string) WSMA_Data::get_field('data_evento', $id);
+            $d_fine = (string) WSMA_Data::get_field('data_fine', $id);
 
             $date_str = '';
             if ($d_inizio) {
@@ -336,18 +356,18 @@ final class WS_Rest_Admin implements WS_Module {
 
             $eventi[] = [
                 'id' => $id,
-                'label' => WS_Data::evento_label($id),
+                'label' => WSMA_Data::evento_label($id),
                 'categoria_nome' => $cat_name,
                 'categoria_tipo' => $cat_tipo,
                 'categoria_foto' => $cat_foto,
                 'data_formattata' => $date_str,
                 'occupati' => $s['occupati'], 'totali' => $s['totali'], 'sold_out' => $s['sold_out'],
-                'n_richieste' => WS_Data::count_richieste($id),
+                'n_richieste' => WSMA_Data::count_richieste($id),
                 'nascosto' => (bool) get_post_meta($id, 'nascondi_dal_frontend', true),
-                'enable_hub_sync' => (bool) WS_Data::get_field('enable_hub_sync', $id),
-                'hub_status' => (string) WS_Data::get_field('hub_status', $id) ?: 'non_sincronizzato',
-                'modalita' => (string) WS_Data::get_field('modalita', $id) ?: 'fisico',
-                'link_virtuale' => (string) WS_Data::get_field('link_virtuale', $id) ?: '',
+                'enable_hub_sync' => (bool) WSMA_Data::get_field('enable_hub_sync', $id),
+                'hub_status' => (string) WSMA_Data::get_field('hub_status', $id) ?: 'non_sincronizzato',
+                'modalita' => (string) WSMA_Data::get_field('modalita', $id) ?: 'fisico',
+                'link_virtuale' => (string) WSMA_Data::get_field('link_virtuale', $id) ?: '',
             ];
         }
 
@@ -357,6 +377,10 @@ final class WS_Rest_Admin implements WS_Module {
             'editing_iscrizione' => $editing_iscrizione,
             'eventi' => $eventi,
             'eventi_options' => $eventi,
+            // Present at top level too (not just inside editing_evento) so
+            // the "crea evento" form — no editing_evento yet — can still
+            // show the WooCommerce product selector.
+            'wc_extra' => apply_filters('wsma_evento_admin_wc_fields', ['active' => false, 'products' => [], 'product_id' => 0], $edit_ev),
         ]);
     }
 
@@ -376,33 +400,34 @@ final class WS_Rest_Admin implements WS_Module {
         if (!in_array($piattaforma_virtuale, ['jitsi', 'zoom', 'meet', 'altro'], true)) $piattaforma_virtuale = 'jitsi';
         $link_virtuale = esc_url_raw((string) $request->get_param('link_virtuale'));
 
-        $term = get_term($cat, 'categoria_evento');
+        $term = get_term($cat, 'wsma_categoria_evento');
         if (!$cat || !$data || !$term || is_wp_error($term)) {
             return new WP_Error('invalid', 'Categoria e data sono obbligatorie.', ['status' => 400]);
         }
         if (!$data_fine || $data_fine < $data) $data_fine = $data;
 
-        $id = wp_insert_post(['post_type' => 'evento', 'post_status' => 'publish',
+        $id = wp_insert_post(['post_type' => 'wsma_evento', 'post_status' => 'publish',
             'post_title' => $term->name . ' – ' . date_i18n('d/m/Y', strtotime($data))]);
         if (!$id) return new WP_Error('failed', 'Creazione evento fallita.', ['status' => 500]);
 
         if ($modalita === 'virtuale') $link_virtuale = $this->maybe_generate_jitsi_room($piattaforma_virtuale, $link_virtuale, $id);
 
-        WS_Data::update_field('data_evento', $data, $id);
-        WS_Data::update_field('data_fine', $data_fine, $id);
-        WS_Data::update_field('ora_inizio', $oi, $id);
-        WS_Data::update_field('ora_fine', $of, $id);
-        WS_Data::update_field('posti_totali', $posti, $id);
-        WS_Data::update_field('enable_hub_sync', $enable_hub_sync, $id);
-        WS_Data::update_field('modalita', $modalita, $id);
-        WS_Data::update_field('piattaforma_virtuale', $piattaforma_virtuale, $id);
-        WS_Data::update_field('link_virtuale', $link_virtuale, $id);
-        WS_Data::update_field('indirizzo_geocoding', $indirizzo_geocoding, $id);
-        WS_Data::update_field('event_latitude', $lat, $id);
-        WS_Data::update_field('event_longitude', $lng, $id);
-        WS_Data::update_field('hub_status', 'non_sincronizzato', $id);
-        wp_set_object_terms($id, $cat, 'categoria_evento');
+        WSMA_Data::update_field('data_evento', $data, $id);
+        WSMA_Data::update_field('data_fine', $data_fine, $id);
+        WSMA_Data::update_field('ora_inizio', $oi, $id);
+        WSMA_Data::update_field('ora_fine', $of, $id);
+        WSMA_Data::update_field('posti_totali', $posti, $id);
+        WSMA_Data::update_field('enable_hub_sync', $enable_hub_sync, $id);
+        WSMA_Data::update_field('modalita', $modalita, $id);
+        WSMA_Data::update_field('piattaforma_virtuale', $piattaforma_virtuale, $id);
+        WSMA_Data::update_field('link_virtuale', $link_virtuale, $id);
+        WSMA_Data::update_field('indirizzo_geocoding', $indirizzo_geocoding, $id);
+        WSMA_Data::update_field('event_latitude', $lat, $id);
+        WSMA_Data::update_field('event_longitude', $lng, $id);
+        WSMA_Data::update_field('hub_status', 'non_sincronizzato', $id);
+        wp_set_object_terms($id, $cat, 'wsma_categoria_evento');
         if ($modalita === 'virtuale') $this->maybe_create_aula_page($id, $piattaforma_virtuale, $link_virtuale);
+        do_action('wsma_evento_admin_save_wc_field', $id, $request);
 
         return new WP_REST_Response(['msg' => 'Evento creato.', 'id' => $id]);
     }
@@ -425,42 +450,52 @@ final class WS_Rest_Admin implements WS_Module {
         $link_virtuale = esc_url_raw((string) $request->get_param('link_virtuale'));
 
         if (!$eid || !$data) return new WP_Error('invalid', 'Data obbligatoria.', ['status' => 400]);
+        if (!apply_filters('wsma_scope_can_access_evento', true, $eid)) {
+            return new WP_Error('forbidden', 'Non hai accesso a questo evento.', ['status' => 403]);
+        }
         if (!$data_fine || $data_fine < $data) $data_fine = $data;
 
         if ($modalita === 'virtuale') $link_virtuale = $this->maybe_generate_jitsi_room($piattaforma_virtuale, $link_virtuale, $eid);
 
-        WS_Data::update_field('data_evento', $data, $eid);
-        WS_Data::update_field('data_fine', $data_fine, $eid);
-        WS_Data::update_field('ora_inizio', $oi, $eid);
-        WS_Data::update_field('ora_fine', $of, $eid);
-        WS_Data::update_field('posti_totali', $posti, $eid);
-        WS_Data::update_field('enable_hub_sync', $enable_hub_sync, $eid);
-        WS_Data::update_field('modalita', $modalita, $eid);
-        WS_Data::update_field('piattaforma_virtuale', $piattaforma_virtuale, $eid);
-        WS_Data::update_field('link_virtuale', $link_virtuale, $eid);
-        WS_Data::update_field('indirizzo_geocoding', $indirizzo_geocoding, $eid);
-        WS_Data::update_field('event_latitude', $lat, $eid);
-        WS_Data::update_field('event_longitude', $lng, $eid);
-        if ($cat) wp_set_object_terms($eid, $cat, 'categoria_evento');
-        $term = $cat ? get_term($cat, 'categoria_evento') : null;
+        WSMA_Data::update_field('data_evento', $data, $eid);
+        WSMA_Data::update_field('data_fine', $data_fine, $eid);
+        WSMA_Data::update_field('ora_inizio', $oi, $eid);
+        WSMA_Data::update_field('ora_fine', $of, $eid);
+        WSMA_Data::update_field('posti_totali', $posti, $eid);
+        WSMA_Data::update_field('enable_hub_sync', $enable_hub_sync, $eid);
+        WSMA_Data::update_field('modalita', $modalita, $eid);
+        WSMA_Data::update_field('piattaforma_virtuale', $piattaforma_virtuale, $eid);
+        WSMA_Data::update_field('link_virtuale', $link_virtuale, $eid);
+        WSMA_Data::update_field('indirizzo_geocoding', $indirizzo_geocoding, $eid);
+        WSMA_Data::update_field('event_latitude', $lat, $eid);
+        WSMA_Data::update_field('event_longitude', $lng, $eid);
+        if ($cat) wp_set_object_terms($eid, $cat, 'wsma_categoria_evento');
+        $term = $cat ? get_term($cat, 'wsma_categoria_evento') : null;
         $tcat = ($term && !is_wp_error($term)) ? $term->name : get_the_title($eid);
         wp_update_post(['ID' => $eid, 'post_title' => $tcat . ' – ' . date_i18n('d/m/Y', strtotime($data))]);
         if ($modalita === 'virtuale') $this->maybe_create_aula_page($eid, $piattaforma_virtuale, $link_virtuale);
+        do_action('wsma_evento_admin_save_wc_field', $eid, $request);
 
         return new WP_REST_Response(['msg' => 'Evento aggiornato.']);
     }
 
     public function elimina_evento(WP_REST_Request $request): WP_REST_Response {
         $eid = (int) $request['id'];
-        foreach (WS_Data::iscrizioni_evento($eid) as $isc) wp_delete_post($isc, true);
+        if (!apply_filters('wsma_scope_can_access_evento', true, $eid)) {
+            return new WP_REST_Response(['msg' => 'Non hai accesso a questo evento.'], 403);
+        }
+        foreach (WSMA_Data::iscrizioni_evento($eid) as $isc) wp_delete_post($isc, true);
         wp_delete_post($eid, true);
         return new WP_REST_Response(['msg' => 'Evento e relative iscrizioni eliminati.']);
     }
 
     public function toggle_frontend(WP_REST_Request $request) {
         $eid = (int) $request['id'];
-        if (get_post_type($eid) !== 'evento') {
+        if (get_post_type($eid) !== 'wsma_evento') {
             return new WP_Error('not_found', 'Evento non trovato', ['status' => 404]);
+        }
+        if (!apply_filters('wsma_scope_can_access_evento', true, $eid)) {
+            return new WP_Error('forbidden', 'Non hai accesso a questo evento.', ['status' => 403]);
         }
         $nascosto = (bool) get_post_meta($eid, 'nascondi_dal_frontend', true);
         update_post_meta($eid, 'nascondi_dal_frontend', $nascosto ? '' : '1');
@@ -472,46 +507,49 @@ final class WS_Rest_Admin implements WS_Module {
 
     public function modifica_iscrizione(WP_REST_Request $request) {
         $isc = (int) $request['id'];
-        if (get_post_type($isc) !== 'iscrizione') {
+        if (get_post_type($isc) !== 'wsma_iscrizione') {
             return new WP_Error('not_found', 'Iscrizione non trovata', ['status' => 404]);
+        }
+        if (!apply_filters('wsma_scope_can_access_iscrizione', true, $isc)) {
+            return new WP_Error('forbidden', 'Non hai accesso a questa iscrizione.', ['status' => 403]);
         }
 
         $st_new = ((string) $request->get_param('stato') === 'confermato') ? 'confermato' : 'richiesta';
-        $st_old = WS_Data::get_field('stato', $isc);
+        $st_old = WSMA_Data::get_field('stato', $isc);
         $new_eid = (int) $request->get_param('evento');
-        $curr_eid = (int) WS_Data::get_field('evento', $isc);
+        $curr_eid = (int) WSMA_Data::get_field('evento', $isc);
         $msg = '';
 
         if ($new_eid && $new_eid !== $curr_eid) {
-            $s_new_ev = WS_Data::stato_posti($new_eid);
+            $s_new_ev = WSMA_Data::stato_posti($new_eid);
             if ($st_new === 'confermato' && $s_new_ev['sold_out']) {
                 $msg = 'Impossibile spostare come Confermato: il nuovo evento è SOLD OUT.';
                 $st_new = 'richiesta';
             }
-            WS_Data::update_field('evento', $new_eid, $isc);
-            $p = WS_Data::get_field('partecipante', $isc);
-            $nome_p = $p ? (WS_Data::get_field('nome', $p) . ' ' . WS_Data::get_field('cognome', $p)) : get_the_title($isc);
-            wp_update_post(['ID' => $isc, 'post_title' => $nome_p . ' → ' . WS_Data::evento_label($new_eid)]);
-            if (!$msg) $msg = 'Iscrizione spostata su: ' . WS_Data::evento_label($new_eid) . '.';
+            WSMA_Data::update_field('evento', $new_eid, $isc);
+            $p = WSMA_Data::get_field('partecipante', $isc);
+            $nome_p = $p ? (WSMA_Data::get_field('nome', $p) . ' ' . WSMA_Data::get_field('cognome', $p)) : get_the_title($isc);
+            wp_update_post(['ID' => $isc, 'post_title' => $nome_p . ' → ' . WSMA_Data::evento_label($new_eid)]);
+            if (!$msg) $msg = 'Iscrizione spostata su: ' . WSMA_Data::evento_label($new_eid) . '.';
         }
 
         if ($st_new === 'confermato' && $st_old !== 'confermato' && !$msg) {
             $check_eid = $new_eid ?: $curr_eid;
-            $s_check = WS_Data::stato_posti($check_eid);
+            $s_check = WSMA_Data::stato_posti($check_eid);
             if ($s_check['sold_out']) {
                 $msg = 'Impossibile passare a Confermato: l\'evento è già SOLD OUT.';
                 $st_new = 'richiesta';
             }
         }
 
-        WS_Data::update_field('stato', $st_new, $isc);
+        WSMA_Data::update_field('stato', $st_new, $isc);
         $sp_new = (string) $request->get_param('stato_pagamento');
         if (in_array($sp_new, ['in_attesa', 'acconto_pagato', 'saldato'], true)) {
-            WS_Data::update_field('stato_pagamento', $sp_new, $isc);
+            WSMA_Data::update_field('stato_pagamento', $sp_new, $isc);
         }
-        WS_Data::update_field('anticipo', (float) $request->get_param('anticipo'), $isc);
-        WS_Data::update_field('saldo', (float) $request->get_param('saldo'), $isc);
-        WS_Data::update_field('note', sanitize_textarea_field((string) $request->get_param('note')), $isc);
+        WSMA_Data::update_field('anticipo', (float) $request->get_param('anticipo'), $isc);
+        WSMA_Data::update_field('saldo', (float) $request->get_param('saldo'), $isc);
+        WSMA_Data::update_field('note', sanitize_textarea_field((string) $request->get_param('note')), $isc);
         update_post_meta($isc, 'num_persone', max(1, (int) $request->get_param('num_persone')));
 
         if (!$msg) $msg = 'Iscrizione aggiornata.';
@@ -521,14 +559,14 @@ final class WS_Rest_Admin implements WS_Module {
     // ───────────────────────── TAB: Categorie ─────────────────────────
 
     /**
-     * `tipo_categoria` is a plain term-meta field via WS_Data::update_field()/WS_Data::get_field(),
+     * `tipo_categoria` is a plain term-meta field via WSMA_Data::update_field()/WSMA_Data::get_field(),
      * same ad-hoc pattern as url_pagina/foto_categoria/contesto_ai — none of
      * these have a formal ACF field group registered (verified: no
      * `acf-field-group` post for categoria_evento), so no UI field definition
      * to add either, just read/write the meta key directly.
      */
     private function get_tipi_map(): array {
-        $saved = WS_Settings::get('event_types', ['Workshop', 'Viaggio Fotografico', 'Masterclass']);
+        $saved = WSMA_Settings::get('event_types', ['Workshop', 'Viaggio Fotografico', 'Masterclass']);
         $map = [];
         foreach ($saved as $t) {
             $slug = sanitize_title($t);
@@ -564,60 +602,65 @@ final class WS_Rest_Admin implements WS_Module {
 
     public function get_categorie_tab(WP_REST_Request $request): WP_REST_Response {
         $edit_cat = (int) $request->get_param('edit_cat');
+        if ($edit_cat && !apply_filters('wsma_scope_can_access_categoria', true, $edit_cat)) {
+            return new WP_REST_Response(['error' => 'Non hai accesso a questa categoria.'], 403);
+        }
 
         $editing_categoria = null;
         if ($edit_cat) {
-            $t = get_term($edit_cat, 'categoria_evento');
+            $t = get_term($edit_cat, 'wsma_categoria_evento');
             if ($t && !is_wp_error($t)) {
                 $editing_categoria = [
                     'id' => $edit_cat,
                     'nome' => $t->name,
                     'slug' => $t->slug,
-                    'url' => WS_Data::get_field('url_pagina', 'categoria_evento_' . $edit_cat) ?: '',
-                    'foto' => WS_Data::get_field('foto_categoria', 'categoria_evento_' . $edit_cat) ?: '',
-                    'contesto_ai' => WS_Data::get_field('contesto_ai', 'categoria_evento_' . $edit_cat) ?: '',
-                    'tipo' => $this->sanitize_tipo((string) WS_Data::get_field('tipo_categoria', 'categoria_evento_' . $edit_cat)),
-                    'oggetto_conferma' => WS_Data::get_field('oggetto_conferma', 'categoria_evento_' . $edit_cat) ?: '',
-                    'mail_conferma' => WS_Data::get_field('mail_conferma', 'categoria_evento_' . $edit_cat) ?: '',
-                    'oggetto_t15' => WS_Data::get_field('oggetto_t15', 'categoria_evento_' . $edit_cat) ?: '',
-                    'mail_t15' => WS_Data::get_field('mail_t15', 'categoria_evento_' . $edit_cat) ?: '',
-                    'prezzo' => (float) WS_Data::get_field('prezzo', 'categoria_evento_' . $edit_cat),
-                    'acconto' => (float) WS_Data::get_field('acconto', 'categoria_evento_' . $edit_cat),
-                    'citta' => WS_Data::get_field('citta', 'categoria_evento_' . $edit_cat) ?: '',
-                    'nazione' => WS_Data::get_field('nazione', 'categoria_evento_' . $edit_cat) ?: '',
-                    'indirizzo' => WS_Data::get_field('indirizzo', 'categoria_evento_' . $edit_cat) ?: '',
-                    'intro' => WS_Data::get_field('intro', 'categoria_evento_' . $edit_cat) ?: '',
-                    'program' => WS_Data::get_field('program', 'categoria_evento_' . $edit_cat) ?: '',
-                    'requirements' => WS_Data::get_field('requirements', 'categoria_evento_' . $edit_cat) ?: '',
-                    'important_notes' => WS_Data::get_field('important_notes', 'categoria_evento_' . $edit_cat) ?: '',
+                    'url' => WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $edit_cat) ?: '',
+                    'foto' => WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $edit_cat) ?: '',
+                    'contesto_ai' => WSMA_Data::get_field('contesto_ai', 'categoria_evento_' . $edit_cat) ?: '',
+                    'tipo' => $this->sanitize_tipo((string) WSMA_Data::get_field('tipo_categoria', 'categoria_evento_' . $edit_cat)),
+                    'oggetto_conferma' => WSMA_Data::get_field('oggetto_conferma', 'categoria_evento_' . $edit_cat) ?: '',
+                    'mail_conferma' => WSMA_Data::get_field('mail_conferma', 'categoria_evento_' . $edit_cat) ?: '',
+                    'oggetto_t15' => WSMA_Data::get_field('oggetto_t15', 'categoria_evento_' . $edit_cat) ?: '',
+                    'mail_t15' => WSMA_Data::get_field('mail_t15', 'categoria_evento_' . $edit_cat) ?: '',
+                    'prezzo' => (float) WSMA_Data::get_field('prezzo', 'categoria_evento_' . $edit_cat),
+                    'acconto' => (float) WSMA_Data::get_field('acconto', 'categoria_evento_' . $edit_cat),
+                    'citta' => WSMA_Data::get_field('citta', 'categoria_evento_' . $edit_cat) ?: '',
+                    'nazione' => WSMA_Data::get_field('nazione', 'categoria_evento_' . $edit_cat) ?: '',
+                    'indirizzo' => WSMA_Data::get_field('indirizzo', 'categoria_evento_' . $edit_cat) ?: '',
+                    'intro' => WSMA_Data::get_field('intro', 'categoria_evento_' . $edit_cat) ?: '',
+                    'program' => WSMA_Data::get_field('program', 'categoria_evento_' . $edit_cat) ?: '',
+                    'requirements' => WSMA_Data::get_field('requirements', 'categoria_evento_' . $edit_cat) ?: '',
+                    'important_notes' => WSMA_Data::get_field('important_notes', 'categoria_evento_' . $edit_cat) ?: '',
+                    'fb_share_enabled' => (bool) WSMA_Data::get_field('fb_share_enabled', 'categoria_evento_' . $edit_cat),
                 ];
             }
         }
 
         $categorie = [];
-        foreach (get_terms(['taxonomy' => 'categoria_evento', 'hide_empty' => false]) as $t) {
+        $tutte_le_categorie = apply_filters('wsma_scope_filter_terms', get_terms(['taxonomy' => 'wsma_categoria_evento', 'hide_empty' => false]), 'categoria');
+        foreach ($tutte_le_categorie as $t) {
             $prossimo = null;
             $pq = new WP_Query([
-                'post_type' => 'evento', 'posts_per_page' => 1, 'no_found_rows' => true,
-                'tax_query' => [['taxonomy' => 'categoria_evento', 'field' => 'term_id', 'terms' => $t->term_id]],
+                'post_type' => 'wsma_evento', 'posts_per_page' => 1, 'no_found_rows' => true,
+                'tax_query' => [['taxonomy' => 'wsma_categoria_evento', 'field' => 'term_id', 'terms' => $t->term_id]],
                 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
                 'meta_query' => [['key' => 'data_fine', 'value' => $this->oggi(), 'compare' => '>=', 'type' => 'DATE']],
             ]);
             if ($pq->have_posts()) {
-                $prossimo = WS_Data::format_periodo($pq->posts[0]->ID);
+                $prossimo = WSMA_Data::format_periodo($pq->posts[0]->ID);
             }
 
             $categorie[] = [
                 'id' => $t->term_id,
                 'nome' => $t->name,
                 'slug' => $t->slug,
-                'url' => WS_Data::get_field('url_pagina', 'categoria_evento_' . $t->term_id) ?: '',
-                'foto' => WS_Data::get_field('foto_categoria', 'categoria_evento_' . $t->term_id) ?: '',
-                'tipo' => $this->sanitize_tipo((string) WS_Data::get_field('tipo_categoria', 'categoria_evento_' . $t->term_id)),
+                'url' => WSMA_Data::get_field('url_pagina', 'categoria_evento_' . $t->term_id) ?: '',
+                'foto' => WSMA_Data::get_field('foto_categoria', 'categoria_evento_' . $t->term_id) ?: '',
+                'tipo' => $this->sanitize_tipo((string) WSMA_Data::get_field('tipo_categoria', 'categoria_evento_' . $t->term_id)),
                 'count' => (int) $t->count,
-                'prezzo' => (float) WS_Data::get_field('prezzo', 'categoria_evento_' . $t->term_id),
-                'acconto' => (float) WS_Data::get_field('acconto', 'categoria_evento_' . $t->term_id),
-                'citta' => WS_Data::get_field('citta', 'categoria_evento_' . $t->term_id) ?: '',
+                'prezzo' => (float) WSMA_Data::get_field('prezzo', 'categoria_evento_' . $t->term_id),
+                'acconto' => (float) WSMA_Data::get_field('acconto', 'categoria_evento_' . $t->term_id),
+                'citta' => WSMA_Data::get_field('citta', 'categoria_evento_' . $t->term_id) ?: '',
                 'prossimo_evento' => $prossimo,
             ];
         }
@@ -640,13 +683,13 @@ final class WS_Rest_Admin implements WS_Module {
             'placeholders' => self::CONFERMA_PLACEHOLDERS,
             'default_oggetto_conferma' => '✓ Confermato · {categoria_nome} · {periodo}',
             'default_mail_conferma' => "Ciao {nome},\n\nsei ufficialmente confermato per {categoria_nome} del {periodo}.\n\nIn allegato il file calendario (.ics) per aggiungere l'evento al tuo Google o Apple Calendar.\n\nPer qualsiasi cosa, rispondimi a questa mail o scrivimi su WhatsApp.\n\nA presto,\nFrancesco",
-            'default_oggetto_t15' => WS_T15_Reminder::default_oggetto(),
-            'default_mail_t15' => WS_T15_Reminder::default_mail(),
+            'default_oggetto_t15' => WSMA_T15_Reminder::default_oggetto(),
+            'default_mail_t15' => WSMA_T15_Reminder::default_mail(),
         ]);
     }
 
     public function get_tipi_tab(): WP_REST_Response {
-        $types = WS_Settings::get('event_types', ['Workshop', 'Viaggio Fotografico', 'Masterclass']);
+        $types = WSMA_Settings::get('event_types', ['Workshop', 'Viaggio Fotografico', 'Masterclass']);
         return new WP_REST_Response([
             'tipi' => $types,
         ]);
@@ -657,9 +700,9 @@ final class WS_Rest_Admin implements WS_Module {
         if (!is_array($tipi)) $tipi = [];
         $clean = array_values(array_filter(array_map('sanitize_text_field', $tipi)));
 
-        $all = WS_Settings::get_all();
+        $all = WSMA_Settings::get_all();
         $all['event_types'] = $clean;
-        WS_Settings::update_all($all);
+        WSMA_Settings::update_all($all);
 
         return new WP_REST_Response(['msg' => 'Tipi di evento salvati.', 'tipi' => $clean]);
     }
@@ -710,9 +753,12 @@ final class WS_Rest_Admin implements WS_Module {
         if (!$title) return new WP_Error('invalid', 'Titolo obbligatorio.', ['status' => 400]);
 
         $tid = (int) $request->get_param('categoria_id');
-        $term = $tid ? get_term($tid, 'categoria_evento') : null;
+        $term = $tid ? get_term($tid, 'wsma_categoria_evento') : null;
         if (!$tid || !$term || is_wp_error($term)) {
             return new WP_Error('invalid', 'Categoria non valida.', ['status' => 400]);
+        }
+        if (!apply_filters('wsma_scope_can_access_categoria', true, $tid)) {
+            return new WP_Error('forbidden', 'Non hai accesso a questa categoria.', ['status' => 403]);
         }
 
         $add_shortcode = $request->get_param('add_shortcode');
@@ -756,6 +802,19 @@ final class WS_Rest_Admin implements WS_Module {
         if (!$page || $page->post_type !== 'page') return;
 
         $content = (string) $page->post_content;
+
+        // Page builders like YOOtheme Pro store the entire visual layout as
+        // a JSON blob inside an HTML comment (`<!-- {"name":...} -->`) that
+        // MUST be the absolute last thing in post_content for their editor
+        // to recognize the page. Appending shortcodes after it broke the
+        // builder entirely (page showed as "empty"/incompatible). Since we
+        // can't safely insert content *inside* that comment, the only safe
+        // move is to not touch a page that already has one — the user adds
+        // the shortcodes manually inside the builder in that case.
+        if (strpos($content, '<!-- {"') !== false || strpos($content, '<!-- {') !== false) {
+            return;
+        }
+
         $additions = [];
 
         if (strpos($content, '[eventi_categoria') === false) {
@@ -800,46 +859,52 @@ final class WS_Rest_Admin implements WS_Module {
         $program = sanitize_textarea_field((string) $request->get_param('program'));
         $requirements = sanitize_textarea_field((string) $request->get_param('requirements'));
         $important_notes = sanitize_textarea_field((string) $request->get_param('important_notes'));
+        $fb_share_enabled = !empty($request->get_param('fb_share_enabled')) ? 1 : 0;
 
-        $t = wp_insert_term($nome, 'categoria_evento');
+        $t = wp_insert_term($nome, 'wsma_categoria_evento');
         if (is_wp_error($t)) return new WP_Error('failed', $t->get_error_message(), ['status' => 500]);
         $tid = $t['term_id'];
+        // A scoped docente's own new category must be owned by them from
+        // the start — otherwise it would be immediately invisible to its
+        // own creator once the scoping filter (owned categories only) applies.
+        do_action('wsma_scope_assign_new_owner', 'categoria', $tid);
 
         if ($url) {
-            WS_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
+            WSMA_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
             update_term_meta($tid, 'url_pagina', $url);
             $linked_page_id = url_to_postid($url);
             if ($linked_page_id) {
                 // wp_insert_term()'s return array has no 'slug' key, only
                 // term_id/term_taxonomy_id — fetch the real term for it.
-                $fresh_term = get_term($tid, 'categoria_evento');
+                $fresh_term = get_term($tid, 'wsma_categoria_evento');
                 if ($fresh_term && !is_wp_error($fresh_term)) {
                     $this->ensure_categoria_shortcodes($linked_page_id, $fresh_term->slug);
                 }
             }
         }
         if ($foto) {
-            WS_Data::update_field('foto_categoria', $foto, 'categoria_evento_' . $tid);
+            WSMA_Data::update_field('foto_categoria', $foto, 'categoria_evento_' . $tid);
             update_term_meta($tid, 'foto_categoria', $foto);
         }
-        if ($contesto_ai) WS_Data::update_field('contesto_ai', $contesto_ai, 'categoria_evento_' . $tid);
+        if ($contesto_ai) WSMA_Data::update_field('contesto_ai', $contesto_ai, 'categoria_evento_' . $tid);
         if ($tipo) {
-            WS_Data::update_field('tipo_categoria', $tipo, 'categoria_evento_' . $tid);
+            WSMA_Data::update_field('tipo_categoria', $tipo, 'categoria_evento_' . $tid);
             update_term_meta($tid, 'tipo_categoria', $tipo);
         }
-        if ($oggetto_conferma) WS_Data::update_field('oggetto_conferma', $oggetto_conferma, 'categoria_evento_' . $tid);
-        if ($mail_conferma) WS_Data::update_field('mail_conferma', $mail_conferma, 'categoria_evento_' . $tid);
-        if ($oggetto_t15) WS_Data::update_field('oggetto_t15', $oggetto_t15, 'categoria_evento_' . $tid);
-        if ($mail_t15) WS_Data::update_field('mail_t15', $mail_t15, 'categoria_evento_' . $tid);
-        WS_Data::update_field('prezzo', $prezzo, 'categoria_evento_' . $tid);
-        WS_Data::update_field('acconto', $acconto, 'categoria_evento_' . $tid);
-        if ($citta) WS_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
-        if ($nazione) WS_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
-        if ($indirizzo) WS_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
-        if ($intro) WS_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
-        if ($program) WS_Data::update_field('program', $program, 'categoria_evento_' . $tid);
-        if ($requirements) WS_Data::update_field('requirements', $requirements, 'categoria_evento_' . $tid);
-        if ($important_notes) WS_Data::update_field('important_notes', $important_notes, 'categoria_evento_' . $tid);
+        if ($oggetto_conferma) WSMA_Data::update_field('oggetto_conferma', $oggetto_conferma, 'categoria_evento_' . $tid);
+        if ($mail_conferma) WSMA_Data::update_field('mail_conferma', $mail_conferma, 'categoria_evento_' . $tid);
+        if ($oggetto_t15) WSMA_Data::update_field('oggetto_t15', $oggetto_t15, 'categoria_evento_' . $tid);
+        if ($mail_t15) WSMA_Data::update_field('mail_t15', $mail_t15, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('prezzo', $prezzo, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('acconto', $acconto, 'categoria_evento_' . $tid);
+        if ($citta) WSMA_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
+        if ($nazione) WSMA_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
+        if ($indirizzo) WSMA_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
+        if ($intro) WSMA_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
+        if ($program) WSMA_Data::update_field('program', $program, 'categoria_evento_' . $tid);
+        if ($requirements) WSMA_Data::update_field('requirements', $requirements, 'categoria_evento_' . $tid);
+        if ($important_notes) WSMA_Data::update_field('important_notes', $important_notes, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('fb_share_enabled', $fb_share_enabled, 'categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria creata.', 'id' => $tid]);
     }
@@ -848,6 +913,9 @@ final class WS_Rest_Admin implements WS_Module {
         $tid = (int) $request['id'];
         $nome = sanitize_text_field((string) $request->get_param('nome'));
         if (!$tid || !$nome) return new WP_Error('invalid', 'Nome obbligatorio.', ['status' => 400]);
+        if (!apply_filters('wsma_scope_can_access_categoria', true, $tid)) {
+            return new WP_Error('forbidden', 'Non hai accesso a questa categoria.', ['status' => 403]);
+        }
 
         $url = esc_url_raw((string) $request->get_param('url'));
         $foto_raw = (string) $request->get_param('foto');
@@ -867,49 +935,54 @@ final class WS_Rest_Admin implements WS_Module {
         $program = sanitize_textarea_field((string) $request->get_param('program'));
         $requirements = sanitize_textarea_field((string) $request->get_param('requirements'));
         $important_notes = sanitize_textarea_field((string) $request->get_param('important_notes'));
+        $fb_share_enabled = !empty($request->get_param('fb_share_enabled')) ? 1 : 0;
 
-        wp_update_term($tid, 'categoria_evento', ['name' => $nome]);
-        WS_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
+        wp_update_term($tid, 'wsma_categoria_evento', ['name' => $nome]);
+        WSMA_Data::update_field('url_pagina', $url, 'categoria_evento_' . $tid);
         update_term_meta($tid, 'url_pagina', $url);
         if ($url) {
             $linked_page_id = url_to_postid($url);
             if ($linked_page_id) {
-                $fresh_term = get_term($tid, 'categoria_evento');
+                $fresh_term = get_term($tid, 'wsma_categoria_evento');
                 if ($fresh_term && !is_wp_error($fresh_term)) {
                     $this->ensure_categoria_shortcodes($linked_page_id, $fresh_term->slug);
                 }
             }
         }
-        WS_Data::update_field('foto_categoria', $foto, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('foto_categoria', $foto, 'categoria_evento_' . $tid);
         update_term_meta($tid, 'foto_categoria', $foto);
-        WS_Data::update_field('contesto_ai', $contesto_ai, 'categoria_evento_' . $tid);
-        WS_Data::update_field('tipo_categoria', $tipo, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('contesto_ai', $contesto_ai, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('tipo_categoria', $tipo, 'categoria_evento_' . $tid);
         update_term_meta($tid, 'tipo_categoria', $tipo);
-        WS_Data::update_field('oggetto_conferma', $oggetto_conferma, 'categoria_evento_' . $tid);
-        WS_Data::update_field('mail_conferma', $mail_conferma, 'categoria_evento_' . $tid);
-        WS_Data::update_field('oggetto_t15', $oggetto_t15, 'categoria_evento_' . $tid);
-        WS_Data::update_field('mail_t15', $mail_t15, 'categoria_evento_' . $tid);
-        WS_Data::update_field('prezzo', $prezzo, 'categoria_evento_' . $tid);
-        WS_Data::update_field('acconto', $acconto, 'categoria_evento_' . $tid);
-        WS_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
-        WS_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
-        WS_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
-        WS_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
-        WS_Data::update_field('program', $program, 'categoria_evento_' . $tid);
-        WS_Data::update_field('requirements', $requirements, 'categoria_evento_' . $tid);
-        WS_Data::update_field('important_notes', $important_notes, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('oggetto_conferma', $oggetto_conferma, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('mail_conferma', $mail_conferma, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('oggetto_t15', $oggetto_t15, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('mail_t15', $mail_t15, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('prezzo', $prezzo, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('acconto', $acconto, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('citta', $citta, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('nazione', $nazione, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('indirizzo', $indirizzo, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('intro', $intro, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('program', $program, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('requirements', $requirements, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('important_notes', $important_notes, 'categoria_evento_' . $tid);
+        WSMA_Data::update_field('fb_share_enabled', $fb_share_enabled, 'categoria_evento_' . $tid);
 
         return new WP_REST_Response(['msg' => 'Categoria aggiornata.']);
     }
 
     public function elimina_categoria(WP_REST_Request $request): WP_REST_Response {
         $tid = (int) $request['id'];
-        $term = get_term($tid, 'categoria_evento');
+        if (!apply_filters('wsma_scope_can_access_categoria', true, $tid)) {
+            return new WP_REST_Response(['msg' => 'Non hai accesso a questa categoria.', 'deleted' => false], 403);
+        }
+        $term = get_term($tid, 'wsma_categoria_evento');
         $n = ($term && !is_wp_error($term)) ? (int) $term->count : 0;
         if ($n > 0) {
             return new WP_REST_Response(['msg' => 'Categoria NON eliminata: ci sono ' . $n . ' eventi collegati.', 'deleted' => false]);
         }
-        wp_delete_term($tid, 'categoria_evento');
+        wp_delete_term($tid, 'wsma_categoria_evento');
         return new WP_REST_Response(['msg' => 'Categoria eliminata.', 'deleted' => true]);
     }
 
@@ -934,7 +1007,7 @@ final class WS_Rest_Admin implements WS_Module {
     public function salva_modello_locandina(WP_REST_Request $request): WP_REST_Response {
         $params = $request->get_json_params();
         $id = !empty($params['id']) ? sanitize_key($params['id']) : 'mod_' . uniqid();
-        $nome = !empty($params['nome']) ? sanitize_text_field($params['nome']) : 'Modello ' . date('d/m/Y H:i');
+        $nome = !empty($params['nome']) ? sanitize_text_field($params['nome']) : 'Modello ' . current_time('d/m/Y H:i');
 
         $modelli = $this->get_modelli_locandine_option();
         if (!is_array($modelli)) $modelli = [];
@@ -991,7 +1064,7 @@ final class WS_Rest_Admin implements WS_Module {
             'imgOffsetX' => isset($params['imgOffsetX']) ? (int)$params['imgOffsetX'] : 0,
             'imgOffsetY' => isset($params['imgOffsetY']) ? (int)$params['imgOffsetY'] : 0,
             'darkOverlay' => isset($params['darkOverlay']) ? (float)$params['darkOverlay'] : 0.5,
-            'updated_at' => date('Y-m-d H:i:s'),
+            'updated_at' => current_time('Y-m-d H:i:s'),
         ];
 
         $modelli[$id] = $item;

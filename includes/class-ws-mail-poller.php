@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) exit;
  * Uses the message's real Date header, not the time it was polled —
  * explicitly confirmed as important by the user.
  */
-final class WS_Mail_Poller implements WS_Module {
+final class WSMA_Mail_Poller implements WSMA_Module {
 
     public const CRON_HOOK = 'ws_cron_mail_poll';
     private const LEGACY_CRON_HOOK = 'fvw_cron_mail_poll';
@@ -31,6 +31,7 @@ final class WS_Mail_Poller implements WS_Module {
         add_action('init', [$this, 'ensure_scheduled']);
         add_action(self::CRON_HOOK, [$this, 'poll']);
         add_action('admin_notices', [$this, 'display_admin_notice']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_notice_style']);
     }
 
     /** One-time cleanup of the orphaned pre-rename event, so it doesn't keep firing alongside the new one. */
@@ -40,28 +41,42 @@ final class WS_Mail_Poller implements WS_Module {
         }
     }
 
+    /**
+     * Registered on admin_enqueue_scripts (fires reliably before
+     * WordPress's style-printing point) rather than inside
+     * display_admin_notice() itself — that callback runs on admin_notices,
+     * which is often too late to enqueue a style and have it print. Same
+     * "only on workshop-suite pages, only when there's an error" guard as
+     * the notice itself, so nothing is enqueued needlessly.
+     */
+    public function enqueue_notice_style(): void {
+        if (!current_user_can('manage_options')) return;
+        if (!self::last_error()) return;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page-slug check to decide whether to enqueue a style/notice, no form data is processed here.
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        if (strpos($page, 'workshop-suite') !== 0) return;
+
+        WSMA_Data::enqueue_inline_style(
+            '.ws-mail-poll-error { padding: 10px 14px; border-radius: 6px; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }'
+            . '.ws-mail-poll-error p { margin: 0; font-weight: 600; }'
+            . '.ws-mail-poll-error code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #fca5a5; }'
+        );
+    }
+
     public function display_admin_notice(): void {
         if (!current_user_can('manage_options')) return;
         $error = self::last_error();
         if (!$error) return;
 
-        // Display notice only on Workshop Suite admin pages
-        $page = isset($_GET['page']) ? (string) $_GET['page'] : '';
+        // Display notice only on WSMaker admin pages
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page-slug check to decide whether to enqueue a style/notice, no form data is processed here.
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
         if (strpos($page, 'workshop-suite') !== 0) return;
 
         ?>
-        <style>
-            /* Inline here (not attribute-level) rather than in admin.css: this
-               notice can render on any workshop-suite admin page, and by the
-               time this callback runs admin.css's own enqueue may already be
-               past WordPress's style-printing point for that page. */
-            .ws-mail-poll-error { padding: 10px 14px; border-radius: 6px; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-            .ws-mail-poll-error p { margin: 0; font-weight: 600; }
-            .ws-mail-poll-error code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #fca5a5; }
-        </style>
         <div class="notice notice-error is-dismissible ws-mail-poll-error">
             <p>
-                ⚠️ <?php /* translators: %s: date and time of the last failed poll */ printf(esc_html__('Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:', 'workshop-suite'), esc_html($error['date'] ?? '')); ?>
+                ⚠️ <?php /* translators: %s: date and time of the last failed poll */ printf(esc_html__('Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:', 'wsmaker'), esc_html($error['date'] ?? '')); ?>
                 <code><?php echo esc_html($error['msg'] ?? ''); ?></code>
             </p>
         </div>
@@ -69,7 +84,7 @@ final class WS_Mail_Poller implements WS_Module {
     }
 
     public function add_schedule(array $schedules): array {
-        $schedules['ws_15min'] = ['interval' => 15 * 60, 'display' => 'Ogni 15 minuti (Workshop Suite)'];
+        $schedules['ws_15min'] = ['interval' => 15 * 60, 'display' => 'Ogni 15 minuti (WSMaker)'];
         return $schedules;
     }
 
@@ -81,7 +96,7 @@ final class WS_Mail_Poller implements WS_Module {
 
     /** @return array{processed: int, matched: int, error?: string} */
     public function poll(): array {
-        if (!WS_Mail_Inbox::is_configured()) {
+        if (!WSMA_Mail_Inbox::is_configured()) {
             return ['processed' => 0, 'matched' => 0, 'error' => 'Casella mail non configurata'];
         }
 
@@ -89,10 +104,10 @@ final class WS_Mail_Poller implements WS_Module {
         $matched = 0;
 
         try {
-            $client = WS_Mail_Inbox::build_client();
+            $client = WSMA_Mail_Inbox::build_client();
             $client->connect();
 
-            $folder_name = WS_Mail_Inbox::configured_folder();
+            $folder_name = WSMA_Mail_Inbox::configured_folder();
             $folder = $client->getFolder($folder_name);
             if (!$folder) {
                 throw new \RuntimeException("Cartella IMAP '{$folder_name}' non trovata.");
@@ -105,16 +120,16 @@ final class WS_Mail_Poller implements WS_Module {
                 $from = $message->getFrom();
                 $from_email = $from && isset($from[0]) ? strtolower($from[0]->mail) : '';
                 $subject = (string) $message->getSubject();
-                $body = (string) ($message->getTextBody() ?: strip_tags((string) $message->getHTMLBody()));
+                $body = (string) ($message->getTextBody() ?: wp_strip_all_tags((string) $message->getHTMLBody()));
                 $date_obj = $message->getDate();
                 $date_mysql = $date_obj ? $date_obj->get()->format('Y-m-d H:i:s') : current_time('mysql');
 
                 if ($from_email) {
-                    $pid = WS_Data::find_partecipante_by_email($from_email);
+                    $pid = WSMA_Data::find_partecipante_by_email($from_email);
                     if ($pid) {
                         $isc_id = $this->latest_iscrizione_for($pid);
                         if ($isc_id) {
-                            WS_Data::append_thread($isc_id, 'in', $subject, $body, $date_mysql, true);
+                            WSMA_Data::append_thread($isc_id, 'in', $subject, $body, $date_mysql, true);
                             $matched++;
                         }
                     }
@@ -130,7 +145,10 @@ final class WS_Mail_Poller implements WS_Module {
             return ['processed' => $processed, 'matched' => $matched];
         } catch (\Throwable $e) {
             $err_msg = $e->getMessage();
-            error_log('[WS Mail Poller Error] ' . $err_msg);
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- gated behind WP_DEBUG above; not run in production.
+                error_log('[WS Mail Poller Error] ' . $err_msg);
+            }
             update_option(self::META_LAST_ERROR, [
                 'date' => current_time('mysql'),
                 'msg'  => $err_msg,
@@ -142,7 +160,7 @@ final class WS_Mail_Poller implements WS_Module {
 
     private function latest_iscrizione_for(int $pid): int {
         $q = new WP_Query([
-            'post_type' => 'iscrizione', 'posts_per_page' => 1, 'orderby' => 'date', 'order' => 'DESC', 'fields' => 'ids',
+            'post_type' => 'wsma_iscrizione', 'posts_per_page' => 1, 'orderby' => 'date', 'order' => 'DESC', 'fields' => 'ids', 'no_found_rows' => true,
             'meta_query' => [['key' => 'partecipante', 'value' => $pid, 'compare' => '=']],
         ]);
         return $q->posts ? (int) $q->posts[0] : 0;

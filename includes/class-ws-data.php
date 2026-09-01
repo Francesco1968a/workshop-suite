@@ -11,7 +11,36 @@ if (!defined('ABSPATH')) exit;
  * Contatti" already broke the list panel once this way, by removing
  * wv_stats_partecipante/wv_timeline_partecipante out from under it).
  */
-final class WS_Data {
+final class WSMA_Data {
+
+    /**
+     * Shared handle for one-off inline CSS/JS blocks that previously
+     * printed as raw <style>/<script> tags directly in HTML output —
+     * WP.org guidelines require these go through wp_add_inline_style()/
+     * wp_add_inline_script(), which need a registered handle to attach
+     * to. `false` as the src registers a handle with no actual file,
+     * exactly for this "inline content only" case (a documented core
+     * pattern, not a workaround).
+     */
+    public static function enqueue_inline_style(string $css): void {
+        if (!wp_style_is('ws-inline', 'registered')) {
+            wp_register_style('ws-inline', false);
+        }
+        if (!wp_style_is('ws-inline', 'enqueued')) {
+            wp_enqueue_style('ws-inline');
+        }
+        wp_add_inline_style('ws-inline', $css);
+    }
+
+    public static function enqueue_inline_script(string $js): void {
+        if (!wp_script_is('ws-inline', 'registered')) {
+            wp_register_script('ws-inline', false, [], WSMA_VERSION, true);
+        }
+        if (!wp_script_is('ws-inline', 'enqueued')) {
+            wp_enqueue_script('ws-inline');
+        }
+        wp_add_inline_script('ws-inline', $js);
+    }
 
     public static function get_field(string $field, $id = false) {
         if (function_exists('get_field')) {
@@ -91,7 +120,7 @@ final class WS_Data {
 
     public static function stats_partecipante(int $pid): array {
         $iscrizioni = get_posts([
-            'post_type'      => 'iscrizione',
+            'post_type'      => 'wsma_iscrizione',
             'posts_per_page' => -1,
             'meta_query'     => [['key' => 'partecipante', 'value' => $pid, 'compare' => '=']],
             'orderby'        => 'date',
@@ -125,7 +154,7 @@ final class WS_Data {
 
     public static function timeline_partecipante(int $pid): array {
         $iscrizioni = get_posts([
-            'post_type'      => 'iscrizione',
+            'post_type'      => 'wsma_iscrizione',
             'posts_per_page' => -1,
             'meta_query'     => [['key' => 'partecipante', 'value' => $pid, 'compare' => '=']],
             'no_found_rows'  => true,
@@ -188,7 +217,7 @@ final class WS_Data {
 
     public static function iscrizioni_evento(int $evento_id): array {
         $q = new WP_Query([
-            'post_type' => 'iscrizione', 'posts_per_page' => -1, 'fields' => 'ids', 'orderby' => 'title', 'order' => 'ASC',
+            'post_type' => 'wsma_iscrizione', 'posts_per_page' => -1, 'fields' => 'ids', 'orderby' => 'title', 'order' => 'ASC',
             'meta_query' => [['key' => 'evento', 'value' => $evento_id, 'compare' => '=']], 'no_found_rows' => true,
         ]);
         return $q->posts;
@@ -200,7 +229,7 @@ final class WS_Data {
         if (isset($cache[$evento_id])) return $cache[$evento_id];
 
         $q = new WP_Query([
-            'post_type' => 'iscrizione', 'posts_per_page' => -1, 'fields' => 'ids',
+            'post_type' => 'wsma_iscrizione', 'posts_per_page' => -1, 'fields' => 'ids',
             'meta_query' => ['relation' => 'AND',
                 ['key' => 'evento', 'value' => $evento_id, 'compare' => '='],
                 ['key' => 'stato', 'value' => 'confermato', 'compare' => '=']],
@@ -222,7 +251,7 @@ final class WS_Data {
         if (isset($cache[$evento_id])) return $cache[$evento_id];
 
         $q = new WP_Query([
-            'post_type' => 'iscrizione', 'posts_per_page' => -1, 'fields' => 'ids',
+            'post_type' => 'wsma_iscrizione', 'posts_per_page' => -1, 'fields' => 'ids',
             'meta_query' => ['relation' => 'AND',
                 ['key' => 'evento', 'value' => $evento_id, 'compare' => '='],
                 ['key' => 'stato', 'value' => 'richiesta', 'compare' => '=']],
@@ -246,7 +275,7 @@ final class WS_Data {
     }
 
     public static function evento_concluso(int $evento_id): bool {
-        return self::data_fine($evento_id) < date('Y-m-d');
+        return self::data_fine($evento_id) < current_time('Y-m-d');
     }
 
     public static function format_periodo(int $evento_id): string {
@@ -267,7 +296,7 @@ final class WS_Data {
      */
     public static function find_categoria_by_url(string $url): ?WP_Term {
         $source_norm = untrailingslashit($url);
-        $all_cats = get_terms(['taxonomy' => 'categoria_evento', 'hide_empty' => false]);
+        $all_cats = get_terms(['taxonomy' => 'wsma_categoria_evento', 'hide_empty' => false]);
         if (is_wp_error($all_cats)) return null;
         foreach ($all_cats as $cat) {
             $cat_url = self::get_field('url_pagina', 'categoria_evento_' . $cat->term_id);
@@ -347,7 +376,7 @@ final class WS_Data {
 
     public static function find_iscrizione(int $partecipante_id, int $evento_id): int {
         $q = new WP_Query([
-            'post_type' => 'iscrizione', 'posts_per_page' => 1, 'fields' => 'ids',
+            'post_type' => 'wsma_iscrizione', 'posts_per_page' => 1, 'fields' => 'ids',
             'meta_query' => ['relation' => 'AND',
                 ['key' => 'partecipante', 'value' => $partecipante_id, 'compare' => '='],
                 ['key' => 'evento', 'value' => $evento_id, 'compare' => '=']],
@@ -358,7 +387,7 @@ final class WS_Data {
 
     public static function find_iscrizione_corso(int $partecipante_id, int $corso_id): int {
         $q = new WP_Query([
-            'post_type' => 'iscrizione', 'posts_per_page' => 1, 'fields' => 'ids',
+            'post_type' => 'wsma_iscrizione', 'posts_per_page' => 1, 'fields' => 'ids',
             'meta_query' => ['relation' => 'AND',
                 ['key' => 'partecipante', 'value' => $partecipante_id, 'compare' => '='],
                 ['key' => 'corso', 'value' => $corso_id, 'compare' => '=']],
@@ -371,14 +400,14 @@ final class WS_Data {
         $email = sanitize_email($email);
         if (!$email) return 0;
         $q = new WP_Query([
-            'post_type' => 'partecipante', 'posts_per_page' => 1, 'fields' => 'ids',
+            'post_type' => 'wsma_partecipante', 'posts_per_page' => 1, 'fields' => 'ids',
             'meta_query' => [['key' => 'email', 'value' => $email, 'compare' => '=']], 'no_found_rows' => true,
         ]);
         return (int) ($q->posts[0] ?? 0);
     }
 
     public static function evento_label(int $evento_id): string {
-        $terms = get_the_terms($evento_id, 'categoria_evento');
+        $terms = get_the_terms($evento_id, 'wsma_categoria_evento');
         $cat = $terms ? $terms[0]->name : '—';
         return $cat . ' – ' . self::format_periodo($evento_id);
     }
@@ -387,36 +416,36 @@ final class WS_Data {
     public static function render_template(string $template, int $iscrizione_id): string {
         if (!$template) return '';
 
-        $pid = (int) get_field('partecipante', $iscrizione_id);
-        $eid = (int) get_field('evento', $iscrizione_id);
+        $pid = (int) self::get_field('partecipante', $iscrizione_id);
+        $eid = (int) self::get_field('evento', $iscrizione_id);
 
-        $nome = $pid ? get_field('nome', $pid) : '';
-        $cognome = $pid ? get_field('cognome', $pid) : '';
-        $email = $pid ? get_field('email', $pid) : '';
-        $telefono = $pid ? get_field('telefono', $pid) : '';
-        $citta = $pid ? get_field('citta', $pid) : '';
+        $nome = $pid ? self::get_field('nome', $pid) : '';
+        $cognome = $pid ? self::get_field('cognome', $pid) : '';
+        $email = $pid ? self::get_field('email', $pid) : '';
+        $telefono = $pid ? self::get_field('telefono', $pid) : '';
+        $citta = $pid ? self::get_field('citta', $pid) : '';
 
-        $terms = $eid ? get_the_terms($eid, 'categoria_evento') : null;
+        $terms = $eid ? get_the_terms($eid, 'wsma_categoria_evento') : null;
         $categoria_nome = $terms ? $terms[0]->name : '';
-        $categoria_url = $terms ? get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id) : '';
+        $categoria_url = $terms ? self::get_field('url_pagina', 'categoria_evento_' . $terms[0]->term_id) : '';
 
-        $d1 = $eid ? get_field('data_evento', $eid) : '';
-        $d2 = $eid ? (get_field('data_fine', $eid) ?: $d1) : '';
+        $d1 = $eid ? self::get_field('data_evento', $eid) : '';
+        $d2 = $eid ? (self::get_field('data_fine', $eid) ?: $d1) : '';
         $data_inizio = $d1 ? date_i18n('j F Y', strtotime($d1)) : '';
         $data_fine = $d2 ? date_i18n('j F Y', strtotime($d2)) : '';
-        $ora_inizio = $eid ? get_field('ora_inizio', $eid) : '';
-        $ora_fine = $eid ? get_field('ora_fine', $eid) : '';
+        $ora_inizio = $eid ? self::get_field('ora_inizio', $eid) : '';
+        $ora_fine = $eid ? self::get_field('ora_fine', $eid) : '';
         $periodo = $eid ? self::format_periodo($eid) : '';
 
         $s = $eid ? self::stato_posti($eid) : ['totali' => 0, 'disponibili' => 0];
-        $anticipo = (float) get_field('anticipo', $iscrizione_id);
-        $saldo = (float) get_field('saldo', $iscrizione_id);
-        $msg_orig = get_field('messaggio_originale', $iscrizione_id) ?: get_field('note', $iscrizione_id);
+        $anticipo = (float) self::get_field('anticipo', $iscrizione_id);
+        $saldo = (float) self::get_field('saldo', $iscrizione_id);
+        $msg_orig = self::get_field('messaggio_originale', $iscrizione_id) ?: self::get_field('note', $iscrizione_id);
 
         // {luogo} resolves to the meeting link for virtual events and the
         // physical address otherwise — same placeholder, different content,
         // so mail templates don't need a modalità-specific variant.
-        $modalita = $eid ? (get_field('modalita', $eid) ?: 'fisico') : 'fisico';
+        $modalita = $eid ? (self::get_field('modalita', $eid) ?: 'fisico') : 'fisico';
         if ($modalita === 'virtuale') {
             // For Jitsi (embedded), point to our own [ws_aula_virtuale] page
             // instead of the raw meet.jit.si URL — same "no visible YouTube/
@@ -426,9 +455,9 @@ final class WS_Data {
             $aula_page_id = $eid ? (int) get_post_meta($eid, '_ws_aula_page_id', true) : 0;
             $luogo = ($aula_page_id && get_post_status($aula_page_id) === 'publish')
                 ? get_permalink($aula_page_id)
-                : (string) get_field('link_virtuale', $eid);
+                : (string) self::get_field('link_virtuale', $eid);
         } else {
-            $luogo = (string) get_field('indirizzo_geocoding', $eid);
+            $luogo = (string) self::get_field('indirizzo_geocoding', $eid);
         }
 
         $placeholders = [
@@ -442,7 +471,15 @@ final class WS_Data {
             '{saldo}' => '€ ' . number_format($saldo, 2, ',', '.'),
             '{messaggio_originale}' => $msg_orig,
             '{luogo}' => $luogo,
+            // Empty by default — PRO's Stripe connector fills this in via
+            // the filter below when a deposit/balance is actually due and
+            // no WooCommerce product already owns this event's payment
+            // (mirrors the wsma_iscrizione_created generic-hook convention:
+            // core has no idea Stripe exists).
+            '{link_pagamento}' => '',
         ];
+
+        $placeholders = apply_filters('wsma_confirmation_placeholders', $placeholders, $iscrizione_id);
 
         return strtr($template, $placeholders);
     }
@@ -482,18 +519,18 @@ final class WS_Data {
     public static function genera_ics(int $evento_id): string {
         if (!$evento_id) return '';
 
-        $data_inizio = get_field('data_evento', $evento_id);
-        $data_fine = get_field('data_fine', $evento_id) ?: $data_inizio;
-        $ora_inizio = get_field('ora_inizio', $evento_id) ?: '09:00';
-        $ora_fine = get_field('ora_fine', $evento_id) ?: '18:00';
+        $data_inizio = self::get_field('data_evento', $evento_id);
+        $data_fine = self::get_field('data_fine', $evento_id) ?: $data_inizio;
+        $ora_inizio = self::get_field('ora_inizio', $evento_id) ?: '09:00';
+        $ora_fine = self::get_field('ora_fine', $evento_id) ?: '18:00';
 
         if (!$data_inizio) return '';
 
-        $terms = get_the_terms($evento_id, 'categoria_evento');
+        $terms = get_the_terms($evento_id, 'wsma_categoria_evento');
         $cat_name = $terms ? $terms[0]->name : 'Workshop';
 
-        $dtstart = date('Ymd\THis', strtotime($data_inizio . ' ' . $ora_inizio));
-        $dtend = date('Ymd\THis', strtotime($data_fine . ' ' . $ora_fine));
+        $dtstart = wp_date('Ymd\THis', strtotime($data_inizio . ' ' . $ora_inizio));
+        $dtend = wp_date('Ymd\THis', strtotime($data_fine . ' ' . $ora_fine));
         $uid = 'wv-evento-' . $evento_id . '@francescoverolino.com';
         $dtstamp = gmdate('Ymd\THis\Z');
 
@@ -520,14 +557,14 @@ final class WS_Data {
     }
 
     public static function format_data(int $evento_id): string {
-        $d = get_field('data_evento', $evento_id);
+        $d = self::get_field('data_evento', $evento_id);
         return $d ? date_i18n('D d M Y', strtotime($d)) : '';
     }
 
     /** @return int[] iscrizione IDs */
     public static function iscrizioni_partecipante(int $partecipante_id): array {
         $q = new WP_Query([
-            'post_type' => 'iscrizione', 'posts_per_page' => -1, 'fields' => 'ids',
+            'post_type' => 'wsma_iscrizione', 'posts_per_page' => -1, 'fields' => 'ids',
             'meta_query' => [['key' => 'partecipante', 'value' => $partecipante_id, 'compare' => '=']], 'no_found_rows' => true,
         ]);
         return $q->posts;
@@ -623,7 +660,7 @@ final class WS_Data {
         if ($existing) return $existing;
 
         $isc_id = wp_insert_post([
-            'post_type'   => 'iscrizione',
+            'post_type'   => 'wsma_iscrizione',
             'post_title'  => 'iscr-corso-' . $partecipante_id . '-' . $course_id,
             'post_status' => 'publish',
         ]);
@@ -693,7 +730,7 @@ final class WS_Data {
      */
     public static function resolve_course_visitor(): int {
         if (empty($_COOKIE['ws_course_auth'])) return 0;
-        $parts = explode('|', (string) $_COOKIE['ws_course_auth'], 2);
+        $parts = explode('|', sanitize_text_field(wp_unslash($_COOKIE['ws_course_auth'])), 2);
         if (count($parts) !== 2) return 0;
         [$pid_str, $sig] = $parts;
         $pid = (int) $pid_str;
@@ -703,7 +740,7 @@ final class WS_Data {
 
     /**
      * Builds the one-time access link and sends it via the same direct-SMTP
-     * channel conferma_iscrizione() uses (WS_Mail_Inbox::send_reply()),
+     * channel conferma_iscrizione() uses (WSMA_Mail_Inbox::send_reply()),
      * logging to wv_thread the same way. $iscrizione_id (if it already
      * exists for this partecipante+corso) is only used to resolve a nicer
      * {nome}/{corso_titolo} via render_template_corso() and to log the
@@ -725,7 +762,7 @@ final class WS_Data {
         $subject = self::render_template_corso($default_subject, $iscrizione_id, ['{link_accesso}' => $link]);
         $body = self::render_template_corso($default_body, $iscrizione_id, ['{link_accesso}' => $link]);
 
-        $result = WS_Mail_Inbox::send_reply($email, $subject, $body);
+        $result = WSMA_Mail_Inbox::send_reply($email, $subject, $body);
         if ($result['ok'] && $iscrizione_id) {
             self::append_thread($iscrizione_id, 'out', $subject, $body);
         }
@@ -741,7 +778,7 @@ final class WS_Data {
      * the same event, so a second call is a safe no-op.
      */
     public static function grant_course_access_after_payment(int $iscrizione_id, float $amount_paid): void {
-        if (get_post_type($iscrizione_id) !== 'iscrizione') return;
+        if (get_post_type($iscrizione_id) !== 'wsma_iscrizione') return;
         if (self::get_field('tipo_iscrizione', $iscrizione_id) !== 'corso') return;
         if (self::get_field('stato', $iscrizione_id) === 'confermato') return;
 
