@@ -7,11 +7,11 @@ const props = defineProps({
 const emit = defineEmits(['message']);
 
 function apiUrl(path) {
-  return window.WS_CONFIG.restUrl + path;
+  return window.WSMA_CONFIG.restUrl + path;
 }
 
 function headers(extra = {}) {
-  return { 'X-WP-Nonce': window.WS_CONFIG.nonce, ...extra };
+  return { 'X-WP-Nonce': window.WSMA_CONFIG.nonce, ...extra };
 }
 
 // ───────────────────────── AI draft (optional — inert unless the PRO
@@ -112,7 +112,7 @@ const editCat = ref(0);
 const savingCategoria = ref(false);
 
 function emptyCatForm() {
-  return { nome: '', url: '', foto: '', tipo: '', oggetto_conferma: '', mail_conferma: '', oggetto_t15: '', mail_t15: '', prezzo: 0, acconto: 0, citta: '', nazione: '', indirizzo: '', intro: '', program: '', requirements: '', important_notes: '' };
+  return { nome: '', url: '', foto: '', tipo: '', oggetto_conferma: '', mail_conferma: '', oggetto_t15: '', mail_t15: '', prezzo: 0, acconto: 0, citta: '', nazione: '', indirizzo: '', intro: '', program: '', requirements: '', important_notes: '', fb_share_enabled: false };
 }
 const catForm = reactive(emptyCatForm());
 
@@ -161,7 +161,7 @@ function onCatFile(e) {
   reader.readAsDataURL(file);
 }
 
-async function submitCategoria() {
+async function submitCategoria(keepOpen = false) {
   savingCategoria.value = true;
   try {
     const editing = !!editingCategoria.value;
@@ -176,7 +176,14 @@ async function submitCategoria() {
       return;
     }
     emit('message', data.msg);
-    navigate({ vista: 'categorie' });
+    // "Crea categoria" (not yet editing) always closes back to the list —
+    // there's no existing edit_cat to stay on. Only an in-progress edit
+    // can choose to stay open on the same categoria after saving.
+    if (keepOpen && editing) {
+      navigate({ vista: 'categorie', edit_cat: editCat.value });
+    } else {
+      navigate({ vista: 'categorie' });
+    }
   } finally {
     savingCategoria.value = false;
   }
@@ -278,7 +285,7 @@ onMounted(() => {
   <div v-if="sub === 'categorie'" class="wv-dash">
     <template v-if="!loadingCat">
       <h3>{{ editingCategoria ? 'Modifica categoria' : 'Crea categoria' }}</h3>
-      <form @submit.prevent="submitCategoria">
+      <form @submit.prevent="submitCategoria(true)">
         <div class="wv-field"><label>Nome (es. NapoliVelata)</label><input type="text" v-model="catForm.nome" required /></div>
 
         <div class="wv-field">
@@ -292,6 +299,13 @@ onMounted(() => {
         <div class="wv-field"><label>Città <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="city"]</code></label><input type="text" v-model="catForm.citta" placeholder="Napoli" /></div>
         <div class="wv-field"><label>Nazione <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="country"]</code></label><input type="text" v-model="catForm.nazione" placeholder="Italia" /></div>
         <div class="wv-field"><label>Indirizzo (opzionale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[ws_workshop_text field="address"]</code></label><input type="text" v-model="catForm.indirizzo" placeholder="Via/Piazza..." /></div>
+
+        <div class="wv-field">
+          <label>
+            <input type="checkbox" v-model="catForm.fb_share_enabled" style="margin-right: 6px" />
+            Consenti condivisione su Facebook per gli eventi di questa categoria
+          </label>
+        </div>
 
         <div class="wv-field">
           <label>Pagina di presentazione (Seleziona pagina o inserisci URL)</label>
@@ -374,6 +388,7 @@ onMounted(() => {
 
         <div class="wv-form-actions">
           <button type="submit" :disabled="savingCategoria">{{ editingCategoria ? 'Salva modifiche' : 'Crea categoria' }}</button>
+          <button v-if="editingCategoria" type="button" class="wv-btn" :disabled="savingCategoria" @click="submitCategoria(false)">Salva e chiudi</button>
           <a v-if="editingCategoria" class="wv-btn wv-btn-ghost" @click="navigate({ vista: 'categorie' })">Annulla</a>
         </div>
       </form>

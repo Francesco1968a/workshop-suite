@@ -1,0 +1,143 @@
+        .ws-bio-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            max-width: 680px;
+            margin: 24px auto;
+            font-family: inherit;
+            color: #1e293b;
+        }
+        .ws-bio-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+        .ws-bio-avatar-wrap {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid #2271b1;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ws-bio-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .ws-bio-avatar-placeholder {
+            font-size: 32px;
+            color: #94a3b8;
+        }
+        .ws-bio-titles {
+            flex: 1;
+        }
+        .ws-bio-name {
+            margin: 0 0 4px 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .ws-bio-role {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2271b1;
+            margin-bottom: 4px;
+        }
+        .ws-bio-location {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+        .ws-bio-languages {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .ws-bio-lang-badge {
+            font-size: 11px;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .ws-bio-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #334155;
+            margin-bottom: 20px;
+            padding-top: 14px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .ws-bio-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .ws-bio-socials {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .ws-bio-social-btn {
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            text-decoration: none;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+        .ws-bio-social-btn:hover {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+        .ws-bio-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .ws-bio-action-btn {
+            display: inline-flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+        .ws-bio-site-btn {
+            background: #2271b1;
+            color: #ffffff;
+        }
+        .ws-bio-site-btn:hover {
+            background: #135e96;
+            color: #ffffff;
+        }
+        .ws-bio-wa-btn {
+            background: #25d366;
+            color: #ffffff;
+        }
+        .ws-bio-wa-btn:hover {
+            background: #1ebe57;
+            color: #ffffff;
+        }

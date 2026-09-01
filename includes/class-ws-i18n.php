@@ -232,7 +232,7 @@ final class WSMA_I18n implements WSMA_Module {
         $lang = self::get_current_language();
         $dict = self::get_dictionary($lang);
 
-        wp_localize_script($handle, 'WS_I18N', [
+        wp_localize_script($handle, 'WSMA_I18N', [
             'lang' => $lang,
             'dict' => $dict,
         ]);

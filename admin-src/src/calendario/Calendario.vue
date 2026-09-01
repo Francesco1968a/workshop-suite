@@ -7,15 +7,33 @@ const url = ref('');
 const webcal = ref('');
 const eventi = ref([]);
 const urlInput = ref(null);
+const revoking = ref(false);
 
 async function load() {
-  const res = await fetch(window.WS_CONFIG.restUrl + 'calendario', {
-    headers: { 'X-WP-Nonce': window.WS_CONFIG.nonce },
+  const res = await fetch(window.WSMA_CONFIG.restUrl + 'calendario', {
+    headers: { 'X-WP-Nonce': window.WSMA_CONFIG.nonce },
   });
   const data = await res.json();
   url.value = data.url;
   webcal.value = data.webcal;
   eventi.value = data.eventi || [];
+}
+
+async function revokeToken() {
+  if (!window.confirm('Il link attuale smetterà di funzionare: ogni calendario già collegato (Apple/Google/Zoho...) andrà ricollegato con il nuovo URL. Continuare?')) return;
+  revoking.value = true;
+  try {
+    const res = await fetch(window.WSMA_CONFIG.restUrl + 'calendario/revoca-token', {
+      method: 'POST',
+      headers: { 'X-WP-Nonce': window.WSMA_CONFIG.nonce },
+    });
+    const data = await res.json();
+    url.value = data.url;
+    webcal.value = data.webcal;
+    showToast('Token rigenerato — il vecchio link non funziona più');
+  } finally {
+    revoking.value = false;
+  }
 }
 
 async function copyUrl() {
@@ -58,7 +76,17 @@ onMounted(load);
           <div class="hint">
             Il bottone <strong>Aggiungi</strong> apre il tuo calendario di sistema (su iPhone/Mac →
             Apple Calendar, su Windows → Outlook).<br />
-            Per Google Calendar usa <strong>Copia</strong> + istruzioni sotto.
+            Per Google Calendar/Zoho Calendar usa <strong>Copia</strong> + istruzioni sotto.
+          </div>
+          <div class="hint token-box">
+            L'URL contiene un token legato al tuo account: chi lo conosce vede nome/telefono/email
+            degli iscritti di ogni evento. Se pensi sia trapelato, rigeneralo — il vecchio link
+            smette subito di funzionare.
+            <div style="margin-top: 8px">
+              <button type="button" class="btn" :disabled="revoking" @click="revokeToken">
+                🔄 {{ revoking ? 'Rigenerazione…' : 'Rigenera token' }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -98,6 +126,27 @@ onMounted(load);
             (non puoi cambiarlo). Per realtime su Google ci vuole l'integrazione API → un altro
             snippet.<br />
             Una volta aggiunto, lo vedi anche sull'app Google Calendar di telefono e tablet.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📇 Zoho Calendar</h3>
+          <ol>
+            <li>
+              Apri
+              <a href="https://calendar.zoho.com" target="_blank" class="link-accent"
+                >calendar.zoho.com</a
+              >.
+            </li>
+            <li>
+              Icona <strong>+</strong> accanto a "Altri calendari" → <strong>Aggiungi tramite
+              URL</strong> (Add by URL / Sottoscrivi da URL, a seconda della lingua).
+            </li>
+            <li>Incolla l'URL → conferma.</li>
+          </ol>
+          <div class="hint">
+            Anche qui l'aggiornamento è periodico (non istantaneo): Zoho ricontrolla il feed a
+            intervalli propri, non modificabili da qui.
           </div>
         </div>
       </div>
@@ -224,6 +273,12 @@ onMounted(load);
   margin-top: 14px;
 }
 
+.token-box {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #dcdcde;
+}
+
 .link-accent {
   color: #2271b1;
 }
@@ -280,6 +335,10 @@ onMounted(load);
 
 .ws-theme-dark .hint {
   color: rgba(255, 255, 255, 0.5);
+}
+
+.ws-theme-dark .token-box {
+  border-top-color: rgba(255, 255, 255, 0.12);
 }
 
 .ws-theme-dark .link-accent {

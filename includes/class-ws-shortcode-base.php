@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) exit;
  * Centralises the repeated enqueue + script_loader_tag pattern that was
  * copy-pasted verbatim across 8 shortcode classes. Each concrete shortcode
  * only needs to declare its handle, asset paths, shortcode tag(s), and
- * override extra_config() if it needs additional WS_CONFIG keys.
+ * override extra_config() if it needs additional WSMA_CONFIG keys.
  *
  * The single add_filter('script_loader_tag', ...) is registered here once
  * per handle — not once per class instance — so it fires only once per
@@ -33,7 +33,7 @@ abstract class WSMA_Shortcode_Base implements WSMA_Module {
     abstract protected function app_id(): string;
 
     /**
-     * Additional WS_CONFIG keys beyond restUrl and nonce.
+     * Additional WSMA_CONFIG keys beyond restUrl and nonce.
      * Override in subclass when needed (e.g. defaultTheme, brandName).
      *
      * @return array<string, mixed>
@@ -130,7 +130,7 @@ abstract class WSMA_Shortcode_Base implements WSMA_Module {
             'nonce'   => wp_create_nonce('wp_rest'),
         ], $this->extra_config());
 
-        wp_localize_script($handle, 'WS_CONFIG', $config);
+        wp_localize_script($handle, 'WSMA_CONFIG', $config);
         WSMA_I18n::localize($handle);
 
         // Frontend-only theming: the wp-admin dashboard pages never go

@@ -19,11 +19,11 @@ watch(selected, (c) => {
 });
 
 function apiUrl(path) {
-  return window.WS_CONFIG.restUrl + path;
+  return window.WSMA_CONFIG.restUrl + path;
 }
 
 function headers(extra = {}) {
-  return { 'X-WP-Nonce': window.WS_CONFIG.nonce, ...extra };
+  return { 'X-WP-Nonce': window.WSMA_CONFIG.nonce, ...extra };
 }
 
 function flash(text) {
@@ -59,6 +59,26 @@ async function conferma() {
       return;
     }
     flash(c.nome + ' confermato.');
+    load();
+  } finally {
+    sending.value.delete(c.isc_id);
+  }
+}
+
+async function eliminaConversazione() {
+  const c = selected.value;
+  if (!c) return;
+  if (!confirm(`Eliminare definitivamente la conversazione con ${c.nome}? L'iscrizione e tutto lo storico verranno cancellati.`)) return;
+  sending.value.add(c.isc_id);
+  try {
+    const res = await fetch(apiUrl('riepilogo/iscrizione/' + c.isc_id), { method: 'DELETE', headers: headers() });
+    const data = await res.json();
+    if (!res.ok) {
+      flash(data.message || 'Impossibile eliminare.');
+      return;
+    }
+    selectedId.value = 0;
+    flash('Conversazione eliminata.');
     load();
   } finally {
     sending.value.delete(c.isc_id);
@@ -241,6 +261,14 @@ onMounted(load);
               @click="inviaT15"
             >
               Invia promemoria T-15
+            </button>
+            <button
+              class="wv-btn wv-btn-ghost wv-btn-danger"
+              :disabled="sending.has(selected.isc_id)"
+              @click="eliminaConversazione"
+              style="margin-left: auto;"
+            >
+              Elimina
             </button>
           </div>
         </template>
@@ -499,6 +527,16 @@ onMounted(load);
   background: #f0f0f1;
 }
 
+.wv-dash .wv-btn-danger {
+  color: #d63638;
+  border-color: #d63638;
+}
+
+.wv-dash .wv-btn-danger:hover:not(:disabled) {
+  background: #d63638;
+  color: #fff;
+}
+
 /* Frontend dark theme — see WS_Shortcode_Base::render(). */
 .ws-theme-dark .wvm {
   color: #fff;
@@ -597,5 +635,15 @@ onMounted(load);
 
 .ws-theme-dark .wv-dash .wv-btn-ghost:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.ws-theme-dark .wv-dash .wv-btn-danger {
+  color: #ff8a8a;
+  border-color: #ff8a8a;
+}
+
+.ws-theme-dark .wv-dash .wv-btn-danger:hover:not(:disabled) {
+  background: #d63638;
+  color: #fff;
 }
 </style>

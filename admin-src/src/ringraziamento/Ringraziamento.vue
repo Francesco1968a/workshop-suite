@@ -10,11 +10,11 @@ const busy = ref(new Set());
 const msg = ref('');
 
 function apiUrl(path) {
-  return window.WS_CONFIG.restUrl + path;
+  return window.WSMA_CONFIG.restUrl + path;
 }
 
 function headers(extra = {}) {
-  return { 'X-WP-Nonce': window.WS_CONFIG.nonce, ...extra };
+  return { 'X-WP-Nonce': window.WSMA_CONFIG.nonce, ...extra };
 }
 
 function flash(text) {

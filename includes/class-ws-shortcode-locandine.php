@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) exit;
 
 /**
  * Shortcode & Admin Page module for Locandine Generator ([workshop_locandine]).
- * Passes extra WS_CONFIG keys: defaultTheme and brandName.
+ * Passes extra WSMA_CONFIG keys: defaultTheme and brandName.
  */
 final class WSMA_Shortcode_Locandine extends WSMA_Shortcode_Base {
 

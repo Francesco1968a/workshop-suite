@@ -9,8 +9,8 @@ import CategorieTipiTab from './CategorieTipiTab.vue';
 // WS_Shortcode_Categorie passes an explicit panelMode config flag instead
 // — see includes/class-ws-shortcode-categorie.php.
 const page = new URL(window.location.href).searchParams.get('page');
-const isCatPage = page === 'workshop-suite-categorie' || window.WS_CONFIG?.panelMode === 'categorie';
-const isVirtualPage = window.WS_CONFIG?.panelMode === 'virtuale';
+const isCatPage = page === 'workshop-suite-categorie' || window.WSMA_CONFIG?.panelMode === 'categorie';
+const isVirtualPage = window.WSMA_CONFIG?.panelMode === 'virtuale';
 const tabs = isCatPage
   ? { categorie: 'Categorie', tipologia: 'Tipologia' }
   : isVirtualPage

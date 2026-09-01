@@ -292,7 +292,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
         }
     }
 
-    /** Enqueues one Vue bundle's JS/CSS + WS_CONFIG, without emitting any markup. */
+    /** Enqueues one Vue bundle's JS/CSS + WSMA_CONFIG, without emitting any markup. */
     private function enqueue_panel_assets(string $handle, string $js_file, string $css_file, array $extra_config = []): void {
         $asset_js  = WSMA_PATH . $js_file;
         $asset_css = WSMA_PATH . $css_file;
@@ -332,7 +332,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
             'nonce'         => wp_create_nonce('wp_rest'),
             'brandName'     => WSMA_Settings::get('site_brand_name', 'WSMaker'),
         ], $extra_config);
-        wp_localize_script($handle, 'WS_CONFIG', $config);
+        wp_localize_script($handle, 'WSMA_CONFIG', $config);
     }
 
     private function render_panel_wrapper(string $app_id, string $handle, string $js_file, string $css_file, array $extra_config = []): void {

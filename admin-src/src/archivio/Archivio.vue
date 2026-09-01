@@ -7,7 +7,7 @@ const anno = ref(0);
 const loading = ref(false);
 
 function apiUrl(path) {
-  return window.WS_CONFIG.restUrl + path;
+  return window.WSMA_CONFIG.restUrl + path;
 }
 
 async function load() {
@@ -15,7 +15,7 @@ async function load() {
   try {
     const url = new URL(apiUrl('archivio'));
     if (anno.value) url.searchParams.set('anno', anno.value);
-    const res = await fetch(url, { headers: { 'X-WP-Nonce': window.WS_CONFIG.nonce } });
+    const res = await fetch(url, { headers: { 'X-WP-Nonce': window.WSMA_CONFIG.nonce } });
     const data = await res.json();
     eventi.value = data.eventi;
     anni.value = data.anni;

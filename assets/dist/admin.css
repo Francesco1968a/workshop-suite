@@ -635,6 +635,18 @@
 .ws-mod-card--locked { border-color:#e2e8f0;background:#f8fafc; }
 .ws-mod-card--active { border-color:#2563eb;background:#ffffff; }
 .ws-mod-card--inactive { border-color:#cbd5e1;background:#ffffff; }
+.ws-mod-card--pro.ws-mod-card--active { border-color:#7c3aed;background:#f5f3ff; }
+.ws-mod-card--pro.ws-mod-card--inactive { border-color:#c4b5fd;background:#faf5ff; }
+.ws-mod-card--academy.ws-mod-card--active,
+.ws-mod-card--academy.ws-mod-card--inactive { border-color:#ff6608;background:#000000; }
+.ws-mod-card--academy .ws-pro-badge--unlocked { background:#000000;color:#ff6608;border-color:#ff6608; }
+.ws-mod-card--academy .ws-mod-title,
+.ws-mod-card--academy .ws-mod-title--locked { color:#ffffff; }
+.ws-mod-card--academy .ws-s21 { color:#ffffff; }
+.ws-mod-card--academy .ws-s19 { background:#000000;color:#ff6608;border:1px solid #ff6608; }
+.ws-mod-card--academy .ws-s23 { color:#ff6608; }
+.ws-mod-card--academy .ws-mod-status--active,
+.ws-mod-card--academy .ws-mod-status--inactive { color:#ff6608; }
 
 .ws-pro-badge { font-size:10px;font-weight:800;letter-spacing:0.5px;padding:3px 8px;border-radius:4px;border:1px solid; }
 .ws-pro-badge--unlocked { background:#ecfdf5;color:#065f46;border-color:#a7f3d0; }
@@ -657,6 +669,7 @@
 .ws-sc-badge { display:inline-block;margin-top:4px;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:600;text-transform:uppercase; }
 .ws-sc-badge--admin { background:#fff8e5;color:#8c5b00;border:1px solid #f0c33c; }
 .ws-sc-badge--default { background:#edfaef;color:#008a20;border:1px solid #c3e6cb; }
+.ws-sc-badge--pro { background:#fff1e8;color:#ff6608;border:1px solid #ffcaa8; }
 
 /* Onboarding wizard */
 .ws-wizard-wrap { display:flex; justify-content:center; padding-top:40px; }

@@ -16,9 +16,9 @@ const haTodo = computed(() => {
 
 async function load() {
   loading.value = true;
-  const url = new URL(window.WS_CONFIG.restUrl + 'riepilogo/cockpit');
+  const url = new URL(window.WSMA_CONFIG.restUrl + 'riepilogo/cockpit');
   if (mostraTutti.value) url.searchParams.set('tutti', '1');
-  const res = await fetch(url, { headers: { 'X-WP-Nonce': window.WS_CONFIG.nonce } });
+  const res = await fetch(url, { headers: { 'X-WP-Nonce': window.WSMA_CONFIG.nonce } });
   data.value = await res.json();
   loading.value = false;
 }
@@ -110,6 +110,36 @@ onMounted(() => {
               <span class="lbl">Mail AI inviate</span>
               <span class="val">{{ data.stats30.mail_ai_30 }}</span>
             </a>
+          </div>
+        </div>
+
+        <div v-if="data.pro_stats" class="wvr-section">
+          <h3>📊 Statistiche <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.5px; background: #7c3aed; color: #fff; padding: 2px 7px; border-radius: 4px; vertical-align: middle;">PRO</span></h3>
+          <div class="wvr-stat-list">
+            <div class="wvr-stat-row">
+              <span class="lbl">Incassato (30gg)</span>
+              <span class="val">{{ data.pro_stats.revenue30_label }}</span>
+            </div>
+            <div class="wvr-stat-row">
+              <span class="lbl">Incassato (totale)</span>
+              <span class="val">{{ data.pro_stats.revenue_total_label }}</span>
+            </div>
+          </div>
+          <div v-if="data.pro_stats.revenue_by_category?.length" class="wvr-stat-list" style="margin-top: 10px">
+            <div v-for="c in data.pro_stats.revenue_by_category" :key="c.nome" class="wvr-stat-row">
+              <span class="lbl">{{ c.nome }}</span>
+              <span class="val">{{ c.label }}</span>
+            </div>
+          </div>
+          <div v-if="data.pro_stats.marketing" class="wvr-stat-list" style="margin-top: 10px">
+            <div class="wvr-stat-row">
+              <span class="lbl">🎁 Coupon emessi / usati</span>
+              <span class="val">{{ data.pro_stats.marketing.coupon_emessi }} / {{ data.pro_stats.marketing.coupon_usati }}</span>
+            </div>
+            <div class="wvr-stat-row">
+              <span class="lbl">Sconto totale concesso</span>
+              <span class="val">{{ data.pro_stats.marketing.sconto_totale_label }}</span>
+            </div>
           </div>
         </div>
       </aside>

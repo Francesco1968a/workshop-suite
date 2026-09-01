@@ -13,11 +13,11 @@ const toast = ref('');
 const toastType = ref('success');
 
 function apiUrl(path) {
-  return window.WS_CONFIG.restUrl + path;
+  return window.WSMA_CONFIG.restUrl + path;
 }
 
 async function apiGet(path) {
-  const res = await fetch(apiUrl(path), { headers: { 'X-WP-Nonce': window.WS_CONFIG.nonce } });
+  const res = await fetch(apiUrl(path), { headers: { 'X-WP-Nonce': window.WSMA_CONFIG.nonce } });
   if (!res.ok) throw new Error('request failed');
   return res.json();
 }
@@ -25,7 +25,7 @@ async function apiGet(path) {
 async function apiPost(path, body) {
   const res = await fetch(apiUrl(path), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': window.WS_CONFIG.nonce },
+    headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': window.WSMA_CONFIG.nonce },
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error('request failed');

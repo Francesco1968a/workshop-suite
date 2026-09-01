@@ -18,11 +18,11 @@ const noteText = ref('');
 const salvandoNote = ref(false);
 
 function apiUrl(path) {
-  return window.WS_CONFIG.restUrl + path;
+  return window.WSMA_CONFIG.restUrl + path;
 }
 
 function headers(extra = {}) {
-  return { 'X-WP-Nonce': window.WS_CONFIG.nonce, ...extra };
+  return { 'X-WP-Nonce': window.WSMA_CONFIG.nonce, ...extra };
 }
 
 async function load() {
@@ -104,6 +104,20 @@ async function elimina(isc) {
   }
 }
 
+const fbCopiato = ref(false);
+
+async function preparaEventoFacebook() {
+  try {
+    await navigator.clipboard.writeText(data.value.fb_share_text || '');
+  } catch (e) {
+    // Clipboard API can fail (permessi negati, contesto non sicuro): l'apertura
+    // della pagina Facebook resta comunque utile anche senza copia riuscita.
+  }
+  fbCopiato.value = true;
+  window.open('https://www.facebook.com/events/create/', '_blank', 'noopener');
+  setTimeout(() => { fbCopiato.value = false; }, 3000);
+}
+
 function euro(n) {
   return '€ ' + Number(n).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -166,6 +180,9 @@ onMounted(load);
         <div class="wvr-evento-actions">
           <a v-if="data.cat_url" class="wvr-link" :href="data.cat_url" target="_blank" rel="noopener">Vai a pagina</a>
           <a class="wvr-link" :href="data.edit_ev_link">Modifica</a>
+          <button v-if="data.fb_share_enabled" class="wvr-link" @click="preparaEventoFacebook">
+            {{ fbCopiato ? '✓ Copiato, apro Facebook…' : '📘 Prepara evento Facebook' }}
+          </button>
         </div>
       </div>
 

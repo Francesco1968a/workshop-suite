@@ -47,7 +47,7 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
                 'error'   => __('Si è verificato un errore. Riprova più tardi.', 'wsmaker'),
             ],
         ];
-        wp_localize_script('ws-form-iscrizione', 'WS_Form_Vars', $form_iscrizione_vars);
+        wp_localize_script('ws-form-iscrizione', 'WSMA_Form_Vars', $form_iscrizione_vars);
     }
 
     public function render_shortcode($atts = []): string {

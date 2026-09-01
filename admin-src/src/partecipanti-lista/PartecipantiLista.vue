@@ -10,9 +10,9 @@ let debounceTimer = null;
 async function load() {
   loading.value = true;
   try {
-    const url = new URL(window.WS_CONFIG.restUrl + 'partecipanti');
+    const url = new URL(window.WSMA_CONFIG.restUrl + 'partecipanti');
     if (q.value) url.searchParams.set('q', q.value);
-    const res = await fetch(url, { headers: { 'X-WP-Nonce': window.WS_CONFIG.nonce } });
+    const res = await fetch(url, { headers: { 'X-WP-Nonce': window.WSMA_CONFIG.nonce } });
     const data = await res.json();
     items.value = data.items;
     count.value = data.count;

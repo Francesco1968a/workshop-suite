@@ -15,15 +15,16 @@ const savingEvento = ref(false);
 const savingIscrizione = ref(false);
 const toggling = ref(0);
 
-const eventoForm = reactive({ categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: 'fisico', piattaforma_virtuale: 'jitsi', link_virtuale: '' });
+const eventoForm = reactive({ categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: 'fisico', piattaforma_virtuale: 'jitsi', link_virtuale: '', wc_product_id: 0 });
+const wcExtra = ref({ active: false, products: [], product_id: 0 });
 const iscrizioneForm = reactive({ evento: 0, stato: 'richiesta', stato_pagamento: 'in_attesa', num_persone: 1, anticipo: 0, saldo: 0, note: '' });
 
 function apiUrl(path) {
-  return window.WS_CONFIG.restUrl + path;
+  return window.WSMA_CONFIG.restUrl + path;
 }
 
 function headers(extra = {}) {
-  return { 'X-WP-Nonce': window.WS_CONFIG.nonce, ...extra };
+  return { 'X-WP-Nonce': window.WSMA_CONFIG.nonce, ...extra };
 }
 
 function baseUrl() {
@@ -60,6 +61,7 @@ async function load() {
   eventi.value = data.eventi;
   editingEvento.value = data.editing_evento;
   editingIscrizione.value = data.editing_iscrizione;
+  wcExtra.value = data.wc_extra || { active: false, products: [], product_id: 0 };
 
   if (editingEvento.value) {
     Object.assign(eventoForm, {
@@ -72,9 +74,10 @@ async function load() {
       modalita: editingEvento.value.modalita || 'fisico',
       piattaforma_virtuale: editingEvento.value.piattaforma_virtuale || 'jitsi',
       link_virtuale: editingEvento.value.link_virtuale || '',
+      wc_product_id: (editingEvento.value.wc_extra || wcExtra.value).product_id || 0,
     });
   } else {
-    Object.assign(eventoForm, { categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: props.filterModalita || 'fisico', piattaforma_virtuale: 'jitsi', link_virtuale: '' });
+    Object.assign(eventoForm, { categoria: 0, data_evento: '', data_fine: '', ora_inizio: '', ora_fine: '', posti_totali: 5, modalita: props.filterModalita || 'fisico', piattaforma_virtuale: 'jitsi', link_virtuale: '', wc_product_id: 0 });
   }
 
   if (editingIscrizione.value) {
@@ -203,6 +206,15 @@ onMounted(() => {
             </div>
           </div>
         </template>
+        <div class="wv-field" v-if="wcExtra.active">
+          <label>Prodotto WooCommerce collegato</label>
+          <select v-model.number="eventoForm.wc_product_id">
+            <option :value="0">— nessuno (nessun acquisto diretto) —</option>
+            <option v-for="p in wcExtra.products" :key="p.id" :value="p.id">{{ p.name }}</option>
+          </select>
+          <div class="hint">Se impostato, l'acquisto di questo prodotto nello shop conferma automaticamente l'iscrizione a questo evento.</div>
+          <div class="hint" v-if="eventoForm.wc_product_id" style="color:#ff6608;">Il link di pagamento Stripe automatico (se attivo) non verrà inviato per questo evento: l'acquisto avviene tramite questo prodotto WooCommerce.</div>
+        </div>
         <div class="wv-form-actions">
           <button type="submit" :disabled="savingEvento">{{ editingEvento ? 'Salva modifiche' : 'Crea evento' }}</button>
           <a v-if="editingEvento" class="wv-btn wv-btn-ghost" @click="navigate({ vista: 'eventi' })">Annulla</a>
