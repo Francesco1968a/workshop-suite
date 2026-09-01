@@ -37,6 +37,14 @@ final class WSMA_Post_Types implements WSMA_Module {
         if (get_option('wsma_cpt_taxonomy_migration_done')) return;
 
         global $wpdb;
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery -- one-time bulk
+        // slug rewrite, guarded by the option check above so it only ever
+        // runs once per install; no WP API renames a post type/taxonomy
+        // across existing rows, and looping wp_update_post() per row here
+        // would be far slower and (as found in production) risks silently
+        // corrupting unrelated post_content via its implicit unslashing.
+        // Nothing to cache: this touches every matching row exactly once,
+        // there's no repeated read to speed up.
         $wpdb->query($wpdb->prepare(
             "UPDATE {$wpdb->posts} SET post_type = %s WHERE post_type = %s",
             'wsma_evento', 'ws_evento'
@@ -53,6 +61,7 @@ final class WSMA_Post_Types implements WSMA_Module {
             "UPDATE {$wpdb->term_taxonomy} SET taxonomy = %s WHERE taxonomy = %s",
             'wsma_categoria_evento', 'categoria_evento'
         ));
+        // phpcs:enable WordPress.DB.DirectDatabaseQuery
 
         // Raw $wpdb queries bypass the object cache — on installs with a
         // persistent cache backend (Redis/Memcached), every already-cached
