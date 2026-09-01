@@ -43,7 +43,6 @@ final class WSMA_Ringraziamento implements WSMA_Module {
         add_action('init', [$this, 'migrate_legacy_cron']);
         add_action('init', [$this, 'ensure_scheduled']);
         add_action(self::CRON_HOOK, [$this, 'process']);
-        add_action('acf/init', [$this, 'register_fields']);
         add_action('rest_api_init', [$this, 'register_routes']);
     }
 
@@ -137,20 +136,6 @@ final class WSMA_Ringraziamento implements WSMA_Module {
         if (!wp_next_scheduled(self::CRON_HOOK)) {
             wp_schedule_event(strtotime('tomorrow 10:00'), 'daily', self::CRON_HOOK);
         }
-    }
-
-    public function register_fields(): void {
-        if (!function_exists('acf_add_local_field_group')) return;
-
-        acf_add_local_field_group([
-            'key' => 'group_cat_ringraziamento',
-            'title' => 'Mail #4 Ringraziamento (template)',
-            'fields' => [
-                ['key' => 'field_cat_ogg_ring', 'label' => 'Oggetto', 'name' => 'oggetto_ringraziamento', 'type' => 'text'],
-                ['key' => 'field_cat_mail_ring', 'label' => 'Corpo', 'name' => 'mail_ringraziamento', 'type' => 'textarea', 'rows' => 10],
-            ],
-            'location' => [[['param' => 'taxonomy', 'operator' => '==', 'value' => 'wsma_categoria_evento']]],
-        ]);
     }
 
     /** @return int[] iscrizione IDs — Confermate, evento concluso esattamente N giorni fa, non ancora inviate. */

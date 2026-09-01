@@ -28,43 +28,9 @@ final class WSMA_Mail_Templates implements WSMA_Module {
     }
 
     public function register(): void {
-        add_action('acf/init', [$this, 'register_fields']);
-    }
-
-    public function register_fields(): void {
-        if (!function_exists('acf_add_local_field_group')) return;
-
-        acf_add_local_field_group([
-            'key' => 'group_categoria_templates',
-            'title' => 'Template Email Workshop',
-            'fields' => [
-                ['key' => 'field_cat_oggetto_risposta', 'label' => 'Oggetto Mail #1 (Risposta richiesta)', 'name' => 'oggetto_risposta', 'type' => 'text'],
-                ['key' => 'field_cat_mail_risposta', 'label' => 'Corpo Mail #1 (Risposta richiesta)', 'name' => 'mail_risposta', 'type' => 'textarea', 'rows' => 10,
-                 'instructions' => 'Inviata automaticamente quando arriva una richiesta dalla form.'],
-                ['key' => 'field_cat_oggetto_followup', 'label' => 'Oggetto Mail #2 (Follow-up 3gg)', 'name' => 'oggetto_followup', 'type' => 'text'],
-                ['key' => 'field_cat_mail_followup', 'label' => 'Corpo Mail #2 (Follow-up 3gg)', 'name' => 'mail_followup', 'type' => 'textarea', 'rows' => 10],
-                ['key' => 'field_cat_oggetto_reminder', 'label' => 'Oggetto Mail #3 (Reminder T-10, legacy)', 'name' => 'oggetto_reminder', 'type' => 'text'],
-                ['key' => 'field_cat_mail_reminder', 'label' => 'Corpo Mail #3 (Reminder T-10, legacy)', 'name' => 'mail_reminder', 'type' => 'textarea', 'rows' => 10],
-                ['key' => 'field_cat_oggetto_welcome', 'label' => 'Oggetto Mail #4 (Welcome T-5, legacy)', 'name' => 'oggetto_welcome', 'type' => 'text'],
-                ['key' => 'field_cat_mail_welcome', 'label' => 'Corpo Mail #4 (Welcome T-5, legacy)', 'name' => 'mail_welcome', 'type' => 'textarea', 'rows' => 10],
-            ],
-            'location' => [[['param' => 'taxonomy', 'operator' => '==', 'value' => 'wsma_categoria_evento']]],
-        ]);
-
-        acf_add_local_field_group([
-            'key' => 'group_iscrizione_tracking',
-            'title' => 'Tracking Email',
-            'fields' => [
-                ['key' => 'field_i_msg_orig', 'label' => 'Messaggio originale dalla form', 'name' => 'messaggio_originale', 'type' => 'textarea', 'rows' => 4],
-                ['key' => 'field_i_risposta_at', 'label' => 'Mail #1 Risposta inviata il', 'name' => 'mail_risposta_sent_at', 'type' => 'date_time_picker', 'return_format' => 'Y-m-d H:i:s'],
-                ['key' => 'field_i_followup_at', 'label' => 'Mail #2 Follow-up inviata il', 'name' => 'mail_followup_sent_at', 'type' => 'date_time_picker', 'return_format' => 'Y-m-d H:i:s'],
-                ['key' => 'field_i_reminder_at', 'label' => 'Mail #3 Reminder inviata il', 'name' => 'mail_reminder_sent_at', 'type' => 'date_time_picker', 'return_format' => 'Y-m-d H:i:s'],
-                ['key' => 'field_i_welcome_at', 'label' => 'Mail #4 Welcome inviata il', 'name' => 'mail_welcome_sent_at', 'type' => 'date_time_picker', 'return_format' => 'Y-m-d H:i:s'],
-                ['key' => 'field_i_replied_at', 'label' => 'Cliente ha risposto il', 'name' => 'replied_at', 'type' => 'date_time_picker', 'return_format' => 'Y-m-d H:i:s'],
-                ['key' => 'field_i_followup_paused', 'label' => 'Follow-up in pausa', 'name' => 'followup_paused', 'type' => 'true_false', 'default_value' => 0],
-            ],
-            'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'wsma_iscrizione']]],
-        ]);
+        // Field data lives in native post/term meta (WSMA_Data::get_field/
+        // update_field) regardless of whether ACF is active — nothing to
+        // register here.
     }
 
     private static function default_template(string $key): string {

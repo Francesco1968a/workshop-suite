@@ -42,10 +42,13 @@ final class WSMA_Data {
         wp_add_inline_script('ws-inline', $js);
     }
 
+    /**
+     * Reads a field by native post/term meta, regardless of whether ACF
+     * happens to be active — see the class docblock in class-ws-post-types.php
+     * for why this plugin deliberately doesn't route through ACF's own
+     * get_field()/update_field(), even when present.
+     */
     public static function get_field(string $field, $id = false) {
-        if (function_exists('get_field')) {
-            return \get_field($field, $id);
-        }
         if (is_string($id) && strpos($id, 'wsma_categoria_evento_') === 0) {
             $term_id = (int) str_replace('wsma_categoria_evento_', '', $id);
             return get_term_meta($term_id, $field, true);
@@ -60,9 +63,6 @@ final class WSMA_Data {
     }
 
     public static function update_field(string $field, $value, $id = false) {
-        if (function_exists('update_field')) {
-            return \update_field($field, $value, $id);
-        }
         if (is_string($id) && strpos($id, 'wsma_categoria_evento_') === 0) {
             $term_id = (int) str_replace('wsma_categoria_evento_', '', $id);
             return update_term_meta($term_id, $field, $value);
