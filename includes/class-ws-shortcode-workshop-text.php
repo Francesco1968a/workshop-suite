@@ -3,11 +3,11 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * [ws_workshop_text slug="..." field="..."] — a single parameterized
+ * [wsma_workshop_text slug="..." field="..."] — a single parameterized
  * shortcode for pulling one categoria field into a hand-built page,
- * instead of the full [ws_workshop_page]. One field, one source of
+ * instead of the full [wsma_workshop_page]. One field, one source of
  * truth (the categoria form) — editing it there updates every page that
- * embeds it, whether via [ws_workshop_page] or placed individually here.
+ * embeds it, whether via [wsma_workshop_page] or placed individually here.
  * Deliberately one shortcode with a `field` attribute rather than a
  * separate tag per field, to keep the shortcode reference list from
  * growing for what's really one capability.
@@ -37,7 +37,6 @@ final class WSMA_Shortcode_Workshop_Text implements WSMA_Module {
 
     public function register(): void {
         add_shortcode('wsma_workshop_text', [$this, 'render']);
-        add_shortcode('ws_workshop_text', [$this, 'render']); // legacy alias, existing page content
     }
 
     public function render($atts): string {
@@ -46,9 +45,9 @@ final class WSMA_Shortcode_Workshop_Text implements WSMA_Module {
         $meta_key = self::FIELD_MAP[$field];
 
         // 'slug' and 'categoria' are accepted as aliases (matches
-        // [ws_form_iscrizione]'s own attribute), and when neither is given
+        // [wsma_form_iscrizione]'s own attribute), and when neither is given
         // the categoria is auto-detected from the current page — same
-        // resolution logic already used by [ws_prezzo]/[workshop_prossimo],
+        // resolution logic already used by [wsma_prezzo]/[workshop_prossimo],
         // so this shortcode works standalone inside a categoria page
         // without having to repeat the slug by hand.
         $explicit_slug = sanitize_title($atts['slug'] ?: $atts['categoria']);

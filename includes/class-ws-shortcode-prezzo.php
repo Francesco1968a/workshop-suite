@@ -3,10 +3,10 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Shortcode [ws_prezzo] / [ws_acconto] — stampano il prezzo di listino o
+ * Shortcode [wsma_prezzo] / [wsma_acconto] — stampano il prezzo di listino o
  * l'acconto richiesto di una categoria evento, in formato leggibile.
  * Stessa logica di risoluzione categoria (slug esplicito, altrimenti
- * auto-rilevata dalla pagina corrente) già usata da [ws_form_iscrizione]
+ * auto-rilevata dalla pagina corrente) già usata da [wsma_form_iscrizione]
  * e [workshop_prossimo].
  */
 final class WSMA_Shortcode_Prezzo implements WSMA_Module {
@@ -17,9 +17,7 @@ final class WSMA_Shortcode_Prezzo implements WSMA_Module {
 
     public function register(): void {
         add_shortcode('wsma_prezzo', [$this, 'render_prezzo']);
-        add_shortcode('ws_prezzo', [$this, 'render_prezzo']); // legacy alias, existing page content
         add_shortcode('wsma_acconto', [$this, 'render_acconto']);
-        add_shortcode('ws_acconto', [$this, 'render_acconto']); // legacy alias, existing page content
     }
 
     public function render_prezzo($atts) {

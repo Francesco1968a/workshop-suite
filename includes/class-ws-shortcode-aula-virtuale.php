@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * [ws_aula_virtuale evento_id="X"] — embeds the virtual room for a
+ * [wsma_aula_virtuale evento_id="X"] — embeds the virtual room for a
  * Modalità=virtuale evento. Jitsi rooms are embedded in-page via Jitsi's
  * own external_api.js (no self-hosted infra needed, works against the
  * free public meet.jit.si server); any other platform (Zoom/Meet/altro)
@@ -19,7 +19,6 @@ final class WSMA_Shortcode_Aula_Virtuale implements WSMA_Module {
 
     public function register(): void {
         add_shortcode('wsma_aula_virtuale', [$this, 'render']);
-        add_shortcode('ws_aula_virtuale', [$this, 'render']); // legacy alias, existing page content
         add_action('wp_enqueue_scripts', [$this, 'maybe_enqueue_style']);
     }
 
@@ -32,7 +31,7 @@ final class WSMA_Shortcode_Aula_Virtuale implements WSMA_Module {
     public function maybe_enqueue_style(): void {
         if (is_admin()) return;
         global $post;
-        if (!$post || !has_shortcode((string) $post->post_content, 'ws_aula_virtuale')) return;
+        if (!$post || !has_shortcode((string) $post->post_content, 'wsma_aula_virtuale')) return;
 
         WSMA_Data::enqueue_inline_style(
             '.ws-av-wrap { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 1100px; margin: 0 auto; }'

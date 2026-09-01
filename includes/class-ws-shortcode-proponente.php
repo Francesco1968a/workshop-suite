@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Public Shortcode: [ws_proponente] / [workshop_suite_bio]
+ * Public Shortcode: [wsma_proponente]
  * Renders an elegant, responsive biography card for the workshop trainer/proposer.
  */
 final class WSMA_Shortcode_Proponente implements WSMA_Module {
@@ -14,8 +14,6 @@ final class WSMA_Shortcode_Proponente implements WSMA_Module {
 
     public function register(): void {
         add_shortcode('wsma_proponente', [$this, 'render']);
-        add_shortcode('ws_proponente', [$this, 'render']); // legacy alias, existing page content
-        add_shortcode('workshop_suite_bio', [$this, 'render']); // legacy alias, existing page content
         add_action('wp_enqueue_scripts', [$this, 'maybe_enqueue_style']);
     }
 

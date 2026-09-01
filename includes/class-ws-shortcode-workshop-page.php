@@ -3,13 +3,13 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * [ws_workshop_page slug="..."] — the new predefined, structured landing
+ * [wsma_workshop_page slug="..."] — the new predefined, structured landing
  * page for a workshop categoria: hero image, intro, programma, requisiti,
  * note importanti, then the existing [eventi_categoria] grid and
- * [ws_form_iscrizione] booking form composed in via do_shortcode() rather
+ * [wsma_form_iscrizione] booking form composed in via do_shortcode() rather
  * than reimplemented — the old shortcodes stay first-class citizens, this
  * is just a curated default arrangement of them plus the new descriptive
- * fields. Deliberately NOT used for [ws_aula_virtuale] pages, which stay
+ * fields. Deliberately NOT used for [wsma_aula_virtuale] pages, which stay
  * purely functional per the "Aula virtuale = utility, not marketing" split.
  *
  * [eventi_categoria] gets theme="light" explicitly: its own default
@@ -26,7 +26,6 @@ final class WSMA_Shortcode_Workshop_Page implements WSMA_Module {
 
     public function register(): void {
         add_shortcode('wsma_workshop_page', [$this, 'render']);
-        add_shortcode('ws_workshop_page', [$this, 'render']); // legacy alias, existing page content
         add_action('wp_enqueue_scripts', [$this, 'maybe_enqueue_style']);
     }
 
@@ -34,7 +33,7 @@ final class WSMA_Shortcode_Workshop_Page implements WSMA_Module {
     public function maybe_enqueue_style(): void {
         if (is_admin()) return;
         global $post;
-        if (!$post || !has_shortcode((string) $post->post_content, 'ws_workshop_page')) return;
+        if (!$post || !has_shortcode((string) $post->post_content, 'wsma_workshop_page')) return;
 
         WSMA_Data::enqueue_inline_style(
             '.ws-wp-wrap { --ws-card-bg: #ffffff; --ws-card-border: #e2e8f0; --ws-text-heading: #1d2327; --ws-text-body: #3c434a; --ws-text-muted: #646970; --ws-surface-alt: #f6f7f7; --ws-accent: #ff6608; }'
@@ -142,7 +141,7 @@ final class WSMA_Shortcode_Workshop_Page implements WSMA_Module {
                     <div class="ws-wp-booking">
                         <?php echo do_shortcode('[eventi_categoria slug="' . esc_attr($term->slug) . '" theme="light"]'); ?>
                         <h3 class="ws-wp-booking-title">Prenota il tuo posto</h3>
-                        <?php echo do_shortcode('[ws_form_iscrizione categoria="' . esc_attr($term->slug) . '"]'); ?>
+                        <?php echo do_shortcode('[wsma_form_iscrizione categoria="' . esc_attr($term->slug) . '"]'); ?>
                     </div>
                 </div>
             </div>

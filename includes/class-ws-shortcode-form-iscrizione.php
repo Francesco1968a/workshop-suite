@@ -3,10 +3,8 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * Shortcode [ws_form_iscrizione] — [fv_form_iscrizione] and
- * [fvw_form_iscrizione] remain registered as permanent aliases for
- * backward compatibility with existing page content.
- * Renders a standalone, responsive registration form for workshops.
+ * Shortcode [wsma_form_iscrizione] — renders a standalone, responsive
+ * registration form for workshops.
  */
 final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
 
@@ -16,9 +14,6 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
 
     public function register(): void {
         add_shortcode('wsma_form_iscrizione', [$this, 'render_shortcode']);
-        add_shortcode('ws_form_iscrizione', [$this, 'render_shortcode']); // legacy alias, existing page content
-        add_shortcode('fv_form_iscrizione', [$this, 'render_shortcode']); // legacy alias, existing page content
-        add_shortcode('fvw_form_iscrizione', [$this, 'render_shortcode']); // legacy alias, existing page content
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
     }
 
@@ -53,7 +48,6 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
             ],
         ];
         wp_localize_script('ws-form-iscrizione', 'WS_Form_Vars', $form_iscrizione_vars);
-        wp_localize_script('ws-form-iscrizione', 'FVW_Form_Vars', $form_iscrizione_vars);
     }
 
     public function render_shortcode($atts = []): string {
@@ -65,7 +59,7 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
         $atts = shortcode_atts([
             'evento_id' => 0,
             'categoria' => '',
-        ], $atts, 'fv_form_iscrizione');
+        ], $atts, 'wsma_form_iscrizione');
 
         $evento_id = (int) $atts['evento_id'];
 

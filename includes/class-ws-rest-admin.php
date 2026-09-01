@@ -986,13 +986,16 @@ final class WSMA_Rest_Admin implements WSMA_Module {
         return new WP_REST_Response(['msg' => 'Categoria eliminata.', 'deleted' => true]);
     }
 
-    /** Reads the option, migrating silently from the legacy key on first access. */
+    /** Reads the option, migrating silently from the legacy key(s) on first access. */
     private function get_modelli_locandine_option(): array {
-        $modelli = get_option('ws_modelli_locandine', false);
+        $modelli = get_option('wsma_modelli_locandine', false);
         if ($modelli === false) {
-            $legacy = get_option('fvw_modelli_locandine', []);
+            $legacy = get_option('ws_modelli_locandine', []);
+            if (empty($legacy)) {
+                $legacy = get_option('fvw_modelli_locandine', []);
+            }
             if (!empty($legacy)) {
-                update_option('ws_modelli_locandine', $legacy);
+                update_option('wsma_modelli_locandine', $legacy);
             }
             $modelli = $legacy;
         }
@@ -1068,7 +1071,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
         ];
 
         $modelli[$id] = $item;
-        update_option('ws_modelli_locandine', $modelli);
+        update_option('wsma_modelli_locandine', $modelli);
 
         return new WP_REST_Response([
             'msg' => 'Modello salvato con successo!',
@@ -1081,7 +1084,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
         $modelli = $this->get_modelli_locandine_option();
         if (is_array($modelli) && isset($modelli[$id])) {
             unset($modelli[$id]);
-            update_option('ws_modelli_locandine', $modelli);
+            update_option('wsma_modelli_locandine', $modelli);
         }
         return new WP_REST_Response([
             'msg' => 'Modello eliminato.',

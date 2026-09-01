@@ -3,9 +3,9 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * [ws_acquista slug="..."] — single frontend "buy" entry point that core
+ * [wsma_acquista slug="..."] — single frontend "buy" entry point that core
  * owns but renders nothing on its own: it resolves the categoria (same
- * slug-or-auto-detect logic as [ws_form_iscrizione]/[ws_prezzo]), lists
+ * slug-or-auto-detect logic as [wsma_form_iscrizione]/[wsma_prezzo]), lists
  * upcoming eventi in it, and for each one asks `wsma_acquista_render`
  * (filter, priority-ordered) whether any PRO connector can sell it. This
  * keeps core unaware WooCommerce or Stripe exist — same convention as
@@ -25,7 +25,6 @@ final class WSMA_Shortcode_Acquista implements WSMA_Module {
 
     public function register(): void {
         add_shortcode('wsma_acquista', [$this, 'render']);
-        add_shortcode('ws_acquista', [$this, 'render']); // legacy alias, existing page content
     }
 
     public function render($atts): string {
@@ -50,7 +49,7 @@ final class WSMA_Shortcode_Acquista implements WSMA_Module {
         }
         if (!$righe) return '';
 
-        // Same CSS custom properties (light/dark) as [ws_form_iscrizione] —
+        // Same CSS custom properties (light/dark) as [wsma_form_iscrizione] —
         // the "ws-form-iscrizione" stylesheet is always registered by that
         // module regardless of whether it's actually on the page, so it's
         // safe to enqueue it here too even standalone.

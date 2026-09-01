@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) exit;
  *
  * `wv_find_categoria_by_url()` was DEFINED here in the legacy snippet — now
  * ported to `WSMA_Data::find_categoria_by_url()` (also used by
- * FVW_Shortcode_Prossimo). All other `wv_*` calls replaced with the
+ * WSMA_Shortcode_Prossimo). All other `wv_*` calls replaced with the
  * `WSMA_Data::` equivalents already ported this session.
  *
  * Mail #1 (Risposta) on submission is sent via WSMA_Mail_Templates

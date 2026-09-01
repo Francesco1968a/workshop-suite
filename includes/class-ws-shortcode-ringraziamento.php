@@ -49,7 +49,6 @@ final class WSMA_Shortcode_Ringraziamento implements WSMA_Module {
             'nonce'   => wp_create_nonce('wp_rest'),
         ];
         wp_localize_script('ws-ringraziamento', 'WS_CONFIG', $ringraziamento_config);
-        wp_localize_script('ws-ringraziamento', 'FVW_CONFIG', $ringraziamento_config);
 
         $theme = WSMA_Settings::get('default_theme_mode', 'dark');
         $theme = in_array($theme, ['dark', 'light'], true) ? $theme : 'dark';

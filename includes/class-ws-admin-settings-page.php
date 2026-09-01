@@ -298,7 +298,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
         $asset_css = WSMA_PATH . $css_file;
 
         // Ensure the Vue ESM script loads with type="module".
-        // This filter is normally registered by the matching FVW_Shortcode_* class,
+        // This filter is normally registered by the matching WSMA_Shortcode_* class,
         // but in WP Admin the shortcode is never invoked, so we register it here.
         static $module_filters = [];
         if (!isset($module_filters[$handle])) {
@@ -333,7 +333,6 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
             'brandName'     => WSMA_Settings::get('site_brand_name', 'WSMaker'),
         ], $extra_config);
         wp_localize_script($handle, 'WS_CONFIG', $config);
-        wp_localize_script($handle, 'FVW_CONFIG', $config);
     }
 
     private function render_panel_wrapper(string $app_id, string $handle, string $js_file, string $css_file, array $extra_config = []): void {
@@ -438,7 +437,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                 <p class="ws-s4"><?php esc_html_e('Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi.', 'wsmaker'); ?></p>
 
                 <form method="post" action="options.php">
-                    <?php settings_fields('ws_settings_group'); ?>
+                    <?php settings_fields('wsma_settings_group'); ?>
                     
                     <input type="hidden" name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[site_brand_name]" value="<?php echo esc_attr($settings['site_brand_name']); ?>">
                     <input type="hidden" name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[sender_name]" value="<?php echo esc_attr($settings['sender_name']); ?>">
@@ -501,7 +500,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
     }
 
     public function register_settings(): void {
-        register_setting('ws_settings_group', WSMA_Settings::OPTION_KEY, [
+        register_setting('wsma_settings_group', WSMA_Settings::OPTION_KEY, [
             'sanitize_callback' => function ($input) {
                 if (!is_array($input)) return [];
                 $current = WSMA_Settings::get_all();
@@ -549,7 +548,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
 
             <?php if ($tab === 'general') : ?>
                 <form method="post" action="options.php">
-                    <?php settings_fields('ws_settings_group'); ?>
+                    <?php settings_fields('wsma_settings_group'); ?>
 
                     <table class="form-table" role="presentation">
                         <tbody>
