@@ -744,7 +744,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
     /**
      * Creates a real WP page for a categoria_evento on the spot, so the
      * admin doesn't have to leave the Categorie panel to set up its booking
-     * page. Optionally pre-fills the page with the [eventi_categoria]
+     * page. Optionally pre-fills the page with the [wsma_eventi_categoria]
      * shortcode already tied to that category's slug, so the page is
      * immediately functional rather than just created-but-empty.
      */
@@ -779,10 +779,10 @@ final class WSMA_Rest_Admin implements WSMA_Module {
             // The "+ Crea Pagina" button builds a brand-new blank page, so it
             // gets the new all-in-one shortcode (hero + intro/programma/
             // requisiti/note + eventi + form) as the predefined default.
-            // ensure_categoria_shortcodes() (old eventi_categoria + ws_form_iscrizione
+            // ensure_categoria_shortcodes() (old wsma_eventi_categoria + ws_form_iscrizione
             // combo) is untouched and still runs for organizers linking an
             // existing, manually-built page instead — see crea_categoria/modifica_categoria.
-            wp_update_post(['ID' => $page_id, 'post_content' => '[ws_workshop_page slug="' . $term->slug . '"]']);
+            wp_update_post(['ID' => $page_id, 'post_content' => '[wsma_workshop_page slug="' . $term->slug . '"]']);
         }
 
         return new WP_REST_Response([
@@ -794,7 +794,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
 
     /**
      * Ensures a categoria's linked page carries both shortcodes
-     * ([eventi_categoria] and the registration form), without duplicating
+     * ([wsma_eventi_categoria] and the registration form), without duplicating
      * either one if already present — preserves any existing layout/text.
      */
     private function ensure_categoria_shortcodes(int $page_id, string $slug): void {
@@ -817,8 +817,8 @@ final class WSMA_Rest_Admin implements WSMA_Module {
 
         $additions = [];
 
-        if (strpos($content, '[eventi_categoria') === false) {
-            $additions[] = '[eventi_categoria slug="' . $slug . '"]';
+        if (strpos($content, '[wsma_eventi_categoria') === false) {
+            $additions[] = '[wsma_eventi_categoria slug="' . $slug . '"]';
         }
 
         $has_form = strpos($content, '[ws_form_iscrizione') !== false

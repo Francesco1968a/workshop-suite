@@ -38,6 +38,7 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
 
     public function register(): void {
         add_action('admin_init', [$this, 'maybe_redirect']);
+        add_action('admin_init', [$this, 'maybe_handle_submit']);
         add_action('admin_menu', [$this, 'add_hidden_page']);
     }
 
@@ -53,10 +54,57 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
         exit;
     }
 
-    /** Hidden page — not added to any menu, only reachable via the redirect above or its own URL. */
+    /**
+     * Handles the wizard's own form submissions. Must run on admin_init —
+     * doing this from render() (the add_submenu_page callback) fires too
+     * late, since core has already sent the admin-header.php output by the
+     * time that callback runs, and wp_safe_redirect() at that point throws
+     * "headers already sent".
+     */
+    public function maybe_handle_submit(): void {
+        if (!current_user_can('manage_options')) return;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page-slug check before the real nonce check below.
+        if (!isset($_GET['page']) || sanitize_key(wp_unslash($_GET['page'])) !== self::PAGE_SLUG) return;
+
+        $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
+        if ($request_method !== 'POST' || !isset($_POST['ws_wizard_nonce_field'])) return;
+
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ws_wizard_nonce_field'])), 'ws_wizard_nonce')) {
+            wp_die(esc_html__('Richiesta non valida, riprova.', 'wsmaker'));
+        }
+
+        if (isset($_POST['ws_wizard_step1_submit'])) {
+            $settings = WSMA_Settings::get_all();
+            $settings['active_modules']['global_hub_pro'] = !empty($_POST['ws_hub_consent']) ? 1 : 0;
+            WSMA_Settings::update_all($settings);
+            wp_safe_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG . '&step=2'));
+            exit;
+        }
+
+        if (isset($_POST['ws_wizard_finish'])) {
+            update_option(self::OPTION_COMPLETED, 1);
+            $redirect = !empty($_POST['ws_go_to_mail'])
+                ? admin_url('admin.php?page=workshop-suite-settings&tab=mail')
+                : admin_url('admin.php?page=workshop-suite-settings');
+            wp_safe_redirect($redirect);
+            exit;
+        }
+    }
+
+    /**
+     * Hidden page — not added to any visible menu, only reachable via the
+     * redirect above or its own URL. Registered under 'options.php' rather
+     * than a null parent: a null parent slug leaves this page absent from
+     * $submenu entirely, which breaks core's get_admin_page_title() lookup
+     * in wp-admin/admin-header.php (strip_tags() gets a null $title on
+     * PHP 8.1+, triggering a deprecated notice followed by "headers already
+     * sent" once output has started) — this is the standard, safe way to
+     * register a page that stays out of the menu while keeping a working
+     * title lookup.
+     */
     public function add_hidden_page(): void {
         add_submenu_page(
-            null,
+            'options.php',
             __('Configurazione guidata', 'wsmaker'),
             '',
             'manage_options',
@@ -68,31 +116,10 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
     public function render(): void {
         if (!current_user_can('manage_options')) return;
 
+        // Form submissions are handled earlier, on admin_init (see
+        // maybe_handle_submit()) — by the time this callback runs, any
+        // redirect they issue has already happened.
         $step = isset($_GET['step']) && $_GET['step'] === '2' ? 2 : 1;
-
-        $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
-        if ($request_method === 'POST' && isset($_POST['ws_wizard_nonce_field'])) {
-            if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ws_wizard_nonce_field'])), 'ws_wizard_nonce')) {
-                wp_die(esc_html__('Richiesta non valida, riprova.', 'wsmaker'));
-            }
-
-            if (isset($_POST['ws_wizard_step1_submit'])) {
-                $settings = WSMA_Settings::get_all();
-                $settings['active_modules']['global_hub_pro'] = !empty($_POST['ws_hub_consent']) ? 1 : 0;
-                WSMA_Settings::update_all($settings);
-                wp_safe_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG . '&step=2'));
-                exit;
-            }
-
-            if (isset($_POST['ws_wizard_finish'])) {
-                update_option(self::OPTION_COMPLETED, 1);
-                $redirect = !empty($_POST['ws_go_to_mail'])
-                    ? admin_url('admin.php?page=workshop-suite-settings&tab=mail')
-                    : admin_url('admin.php?page=workshop-suite-settings');
-                wp_safe_redirect($redirect);
-                exit;
-            }
-        }
 
         $asset_css = WSMA_PATH . 'assets/dist/admin.css';
         if (file_exists($asset_css)) {

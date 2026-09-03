@@ -5,14 +5,14 @@ if (!defined('ABSPATH')) exit;
 /**
  * [wsma_workshop_page slug="..."] — the new predefined, structured landing
  * page for a workshop categoria: hero image, intro, programma, requisiti,
- * note importanti, then the existing [eventi_categoria] grid and
+ * note importanti, then the existing [wsma_eventi_categoria] grid and
  * [wsma_form_iscrizione] booking form composed in via do_shortcode() rather
  * than reimplemented — the old shortcodes stay first-class citizens, this
  * is just a curated default arrangement of them plus the new descriptive
  * fields. Deliberately NOT used for [wsma_aula_virtuale] pages, which stay
  * purely functional per the "Aula virtuale = utility, not marketing" split.
  *
- * [eventi_categoria] gets theme="light" explicitly: its own default
+ * [wsma_eventi_categoria] gets theme="light" explicitly: its own default
  * ("dark") renders light/white text assuming the page around it already
  * has a dark background (true of the old hand-built YOOtheme pages) —
  * our auto-created WP page has a plain white background, so without this
@@ -139,7 +139,7 @@ final class WSMA_Shortcode_Workshop_Page implements WSMA_Module {
                     <?php endif; ?>
 
                     <div class="ws-wp-booking">
-                        <?php echo do_shortcode('[eventi_categoria slug="' . esc_attr($term->slug) . '" theme="light"]'); ?>
+                        <?php echo do_shortcode('[wsma_eventi_categoria slug="' . esc_attr($term->slug) . '" theme="light"]'); ?>
                         <h3 class="ws-wp-booking-title">Prenota il tuo posto</h3>
                         <?php echo do_shortcode('[wsma_form_iscrizione categoria="' . esc_attr($term->slug) . '"]'); ?>
                     </div>
