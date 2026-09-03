@@ -22,8 +22,8 @@ if (!defined('ABSPATH')) exit;
  */
 final class WSMA_Onboarding_Wizard implements WSMA_Module {
 
-    private const OPTION_COMPLETED = 'ws_onboarding_completed';
-    private const TRANSIENT_SHOW = 'ws_show_onboarding';
+    private const OPTION_COMPLETED = 'wsma_onboarding_completed';
+    private const TRANSIENT_SHOW = 'wsma_show_onboarding';
     private const PAGE_SLUG = 'workshop-suite-wizard';
 
     public static function on_activate(): void {

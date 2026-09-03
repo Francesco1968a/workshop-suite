@@ -16,14 +16,18 @@ use Webklex\PHPIMAP\ClientManager;
  */
 final class WSMA_Mail_Inbox {
 
-    private const OPTION = 'ws_imap_settings';
-    private const LEGACY_OPTION = 'fvw_imap_settings';
+    private const OPTION = 'wsma_imap_settings';
+    private const LEGACY_OPTION = 'ws_imap_settings';
+    private const LEGACY_OPTION_V0 = 'fvw_imap_settings';
 
-    /** Reads the option, migrating silently from the legacy key on first access. */
+    /** Reads the option, migrating silently from the legacy key(s) on first access. */
     private static function get_stored(): array {
         $stored = get_option(self::OPTION, false);
         if ($stored === false) {
             $legacy = get_option(self::LEGACY_OPTION, []);
+            if (empty($legacy)) {
+                $legacy = get_option(self::LEGACY_OPTION_V0, []);
+            }
             if (!empty($legacy)) {
                 update_option(self::OPTION, $legacy, false);
             }

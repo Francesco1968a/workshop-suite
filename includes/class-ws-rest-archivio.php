@@ -51,8 +51,8 @@ final class WSMA_Rest_Archivio implements WSMA_Module {
         }
         $eq = new WP_Query($args);
 
-        $anni_cache_key = 'ws_archivio_anni_' . $oggi;
-        $anni = wp_cache_get($anni_cache_key, 'ws_archivio');
+        $anni_cache_key = 'wsma_archivio_anni_' . $oggi;
+        $anni = wp_cache_get($anni_cache_key, 'wsma_archivio');
         if (false === $anni) {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- DISTINCT YEAR() aggregation across postmeta has no WP_Query equivalent; the result is cached just below.
             $anni = $wpdb->get_col($wpdb->prepare("
@@ -63,7 +63,7 @@ final class WSMA_Rest_Archivio implements WSMA_Module {
                   AND pm.meta_value <> '' AND pm.meta_value < %s
                 ORDER BY y DESC
             ", $oggi));
-            wp_cache_set($anni_cache_key, $anni, 'ws_archivio', HOUR_IN_SECONDS);
+            wp_cache_set($anni_cache_key, $anni, 'wsma_archivio', HOUR_IN_SECONDS);
         }
 
         $admin = WSMA_Data::find_page_url_containing('[workshop_admin]');

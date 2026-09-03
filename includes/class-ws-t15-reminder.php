@@ -22,8 +22,9 @@ final class WSMA_T15_Reminder implements WSMA_Module {
     public const DAYS_OFFSET = 15;
     public const META_SENT = 'wv_t15_sent_at';
     public const META_THREAD = 'wv_thread';
-    public const CRON_HOOK = 'ws_cron_t15_reminder';
-    private const LEGACY_CRON_HOOK = 'fvw_cron_t15_reminder';
+    public const CRON_HOOK = 'wsma_cron_t15_reminder';
+    private const LEGACY_CRON_HOOK = 'ws_cron_t15_reminder';
+    private const LEGACY_CRON_HOOK_V0 = 'fvw_cron_t15_reminder';
 
     public function should_load(): bool {
         return true;
@@ -35,10 +36,13 @@ final class WSMA_T15_Reminder implements WSMA_Module {
         add_action(self::CRON_HOOK, [$this, 'process']);
     }
 
-    /** One-time cleanup of the orphaned pre-rename event. */
+    /** One-time cleanup of orphaned pre-rename events. */
     public function migrate_legacy_cron(): void {
         if (wp_next_scheduled(self::LEGACY_CRON_HOOK)) {
             wp_clear_scheduled_hook(self::LEGACY_CRON_HOOK);
+        }
+        if (wp_next_scheduled(self::LEGACY_CRON_HOOK_V0)) {
+            wp_clear_scheduled_hook(self::LEGACY_CRON_HOOK_V0);
         }
     }
 

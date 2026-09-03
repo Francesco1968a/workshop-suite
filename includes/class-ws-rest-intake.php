@@ -96,7 +96,7 @@ final class WSMA_Rest_Intake implements WSMA_Module {
 
         // 2. IP Rate Limit check
         if (!empty($settings['intake_rate_limit_enabled'])) {
-            $transient_key = 'ws_rl_' . md5($ip_clean);
+            $transient_key = 'wsma_rl_' . md5($ip_clean);
             $count = (int) get_transient($transient_key);
             $max_requests = (int) ($settings['intake_rate_limit_requests'] ?? 5);
             $window = (int) ($settings['intake_rate_limit_window'] ?? 60);
@@ -293,7 +293,7 @@ final class WSMA_Rest_Intake implements WSMA_Module {
             return '';
         }
 
-        $cache_key = 'ws_geo_' . md5($ip);
+        $cache_key = 'wsma_geo_' . md5($ip);
         $cached = get_transient($cache_key);
         if ($cached !== false) {
             return $cached;

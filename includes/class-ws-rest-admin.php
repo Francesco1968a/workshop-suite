@@ -22,7 +22,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
     }
 
     public function register_routes(): void {
-        $perm = fn() => current_user_can('manage_options') || current_user_can('ws_access_panel');
+        $perm = fn() => current_user_can('manage_options') || current_user_can('wsma_access_panel');
         $ns = 'workshop-suite/v1';
 
         register_rest_route($ns, '/admin/partecipanti-tab', ['methods' => 'GET', 'callback' => [$this, 'get_partecipanti_tab'], 'permission_callback' => $perm]);

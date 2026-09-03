@@ -18,13 +18,13 @@ final class WSMA_Hub_Sync implements WSMA_Module {
     // 2min, attempt 2 -> 10min, attempt 3 -> 30min, then give up.
     private const RETRY_DELAYS = [1 => 120, 2 => 600, 3 => 1800];
     private const MAX_ATTEMPTS = 4;
-    private const FAILURES_OPTION = 'ws_hub_sync_failures';
+    private const FAILURES_OPTION = 'wsma_hub_sync_failures';
 
     public function register(): void {
         add_action('init', [__CLASS__, 'migrate_legacy_synced_events']);
-        add_action('save_post_ws_evento', [__CLASS__, 'on_event_save'], 20, 2);
+        add_action('save_post_wsma_evento', [__CLASS__, 'on_event_save'], 20, 2);
         add_action('wp_trash_post', [__CLASS__, 'on_event_trash']);
-        add_action('ws_hub_sync_retry', [__CLASS__, 'retry_sync'], 10, 2);
+        add_action('wsma_hub_sync_retry', [__CLASS__, 'retry_sync'], 10, 2);
         add_action('admin_notices', [__CLASS__, 'maybe_show_failure_notice']);
     }
 
@@ -67,7 +67,7 @@ final class WSMA_Hub_Sync implements WSMA_Module {
 
         if ($attempt < self::MAX_ATTEMPTS) {
             $delay = self::RETRY_DELAYS[$attempt] ?? 1800;
-            wp_schedule_single_event(time() + $delay, 'ws_hub_sync_retry', [$post_id, $attempt + 1]);
+            wp_schedule_single_event(time() + $delay, 'wsma_hub_sync_retry', [$post_id, $attempt + 1]);
         } else {
             self::record_failure($post_id, $res['message'] ?? 'Errore sconosciuto');
         }
@@ -230,14 +230,12 @@ final class WSMA_Hub_Sync implements WSMA_Module {
             }
         }
         if (empty($booking_url)) {
-            $booking_page = WSMA_Data::find_page_url_containing('ws_form_iscrizione');
-            if (!$booking_page) {
-                // 'fvw_iscrizione' was never a real substring of either
-                // registered shortcode tag (fv_form_iscrizione /
-                // fvw_form_iscrizione), so this search never matched
-                // anything — try the actual live tag instead.
-                $booking_page = WSMA_Data::find_page_url_containing('fv_form_iscrizione');
-            }
+            // wsma_form_iscrizione is the only tag registered now — the
+            // old ws_form_iscrizione/fv_form_iscrizione aliases were
+            // removed once every existing page was converted to the new
+            // tag (see readme changelog 1.1.4), so searching for them
+            // here would never match anything anymore.
+            $booking_page = WSMA_Data::find_page_url_containing('wsma_form_iscrizione');
             $booking_url = $booking_page ?: home_url();
         }
 

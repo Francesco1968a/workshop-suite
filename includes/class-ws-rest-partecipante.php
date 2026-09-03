@@ -18,7 +18,7 @@ final class WSMA_Rest_Partecipante implements WSMA_Module {
     }
 
     public function register_routes(): void {
-        $perm = fn() => current_user_can('manage_options') || current_user_can('ws_access_panel');
+        $perm = fn() => current_user_can('manage_options') || current_user_can('wsma_access_panel');
 
         register_rest_route('workshop-suite/v1', '/partecipante/(?P<id>\d+)', [
             'methods'             => 'GET',

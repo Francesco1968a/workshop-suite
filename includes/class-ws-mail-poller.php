@@ -14,12 +14,14 @@ if (!defined('ABSPATH')) exit;
  */
 final class WSMA_Mail_Poller implements WSMA_Module {
 
-    public const CRON_HOOK = 'ws_cron_mail_poll';
-    private const LEGACY_CRON_HOOK = 'fvw_cron_mail_poll';
+    public const CRON_HOOK = 'wsma_cron_mail_poll';
+    private const LEGACY_CRON_HOOK = 'ws_cron_mail_poll';
+    private const LEGACY_CRON_HOOK_V0 = 'fvw_cron_mail_poll';
     private const META_THREAD = 'wv_thread';
-    private const META_LAST_POLL = 'ws_mail_poll_last';
-    private const LEGACY_META_LAST_POLL = 'fvw_mail_poll_last';
-    public const META_LAST_ERROR = 'ws_mail_poll_last_error';
+    private const META_LAST_POLL = 'wsma_mail_poll_last';
+    private const LEGACY_META_LAST_POLL = 'ws_mail_poll_last';
+    private const LEGACY_META_LAST_POLL_V0 = 'fvw_mail_poll_last';
+    public const META_LAST_ERROR = 'wsma_mail_poll_last_error';
 
     public function should_load(): bool {
         return true;
@@ -34,10 +36,13 @@ final class WSMA_Mail_Poller implements WSMA_Module {
         add_action('admin_enqueue_scripts', [$this, 'enqueue_notice_style']);
     }
 
-    /** One-time cleanup of the orphaned pre-rename event, so it doesn't keep firing alongside the new one. */
+    /** One-time cleanup of orphaned pre-rename events, so they don't keep firing alongside the new one. */
     public function migrate_legacy_cron(): void {
         if (wp_next_scheduled(self::LEGACY_CRON_HOOK)) {
             wp_clear_scheduled_hook(self::LEGACY_CRON_HOOK);
+        }
+        if (wp_next_scheduled(self::LEGACY_CRON_HOOK_V0)) {
+            wp_clear_scheduled_hook(self::LEGACY_CRON_HOOK_V0);
         }
     }
 
@@ -84,13 +89,13 @@ final class WSMA_Mail_Poller implements WSMA_Module {
     }
 
     public function add_schedule(array $schedules): array {
-        $schedules['ws_15min'] = ['interval' => 15 * 60, 'display' => 'Ogni 15 minuti (WSMaker)'];
+        $schedules['wsma_15min'] = ['interval' => 15 * 60, 'display' => 'Ogni 15 minuti (WSMaker)'];
         return $schedules;
     }
 
     public function ensure_scheduled(): void {
         if (!wp_next_scheduled(self::CRON_HOOK)) {
-            wp_schedule_event(time() + 60, 'ws_15min', self::CRON_HOOK);
+            wp_schedule_event(time() + 60, 'wsma_15min', self::CRON_HOOK);
         }
     }
 
@@ -170,6 +175,9 @@ final class WSMA_Mail_Poller implements WSMA_Module {
         $val = get_option(self::META_LAST_POLL, '');
         if ($val === '') {
             $val = get_option(self::LEGACY_META_LAST_POLL, '');
+        }
+        if ($val === '') {
+            $val = get_option(self::LEGACY_META_LAST_POLL_V0, '');
         }
         return (string) $val;
     }

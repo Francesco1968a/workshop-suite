@@ -26,7 +26,7 @@ final class WSMA_Rest_Riepilogo implements WSMA_Module {
     }
 
     public function register_routes(): void {
-        $perm = fn() => current_user_can('manage_options') || current_user_can('ws_access_panel');
+        $perm = fn() => current_user_can('manage_options') || current_user_can('wsma_access_panel');
 
         register_rest_route('workshop-suite/v1', '/riepilogo/cockpit', [
             'methods' => 'GET', 'callback' => [$this, 'get_cockpit'], 'permission_callback' => $perm,

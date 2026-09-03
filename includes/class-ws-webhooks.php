@@ -20,8 +20,8 @@ if (!defined('ABSPATH')) exit;
  */
 final class WSMA_Webhooks implements WSMA_Module {
 
-    private const OPTION = 'ws_webhooks';
-    private const LOG_OPTION = 'ws_webhooks_log';
+    private const OPTION = 'wsma_webhooks';
+    private const LOG_OPTION = 'wsma_webhooks_log';
     private const LOG_MAX = 20;
 
     public function should_load(): bool {
@@ -40,7 +40,7 @@ final class WSMA_Webhooks implements WSMA_Module {
         add_action('wp_insert_post', [$this, 'on_post_inserted'], 20, 3);
         add_action('added_post_meta', [$this, 'on_meta_changed'], 10, 4);
         add_action('updated_post_meta', [$this, 'on_meta_changed'], 10, 4);
-        add_action('ws_webhook_dispatch', [$this, 'handle_dispatch_cron'], 10, 4);
+        add_action('wsma_webhook_dispatch', [$this, 'handle_dispatch_cron'], 10, 4);
         add_action('admin_menu', [$this, 'add_admin_menu'], 58);
         add_action('admin_post_ws_webhooks_save', [$this, 'handle_save']);
         add_action('admin_post_ws_webhooks_test', [$this, 'handle_test']);
@@ -100,7 +100,7 @@ final class WSMA_Webhooks implements WSMA_Module {
     private function dispatch(string $event, array $payload): void {
         foreach (self::get_endpoints() as $endpoint) {
             if (empty($endpoint['url']) || empty($endpoint['events'][$event])) continue;
-            wp_schedule_single_event(time(), 'ws_webhook_dispatch', [$endpoint['url'], $event, $payload, 1]);
+            wp_schedule_single_event(time(), 'wsma_webhook_dispatch', [$endpoint['url'], $event, $payload, 1]);
         }
     }
 
@@ -109,7 +109,7 @@ final class WSMA_Webhooks implements WSMA_Module {
 
         if (!$result['success'] && $attempt < self::MAX_ATTEMPTS) {
             $delay = self::RETRY_DELAYS[$attempt] ?? 1800;
-            wp_schedule_single_event(time() + $delay, 'ws_webhook_dispatch', [$url, $event, $payload, $attempt + 1]);
+            wp_schedule_single_event(time() + $delay, 'wsma_webhook_dispatch', [$url, $event, $payload, $attempt + 1]);
         }
     }
 
