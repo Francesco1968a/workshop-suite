@@ -42,8 +42,8 @@ final class WSMA_Webhooks implements WSMA_Module {
         add_action('updated_post_meta', [$this, 'on_meta_changed'], 10, 4);
         add_action('wsma_webhook_dispatch', [$this, 'handle_dispatch_cron'], 10, 4);
         add_action('admin_menu', [$this, 'add_admin_menu'], 58);
-        add_action('admin_post_ws_webhooks_save', [$this, 'handle_save']);
-        add_action('admin_post_ws_webhooks_test', [$this, 'handle_test']);
+        add_action('admin_post_wsma_webhooks_save', [$this, 'handle_save']);
+        add_action('admin_post_wsma_webhooks_test', [$this, 'handle_test']);
     }
 
     // ───────────────────────── triggers ─────────────────────────
@@ -152,14 +152,14 @@ final class WSMA_Webhooks implements WSMA_Module {
             __('Webhooks', 'wsmaker'),
             __('🔌 Webhooks', 'wsmaker'),
             'manage_options',
-            'ws-webhooks',
+            'wsma-webhooks',
             [$this, 'render_admin_page']
         );
     }
 
     public function handle_save(): void {
         if (!current_user_can('manage_options')) wp_die('Access Denied');
-        check_admin_referer('ws_webhooks_save');
+        check_admin_referer('wsma_webhooks_save');
 
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each element is sanitized individually below (esc_url_raw/sanitize_text_field) inside the foreach.
         $labels = isset($_POST['label']) ? (array) wp_unslash($_POST['label']) : [];
@@ -185,20 +185,20 @@ final class WSMA_Webhooks implements WSMA_Module {
         }
         update_option(self::OPTION, $endpoints);
 
-        wp_safe_redirect(add_query_arg(['page' => 'ws-webhooks', 'saved' => 1], admin_url('admin.php')));
+        wp_safe_redirect(add_query_arg(['page' => 'wsma-webhooks', 'saved' => 1], admin_url('admin.php')));
         exit;
     }
 
     public function handle_test(): void {
         if (!current_user_can('manage_options')) wp_die('Access Denied');
-        check_admin_referer('ws_webhooks_test');
+        check_admin_referer('wsma_webhooks_test');
 
         $url = isset($_POST['test_url']) ? esc_url_raw(wp_unslash((string) $_POST['test_url'])) : '';
         if ($url) {
             $this->send($url, 'test', ['message' => 'Test da WSMaker', 'site' => home_url(), 'timestamp' => current_time('mysql')], true);
         }
 
-        wp_safe_redirect(add_query_arg(['page' => 'ws-webhooks', 'tested' => 1], admin_url('admin.php')));
+        wp_safe_redirect(add_query_arg(['page' => 'wsma-webhooks', 'tested' => 1], admin_url('admin.php')));
         exit;
     }
 
@@ -222,8 +222,8 @@ final class WSMA_Webhooks implements WSMA_Module {
             <?php endif; ?>
 
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                <?php wp_nonce_field('ws_webhooks_save'); ?>
-                <input type="hidden" name="action" value="ws_webhooks_save">
+                <?php wp_nonce_field('wsma_webhooks_save'); ?>
+                <input type="hidden" name="action" value="wsma_webhooks_save">
 
                 <table class="widefat" style="margin-bottom: 16px;">
                     <thead>
@@ -234,7 +234,7 @@ final class WSMA_Webhooks implements WSMA_Module {
                             <th style="width:120px">Conferma</th>
                         </tr>
                     </thead>
-                    <tbody id="ws-webhooks-rows">
+                    <tbody id="wsma-webhooks-rows">
                         <?php
                         $rows = $endpoints ?: [['label' => '', 'url' => '', 'events' => ['iscrizione_created' => false, 'confirmed' => false]]];
                         foreach ($rows as $i => $e): ?>
@@ -262,8 +262,8 @@ final class WSMA_Webhooks implements WSMA_Module {
                 <h2 style="margin-top:32px;">Test rapido</h2>
                 <?php foreach ($endpoints as $e): if (empty($e['url'])) continue; ?>
                     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-block;margin:0 8px 8px 0;">
-                        <?php wp_nonce_field('ws_webhooks_test'); ?>
-                        <input type="hidden" name="action" value="ws_webhooks_test">
+                        <?php wp_nonce_field('wsma_webhooks_test'); ?>
+                        <input type="hidden" name="action" value="wsma_webhooks_test">
                         <input type="hidden" name="test_url" value="<?php echo esc_attr($e['url']); ?>">
                         <button type="submit" class="button">📡 Invia test a "<?php echo esc_html($e['label']); ?>"</button>
                     </form>

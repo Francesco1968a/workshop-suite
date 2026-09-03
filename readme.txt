@@ -4,7 +4,7 @@ Tags: workshop, events, event management, crm, poster builder
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,10 @@ The poster builder operates entirely client-side using the HTML5 Canvas API. It 
 4. **Settings & Security**: Native configuration panel with AES-256 encrypted mail credentials and rate limit protection.
 
 == Changelog ==
+
+= 1.1.5 =
+* Renamed the last remaining short-prefixed identifiers found by review: two shortcode tags (`[eventi_categoria]`→`[wsma_eventi_categoria]`, `[workshop_prossimo]`→`[wsma_workshop_prossimo]`), a transient cache key, an admin menu slug, and the Webhooks module's form/nonce action names — all now under the `wsma_`/`wsma-` namespace, no leftover `ws_`/`ws-` prefixes.
+* Existing published pages using the two old shortcode tags were migrated to the new tags directly (no alias layer needed going forward).
 
 = 1.1.4 =
 * Removed the Custom CSS admin feature from this (free) plugin — arbitrary CSS/code insertion is no longer permitted per WordPress.org guidelines. (The equivalent feature remains available only in the separately-distributed PRO add-on, not reviewed by WordPress.org.)

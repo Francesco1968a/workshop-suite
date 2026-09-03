@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) exit;
 final class WSMA_Taxonomy_Registry {
 
     const HUB_TAXONOMY_URL = 'https://wsmaker.pro/wp-json/woorkshoop-hub/v1/taxonomies';
-    const CACHE_KEY        = '_ws_hub_taxonomies_cache';
+    const CACHE_KEY        = '_wsma_hub_taxonomies_cache';
     const CACHE_TTL        = 86400; // 24 hours
 
     public static function init(): void {

@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) exit;
 
 /**
  * Ported from legacy snippet 12 "Workshop CRM 3 Eventi Categoria".
- * Shortcode [eventi_categoria slug="..." max_width="1100"] — grid of
+ * Shortcode [wsma_eventi_categoria slug="..." max_width="1100"] — grid of
  * upcoming eventi for a given categoria_evento. Verbatim port with
  * `wv_format_periodo()` / `wv_stato_posti()` → `WSMA_Data::` equivalents.
  * Excludes eventi flagged `nascondi_dal_frontend` (same ACF meta key
@@ -17,7 +17,7 @@ final class WSMA_Shortcode_Eventi_Categoria implements WSMA_Module {
     }
 
     public function register(): void {
-        add_shortcode('eventi_categoria', [$this, 'render']);
+        add_shortcode('wsma_eventi_categoria', [$this, 'render']);
         add_action('wp_enqueue_scripts', [$this, 'maybe_enqueue_style']);
     }
 
@@ -33,7 +33,7 @@ final class WSMA_Shortcode_Eventi_Categoria implements WSMA_Module {
     public function maybe_enqueue_style(): void {
         if (is_admin()) return;
         global $post;
-        if (!$post || !has_shortcode((string) $post->post_content, 'eventi_categoria')) return;
+        if (!$post || !has_shortcode((string) $post->post_content, 'wsma_eventi_categoria')) return;
 
         WSMA_Data::enqueue_inline_style(
             '.wv-empty-msg{text-align:center;color:#888;}'

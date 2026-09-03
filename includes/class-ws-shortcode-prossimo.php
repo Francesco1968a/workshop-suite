@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) exit;
 
 /**
  * Ported from legacy snippet 18 "Workshop CRM 9 - Data in Hero".
- * Shortcode [workshop_prossimo] — shows the period of the next upcoming
+ * Shortcode [wsma_workshop_prossimo] — shows the period of the next upcoming
  * evento, optionally scoped to the categoria_evento matching the current
  * page's URL. Verbatim port of the legacy shortcode callback, with
  * `wv_format_periodo()` → `WSMA_Data::format_periodo()` and
@@ -17,7 +17,7 @@ final class WSMA_Shortcode_Prossimo implements WSMA_Module {
     }
 
     public function register(): void {
-        add_shortcode('workshop_prossimo', [$this, 'render']);
+        add_shortcode('wsma_workshop_prossimo', [$this, 'render']);
         add_action('wp_enqueue_scripts', [$this, 'maybe_enqueue_style']);
     }
 
@@ -25,7 +25,7 @@ final class WSMA_Shortcode_Prossimo implements WSMA_Module {
     public function maybe_enqueue_style(): void {
         if (is_admin()) return;
         global $post;
-        if (!$post || !has_shortcode((string) $post->post_content, 'workshop_prossimo')) return;
+        if (!$post || !has_shortcode((string) $post->post_content, 'wsma_workshop_prossimo')) return;
 
         WSMA_Data::enqueue_inline_style(
             '.wv-prox-hero{display:block;text-align:center;font-family:"Antony",serif;'

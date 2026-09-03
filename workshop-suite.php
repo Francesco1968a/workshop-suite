@@ -3,7 +3,7 @@
  * Plugin Name: WSMaker — All-in-One Event Manager, CRM & Social Banner Builder
  * Plugin URI: https://wsmaker.pro/
  * Description: The complete all-in-one suite for WordPress to manage workshops, courses and events, participant CRM with timeline tracking, automatic T-15 email reminders, and social poster graphic builder.
- * Version: 1.1.4
+ * Version: 1.1.5
  * Author: Francesco Verolino
  * Author URI: https://francescoverolino.com
  * License: GPLv2 or later
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) exit;
 
 define('WSMA_PATH', plugin_dir_path(__FILE__));
 define('WSMA_URL', plugin_dir_url(__FILE__));
-define('WSMA_VERSION', '1.1.4');
+define('WSMA_VERSION', '1.1.5');
 
 // Translations are loaded automatically by WordPress.org since WP 4.6 —
 // no load_plugin_textdomain() call needed for a wordpress.org-hosted plugin.
