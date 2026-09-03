@@ -59,6 +59,12 @@ final class WSMA_Rest_Riepilogo implements WSMA_Module {
         $mostra_tutti = (bool) $request->get_param('tutti');
         $oggi = current_time('Y-m-d');
 
+        // phpcs:disable WordPress.DB.SlowDBQuery -- this cockpit reads live
+        // seat availability (stato_posti() below, sold_out included) that
+        // the admin acts on directly (confirming/declining a request) —
+        // caching it risks the same double-booking/wrong-refusal problem a
+        // stale frontend would cause, for a query set that's cheap at this
+        // site's real scale (tens of eventi, not thousands of iscrizioni).
         $args = [
             'post_type'      => 'wsma_evento',
             'posts_per_page' => -1,
@@ -170,6 +176,7 @@ final class WSMA_Rest_Riepilogo implements WSMA_Module {
             'post_type' => 'wsma_iscrizione', 'posts_per_page' => -1, 'fields' => 'ids', 'no_found_rows' => true,
             'meta_query' => [['key' => 'mail_risposta_sent_at', 'value' => $thirty_ago, 'compare' => '>=', 'type' => 'DATETIME']],
         ]))->post_count;
+        // phpcs:enable WordPress.DB.SlowDBQuery
         $conv30 = $n_nuove ? round($n_conf30 * 100 / $n_nuove) : 0;
 
         $pct_posti = $tot_posti ? round($tot_confermati * 100 / $tot_posti) : 0;
@@ -257,12 +264,14 @@ final class WSMA_Rest_Riepilogo implements WSMA_Module {
 
         $altri = [];
         if ($cat_id_ev) {
+            // phpcs:disable WordPress.DB.SlowDBQuery -- same "live availability, not cached" reasoning as get_cockpit() above.
             $altri_q = new WP_Query([
                 'post_type' => 'wsma_evento', 'posts_per_page' => -1, 'no_found_rows' => true,
                 'tax_query' => [['taxonomy' => 'wsma_categoria_evento', 'field' => 'term_id', 'terms' => $cat_id_ev]],
                 'meta_key' => 'data_evento', 'orderby' => 'meta_value', 'order' => 'ASC',
                 'meta_query' => [['key' => 'data_fine', 'value' => $oggi, 'compare' => '>=', 'type' => 'DATE']],
             ]);
+            // phpcs:enable WordPress.DB.SlowDBQuery
             foreach ($altri_q->posts as $ev2) {
                 if ($ev2->ID === $evento_id) continue;
                 $s2 = WSMA_Data::stato_posti($ev2->ID);

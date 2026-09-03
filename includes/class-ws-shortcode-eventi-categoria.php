@@ -75,6 +75,14 @@ final class WSMA_Shortcode_Eventi_Categoria implements WSMA_Module {
         $foto = $term ? WSMA_Data::get_field('foto_categoria', 'wsma_categoria_evento_' . $term->term_id) : '';
 
         $oggi = current_time('Y-m-d');
+        // phpcs:disable WordPress.DB.SlowDBQuery -- filters/sorts by postmeta
+        // on purpose: WordPress has no native "event date" field to query
+        // against instead. Deliberately not cached — this renders live seat
+        // availability (WSMA_Data::stato_posti() below, incl. "Sold Out"),
+        // and stale results here mean a customer either books a seat that's
+        // already gone or is wrongly told an event is full. Cost is a
+        // non-issue at this site's real scale (tens of eventi per categoria,
+        // not thousands); revisit only if that scale changes materially.
         $q = new WP_Query([
             'post_type'      => 'wsma_evento',
             'posts_per_page' => -1,
@@ -95,6 +103,7 @@ final class WSMA_Shortcode_Eventi_Categoria implements WSMA_Module {
                 ],
             ],
         ]);
+        // phpcs:enable WordPress.DB.SlowDBQuery
 
         if (!$q->have_posts()) return '<p class="wv-empty-msg">Nessuna data in programma.</p>';
 

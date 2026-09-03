@@ -119,7 +119,8 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
         // Form submissions are handled earlier, on admin_init (see
         // maybe_handle_submit()) — by the time this callback runs, any
         // redirect they issue has already happened.
-        $step = isset($_GET['step']) && $_GET['step'] === '2' ? 2 : 1;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view routing (which step to display), no data is processed here.
+        $step = isset($_GET['step']) && sanitize_text_field(wp_unslash($_GET['step'])) === '2' ? 2 : 1;
 
         $asset_css = WSMA_PATH . 'assets/dist/admin.css';
         if (file_exists($asset_css)) {
