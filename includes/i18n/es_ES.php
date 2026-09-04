@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) exit;
 return [
     'admin_h2_aula_virtuale' => '💻 Aula Virtual',
     'admin_h2_categoria_tipologia' => 'Categoría y tipo',
-    'admin_tab_aggiungi_partecipante' => 'Añadir Partecipante',
+    'admin_tab_aggiungi_partecipante' => 'Añadir Participante',
     'admin_tab_categoria' => 'Categoría',
     'admin_tab_categorie' => 'Categorías',
     'admin_tab_eventi' => 'Eventos',
