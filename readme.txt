@@ -4,7 +4,7 @@ Tags: training management system, workshop, events, event management, crm
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,13 @@ The poster builder operates entirely client-side using the HTML5 Canvas API. It 
 4. **Settings & Security**: Native configuration panel with AES-256 encrypted mail credentials and rate limit protection.
 
 == Changelog ==
+
+= 1.1.6 =
+* Full source-string i18n overhaul: the plugin's UI was hardcoded in Italian despite the public listing being in English. Flipped the PHP source strings to English (Italian now ships as a proper translation), and built i18n infrastructure for the Vue admin panels from scratch (they previously had none) — all 15 Vue panels plus the vanilla-JS Poster Templates screen now translate.
+* Added 4 new complete translations: Spanish (es_ES), French (fr_FR), German (de_DE), and Brazilian Portuguese (pt_BR) — alongside the existing Italian (it_IT).
+* Fixed 27 admin menu labels in the Italian translation that had a translated-looking but untranslated string (`msgstr` identical to the English `msgid`), so they silently stayed in English even with the Italian locale active.
+* Repositioned the plugin as a Training Management System (TMS): updated title, tags, and description.
+* Fixed several stale/broken references in this readme (old `workshop-suite` folder name, Italian menu labels, non-clickable bare URLs).
 
 = 1.1.5 =
 * Renamed the last remaining short-prefixed identifiers found by review: two shortcode tags (`[eventi_categoria]`→`[wsma_eventi_categoria]`, `[workshop_prossimo]`→`[wsma_workshop_prossimo]`), a transient cache key, an admin menu slug, and the Webhooks module's form/nonce action names — all now under the `wsma_`/`wsma-` namespace, no leftover `ws_`/`ws-` prefixes.
