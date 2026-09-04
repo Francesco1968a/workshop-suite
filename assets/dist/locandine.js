@@ -9,11 +9,15 @@
     function headers(extra) {
         return Object.assign({ 'X-WP-Nonce': (window.WSMA_CONFIG && window.WSMA_CONFIG.nonce) || (window.WSMA_CONFIG && window.WSMA_CONFIG.nonce) || '' }, extra || {});
     }
+    function t(key, fallback) {
+        var map = (window.WSMA_CONFIG && window.WSMA_CONFIG.i18n) || {};
+        return (typeof map[key] === 'string' && map[key] !== '') ? map[key] : fallback;
+    }
 
     var FORMATS = [
-        { value: 'sq',    label: 'Quadrato \u2014 1080\u00D71080 (Instagram / Feed)', w: 1080, h: 1080 },
-        { value: 'fb',    label: 'Post Facebook \u2014 1200\u00D7628',                w: 1200, h: 628  },
-        { value: 'story', label: 'Storia IG / Reels \u2014 1080\u00D71920',           w: 1080, h: 1920 }
+        { value: 'sq',    label: t('loc_fmt_square', 'Square \u2014 1080\u00D71080 (Instagram / Feed)'), w: 1080, h: 1080 },
+        { value: 'fb',    label: t('loc_fmt_fb', 'Facebook Post \u2014 1200\u00D7628'),                w: 1200, h: 628  },
+        { value: 'story', label: t('loc_fmt_story', 'IG Story / Reels \u2014 1080\u00D71920'),           w: 1080, h: 1920 }
     ];
 
     var FONTS = [
@@ -21,11 +25,11 @@
         { value: '"Special Elite", monospace',    label: 'Special Elite' },
         { value: 'Poppins, sans-serif',           label: 'Poppins' },
         { value: 'Antonio, sans-serif',           label: 'Antonio' },
-        { value: 'Montserrat, Arial, sans-serif', label: 'Montserrat (Modern)' },
-        { value: '"Courier New", monospace',      label: 'Courier New (Typewriter)' },
-        { value: 'Arial, sans-serif',             label: 'Arial (Clean)' },
-        { value: 'Georgia, serif',                label: 'Georgia (Classic Editorial)' },
-        { value: 'Impact, sans-serif',            label: 'Impact (Bold Poster)' },
+        { value: 'Montserrat, Arial, sans-serif', label: 'Montserrat (' + t('loc_font_modern', 'Modern') + ')' },
+        { value: '"Courier New", monospace',      label: 'Courier New (' + t('loc_font_typewriter', 'Typewriter') + ')' },
+        { value: 'Arial, sans-serif',             label: 'Arial (' + t('loc_font_clean', 'Clean') + ')' },
+        { value: 'Georgia, serif',                label: 'Georgia (' + t('loc_font_editorial', 'Classic Editorial') + ')' },
+        { value: 'Impact, sans-serif',            label: 'Impact (' + t('loc_font_bold_poster', 'Bold Poster') + ')' },
         { value: '"Trebuchet MS", sans-serif',    label: 'Trebuchet MS' }
     ];
 
@@ -101,13 +105,13 @@
     }
 
     function formatImgLabel(url) {
-        if (!url) return 'Nessuna immagine';
-        if (url.startsWith('data:')) return 'Immagine caricata (File locale)';
+        if (!url) return t('loc_no_image', 'No image');
+        if (url.startsWith('data:')) return t('loc_img_uploaded', 'Uploaded image (local file)');
         var clean = url.split('?')[0];
         var parts = clean.split('/');
         var fn = parts.pop();
         if (fn && fn.length > 0 && fn.length < 35 && fn.indexOf('.') !== -1) return fn;
-        return 'Immagine di sfondo selezionata';
+        return t('loc_img_selected', 'Background image selected');
     }
 
     /* ───────── notify ───────── */
@@ -188,7 +192,7 @@
                 var subX = (S.subtitleX !== null && S.subtitleX !== undefined) ? +S.subtitleX : 60;
                 var subY = (S.subtitleY !== null && S.subtitleY !== undefined) ? +S.subtitleY : 290;
                 ctx.textAlign = 'left';
-                ctx.fillText(S.subtitle || 'Sottotitolo', subX, subY);
+                ctx.fillText(S.subtitle || t('loc_default_subtitle', 'Subtitle'), subX, subY);
 
                 // Date FB
                 ctx.fillStyle = dColor;
@@ -226,7 +230,7 @@
                 var subX = (S.subtitleX !== null && S.subtitleX !== undefined) ? +S.subtitleX : cx;
                 var subY = (S.subtitleY !== null && S.subtitleY !== undefined) ? +S.subtitleY : 1220;
                 ctx.textAlign = (S.subtitleX !== null) ? 'left' : 'center';
-                ctx.fillText(S.subtitle || 'Sottotitolo', subX, subY);
+                ctx.fillText(S.subtitle || t('loc_default_subtitle', 'Subtitle'), subX, subY);
 
                 // Date Story
                 ctx.fillStyle = dColor;
@@ -264,7 +268,7 @@
                 var subX = (S.subtitleX !== null && S.subtitleX !== undefined) ? +S.subtitleX : cx;
                 var subY = (S.subtitleY !== null && S.subtitleY !== undefined) ? +S.subtitleY : 605;
                 ctx.textAlign = (S.subtitleX !== null) ? 'left' : 'center';
-                ctx.fillText(S.subtitle || 'Sottotitolo', subX, subY);
+                ctx.fillText(S.subtitle || t('loc_default_subtitle', 'Subtitle'), subX, subY);
 
                 // Date Sq
                 ctx.fillStyle = dColor;
@@ -353,7 +357,7 @@
                 ctx.fillStyle = subColor;
                 var subSize = m.subtitleFontSize || 28;
                 ctx.font = '600 ' + subSize + 'px ' + subFamily;
-                ctx.fillText(m.subtitle || 'Sottotitolo', (m.subtitleX !== null && m.subtitleX !== undefined) ? +m.subtitleX : 60, (m.subtitleY !== null && m.subtitleY !== undefined) ? +m.subtitleY : 290);
+                ctx.fillText(m.subtitle || t('loc_default_subtitle', 'Subtitle'), (m.subtitleX !== null && m.subtitleX !== undefined) ? +m.subtitleX : 60, (m.subtitleY !== null && m.subtitleY !== undefined) ? +m.subtitleY : 290);
 
                 ctx.fillStyle = dColor;
                 var dSize = m.datesFontSize || 30;
@@ -379,7 +383,7 @@
                 var subSize = m.subtitleFontSize || 38;
                 ctx.font = '600 ' + subSize + 'px ' + subFamily;
                 ctx.textAlign = (m.subtitleX !== null) ? 'left' : 'center';
-                ctx.fillText(m.subtitle || 'Sottotitolo', (m.subtitleX !== null && m.subtitleX !== undefined) ? +m.subtitleX : cx, (m.subtitleY !== null && m.subtitleY !== undefined) ? +m.subtitleY : 1220);
+                ctx.fillText(m.subtitle || t('loc_default_subtitle', 'Subtitle'), (m.subtitleX !== null && m.subtitleX !== undefined) ? +m.subtitleX : cx, (m.subtitleY !== null && m.subtitleY !== undefined) ? +m.subtitleY : 1220);
 
                 ctx.fillStyle = dColor;
                 var dSize = m.datesFontSize || 40;
@@ -407,7 +411,7 @@
                 var subSize = m.subtitleFontSize || 34;
                 ctx.font = '600 ' + subSize + 'px ' + subFamily;
                 ctx.textAlign = (m.subtitleX !== null) ? 'left' : 'center';
-                ctx.fillText(m.subtitle || 'Sottotitolo', (m.subtitleX !== null && m.subtitleX !== undefined) ? +m.subtitleX : cx, (m.subtitleY !== null && m.subtitleY !== undefined) ? +m.subtitleY : 605);
+                ctx.fillText(m.subtitle || t('loc_default_subtitle', 'Subtitle'), (m.subtitleX !== null && m.subtitleX !== undefined) ? +m.subtitleX : cx, (m.subtitleY !== null && m.subtitleY !== undefined) ? +m.subtitleY : 605);
 
                 ctx.fillStyle = dColor;
                 var dSize = m.datesFontSize || 36;
@@ -462,7 +466,7 @@
         } catch (e) { console.warn(e); }
     }
     async function saveModel() {
-        if (!S.modelName.trim()) { notify('Inserisci un nome modello.', true); return; }
+        if (!S.modelName.trim()) { notify(t('loc_err_no_name', 'Enter a template name.'), true); return; }
         var p = { id: S.currentModelId, nome: S.modelName.trim(), format: S.format,
             brand: S.brand, brandFont: S.brandFont, brandFontSize: S.brandFontSize, brandColor: S.brandColor, brandX: S.brandX, brandY: S.brandY,
             title: S.title, titleFont: S.titleFont, titleFontSize: S.titleFontSize, titleColor: S.titleColor, titleX: S.titleX, titleY: S.titleY,
@@ -474,23 +478,23 @@
             var r = await fetch(restUrl('admin/locandine-modelli'),
                 { method: 'POST', headers: headers({ 'Content-Type': 'application/json' }), body: JSON.stringify(p) });
             var d = await r.json();
-            if (r.ok) { S.savedModels = d.modelli || []; renderModels(); notify(d.msg || 'Modello salvato.'); }
-            else notify(d.message || 'Errore.', true);
-        } catch (e) { notify('Errore connessione.', true); }
+            if (r.ok) { S.savedModels = d.modelli || []; renderModels(); notify(d.msg || t('loc_model_saved', 'Template saved.')); }
+            else notify(d.message || t('loc_error_generic', 'Error.'), true);
+        } catch (e) { notify(t('loc_err_connection', 'Connection error.'), true); }
     }
     async function deleteModel(id) {
-        if (!confirm('Eliminare questo modello?')) return;
+        if (!confirm(t('loc_confirm_delete', 'Delete this template?'))) return;
         try {
             var r = await fetch(restUrl('admin/locandine-modelli/' + id), { method: 'DELETE', headers: headers() });
             var d = await r.json();
-            if (r.ok) { S.savedModels = d.modelli || []; if (S.currentModelId === id) reset(); renderModels(); notify('Eliminato.'); }
+            if (r.ok) { S.savedModels = d.modelli || []; if (S.currentModelId === id) reset(); renderModels(); notify(t('loc_deleted', 'Deleted.')); }
         } catch (e) { console.warn(e); }
     }
 
     /* ───────── media ───────── */
     function mediaPickerSingle() {
         if (window.wp && window.wp.media) {
-            var fr = window.wp.media({ title: 'Seleziona immagine di sfondo', button: { text: 'Usa questa immagine' }, multiple: false });
+            var fr = window.wp.media({ title: t('loc_media_title', 'Select background image'), button: { text: t('loc_media_button', 'Use this image') }, multiple: false });
             fr.on('select', function () {
                 var a = fr.state().get('selection').first().toJSON();
                 if (a && a.url) {
@@ -501,7 +505,7 @@
                 }
             });
             fr.open();
-        } else notify('WP Media non disponibile.', true);
+        } else notify(t('loc_media_unavailable', 'WP Media not available.'), true);
     }
 
     /* ───────── load / reset ───────── */
@@ -548,7 +552,7 @@
         S.imgOffsetY = (m.imgOffsetY !== undefined) ? m.imgOffsetY : 0;
         S.darkOverlay = (m.darkOverlay !== undefined) ? m.darkOverlay : 0.5;
 
-        rebuildForm(); requestRenderCanvas(); notify('Modello "' + m.nome + '" caricato.');
+        rebuildForm(); requestRenderCanvas(); notify(t('loc_model_loaded', 'Template "%s" loaded.').replace('%s', m.nome));
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function reset() {
@@ -602,7 +606,7 @@
         var dispD = document.getElementById('fvw-dates-display-val');
         if (dispD) dispD.textContent = S.dates || "16 - 18 OTT'26";
         var dispDesc = document.getElementById('fvw-desc-display-val');
-        if (dispDesc) dispDesc.textContent = S.description ? (S.description.slice(0, 30) + (S.description.length > 30 ? '...' : '')) : 'Nessuna descrizione';
+        if (dispDesc) dispDesc.textContent = S.description ? (S.description.slice(0, 30) + (S.description.length > 30 ? '...' : '')) : t('loc_no_description', 'No description');
         var dispImg = document.getElementById('fvw-img-display-val');
         if (dispImg) dispImg.textContent = formatImgLabel(S.imageUrl);
     }
@@ -615,13 +619,13 @@
         while (body.firstChild) body.removeChild(body.firstChild);
 
         if (type === 'brand') {
-            title.textContent = 'Brand / Intestazione';
+            title.textContent = t('loc_drawer_brand', 'Brand / Header');
 
             /* 1. Testo */
             var fTesto = document.createElement('div'); fTesto.className = 'wv-field';
-            var lb1 = document.createElement('label'); lb1.textContent = 'Testo Brand'; fTesto.appendChild(lb1);
+            var lb1 = document.createElement('label'); lb1.textContent = t('loc_label_brand_text', 'Brand text'); fTesto.appendChild(lb1);
             var inpTesto = document.createElement('input'); inpTesto.type = 'text';
-            inpTesto.placeholder = 'Es. FRANCESCOVEROLINO'; inpTesto.value = S.brand || '';
+            inpTesto.placeholder = t('loc_ph_brand', 'E.g. FRANCESCOVEROLINO'); inpTesto.value = S.brand || '';
             inpTesto.addEventListener('input', function () {
                 S.brand = inpTesto.value;
                 updateAllDisplayVals();
@@ -631,7 +635,7 @@
 
             /* 2. Font */
             var fFont = document.createElement('div'); fFont.className = 'wv-field';
-            var lb2 = document.createElement('label'); lb2.textContent = '1. Font / Carattere'; fFont.appendChild(lb2);
+            var lb2 = document.createElement('label'); lb2.textContent = t('loc_label_font', '1. Font / Typeface'); fFont.appendChild(lb2);
             var selFont = document.createElement('select');
             FONTS.forEach(function (f) {
                 var opt = document.createElement('option'); opt.value = f.value; opt.textContent = f.label;
@@ -648,7 +652,7 @@
             var fSize = document.createElement('div'); fSize.className = 'wv-field';
             var lb3 = document.createElement('label');
             var sizeSpan = document.createElement('span'); sizeSpan.style.float = 'right'; sizeSpan.textContent = (S.brandFontSize || 28) + 'px';
-            lb3.textContent = '2. Dimensione Font '; lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
+            lb3.textContent = t('loc_label_font_size', '2. Font Size '); lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
             var inpSize = document.createElement('input'); inpSize.type = 'range';
             inpSize.min = 10; inpSize.max = 120; inpSize.value = S.brandFontSize || 28; inpSize.style.width = '100%';
             inpSize.addEventListener('input', function () {
@@ -660,7 +664,7 @@
 
             /* 4. Colore */
             var fColor = document.createElement('div'); fColor.className = 'wv-field';
-            var lb4 = document.createElement('label'); lb4.textContent = '3. Colore Testo'; fColor.appendChild(lb4);
+            var lb4 = document.createElement('label'); lb4.textContent = t('loc_label_color', '3. Text Color'); fColor.appendChild(lb4);
             var colorWrap = document.createElement('div'); colorWrap.style.cssText = 'display:flex;gap:10px;align-items:center;';
             var inpColor = document.createElement('input'); inpColor.type = 'color';
             inpColor.value = S.brandColor || '#ffffff';
@@ -674,11 +678,11 @@
 
             /* 5. Posizione */
             var fPos = document.createElement('div'); fPos.className = 'wv-field';
-            var lb5 = document.createElement('label'); lb5.textContent = '4. Posizione (Orizzontale / Verticale)'; fPos.appendChild(lb5);
+            var lb5 = document.createElement('label'); lb5.textContent = t('loc_label_position', '4. Position (Horizontal / Vertical)'); fPos.appendChild(lb5);
             var posXWrap = document.createElement('div'); posXWrap.style.marginBottom = '10px';
             var lbX = document.createElement('div'); lbX.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
             var spanX = document.createElement('span'); spanX.textContent = (S.brandX !== undefined ? S.brandX : 60) + 'px';
-            lbX.innerHTML = 'Orizzontale (X): '; lbX.appendChild(spanX);
+            lbX.innerHTML = t('loc_label_x', 'Horizontal (X): '); lbX.appendChild(spanX);
             var inpX = document.createElement('input'); inpX.type = 'range'; inpX.min = 0; inpX.max = 800; inpX.value = S.brandX !== undefined ? S.brandX : 60; inpX.style.width = '100%';
             inpX.addEventListener('input', function () { S.brandX = +inpX.value; spanX.textContent = inpX.value + 'px'; requestRenderCanvas(); });
             posXWrap.appendChild(lbX); posXWrap.appendChild(inpX); fPos.appendChild(posXWrap);
@@ -686,7 +690,7 @@
             var posYWrap = document.createElement('div');
             var lbY = document.createElement('div'); lbY.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
             var spanY = document.createElement('span'); spanY.textContent = (S.brandY !== undefined ? S.brandY : 75) + 'px';
-            lbY.innerHTML = 'Verticale (Y): '; lbY.appendChild(spanY);
+            lbY.innerHTML = t('loc_label_y', 'Vertical (Y): '); lbY.appendChild(spanY);
             var inpY = document.createElement('input'); inpY.type = 'range'; inpY.min = 0; inpY.max = 800; inpY.value = S.brandY !== undefined ? S.brandY : 75; inpY.style.width = '100%';
             inpY.addEventListener('input', function () { S.brandY = +inpY.value; spanY.textContent = inpY.value + 'px'; requestRenderCanvas(); });
             posYWrap.appendChild(lbY); posYWrap.appendChild(inpY); fPos.appendChild(posYWrap);
@@ -694,17 +698,17 @@
             body.appendChild(fPos);
 
         } else if (type === 'title') {
-            title.textContent = 'Categoria / Titolo';
+            title.textContent = t('loc_drawer_title', 'Category / Title');
 
             var fTesto = document.createElement('div'); fTesto.className = 'wv-field';
-            var lb1 = document.createElement('label'); lb1.textContent = 'Testo Categoria / Titolo'; fTesto.appendChild(lb1);
+            var lb1 = document.createElement('label'); lb1.textContent = t('loc_label_title_text', 'Category / Title text'); fTesto.appendChild(lb1);
             var inpTesto = document.createElement('input'); inpTesto.type = 'text';
-            inpTesto.placeholder = 'Es. FIRENZE STREET'; inpTesto.value = S.title || '';
+            inpTesto.placeholder = t('loc_ph_title', 'E.g. FIRENZE STREET'); inpTesto.value = S.title || '';
             inpTesto.addEventListener('input', function () { S.title = inpTesto.value; updateAllDisplayVals(); requestRenderCanvas(); });
             fTesto.appendChild(inpTesto); body.appendChild(fTesto);
 
             var fFont = document.createElement('div'); fFont.className = 'wv-field';
-            var lb2 = document.createElement('label'); lb2.textContent = '1. Font / Carattere'; fFont.appendChild(lb2);
+            var lb2 = document.createElement('label'); lb2.textContent = t('loc_label_font', '1. Font / Typeface'); fFont.appendChild(lb2);
             var selFont = document.createElement('select');
             FONTS.forEach(function (f) {
                 var opt = document.createElement('option'); opt.value = f.value; opt.textContent = f.label;
@@ -716,13 +720,13 @@
             var currSize = S.titleFontSize || (S.format === 'fb' ? 60 : S.format === 'story' ? 80 : 72);
             var fSize = document.createElement('div'); fSize.className = 'wv-field';
             var lb3 = document.createElement('label'); var sizeSpan = document.createElement('span'); sizeSpan.style.float = 'right'; sizeSpan.textContent = currSize + 'px';
-            lb3.textContent = '2. Dimensione Font '; lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
+            lb3.textContent = t('loc_label_font_size', '2. Font Size '); lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
             var inpSize = document.createElement('input'); inpSize.type = 'range'; inpSize.min = 20; inpSize.max = 160; inpSize.value = currSize; inpSize.style.width = '100%';
             inpSize.addEventListener('input', function () { S.titleFontSize = +inpSize.value; sizeSpan.textContent = inpSize.value + 'px'; requestRenderCanvas(); });
             fSize.appendChild(inpSize); body.appendChild(fSize);
 
             var fColor = document.createElement('div'); fColor.className = 'wv-field';
-            var lb4 = document.createElement('label'); lb4.textContent = '3. Colore Testo'; fColor.appendChild(lb4);
+            var lb4 = document.createElement('label'); lb4.textContent = t('loc_label_color', '3. Text Color'); fColor.appendChild(lb4);
             var colorWrap = document.createElement('div'); colorWrap.style.cssText = 'display:flex;gap:10px;align-items:center;';
             var inpColor = document.createElement('input'); inpColor.type = 'color'; inpColor.value = S.titleColor || '#E11D48'; inpColor.style.cssText = 'width:44px;height:36px;padding:0;border:none;background:none;cursor:pointer;';
             var hexText = document.createElement('input'); hexText.type = 'text'; hexText.value = S.titleColor || '#E11D48'; hexText.style.flex = '1';
@@ -731,18 +735,18 @@
             colorWrap.appendChild(inpColor); colorWrap.appendChild(hexText); fColor.appendChild(colorWrap); body.appendChild(fColor);
 
             var fPos = document.createElement('div'); fPos.className = 'wv-field';
-            var lb5 = document.createElement('label'); lb5.textContent = '4. Posizione (Orizzontale / Verticale)'; fPos.appendChild(lb5);
+            var lb5 = document.createElement('label'); lb5.textContent = t('loc_label_position', '4. Position (Horizontal / Vertical)'); fPos.appendChild(lb5);
             var defaultX = S.format === 'fb' ? 60 : (fmt().w / 2); var defaultY = S.format === 'fb' ? 240 : (S.format === 'story' ? 1150 : 545);
             var currX = (S.titleX !== null && S.titleX !== undefined) ? S.titleX : defaultX; var currY = (S.titleY !== null && S.titleY !== undefined) ? S.titleY : defaultY;
             var posXWrap = document.createElement('div'); posXWrap.style.marginBottom = '10px';
             var lbX = document.createElement('div'); lbX.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
-            var spanX = document.createElement('span'); spanX.textContent = Math.round(currX) + 'px'; lbX.innerHTML = 'Orizzontale (X): '; lbX.appendChild(spanX);
+            var spanX = document.createElement('span'); spanX.textContent = Math.round(currX) + 'px'; lbX.innerHTML = t('loc_label_x', 'Horizontal (X): '); lbX.appendChild(spanX);
             var inpX = document.createElement('input'); inpX.type = 'range'; inpX.min = 0; inpX.max = 1200; inpX.value = currX; inpX.style.width = '100%';
             inpX.addEventListener('input', function () { S.titleX = +inpX.value; spanX.textContent = inpX.value + 'px'; requestRenderCanvas(); });
             posXWrap.appendChild(lbX); posXWrap.appendChild(inpX); fPos.appendChild(posXWrap);
 
             var posYWrap = document.createElement('div'); var lbY = document.createElement('div'); lbY.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
-            var spanY = document.createElement('span'); spanY.textContent = Math.round(currY) + 'px'; lbY.innerHTML = 'Verticale (Y): '; lbY.appendChild(spanY);
+            var spanY = document.createElement('span'); spanY.textContent = Math.round(currY) + 'px'; lbY.innerHTML = t('loc_label_y', 'Vertical (Y): '); lbY.appendChild(spanY);
             var inpY = document.createElement('input'); inpY.type = 'range'; inpY.min = 0; inpY.max = 1920; inpY.value = currY; inpY.style.width = '100%';
             inpY.addEventListener('input', function () { S.titleY = +inpY.value; spanY.textContent = inpY.value + 'px'; requestRenderCanvas(); });
             posYWrap.appendChild(lbY); posYWrap.appendChild(inpY); fPos.appendChild(posYWrap);
@@ -750,16 +754,16 @@
             body.appendChild(fPos);
 
         } else if (type === 'subtitle') {
-            title.textContent = 'Tipologia / Sottotitolo';
+            title.textContent = t('loc_drawer_subtitle', 'Type / Subtitle');
 
             var fTesto = document.createElement('div'); fTesto.className = 'wv-field';
-            var lb1 = document.createElement('label'); lb1.textContent = 'Testo Sottotitolo'; fTesto.appendChild(lb1);
-            var inpTesto = document.createElement('input'); inpTesto.type = 'text'; inpTesto.placeholder = 'Es. Talk & Masterclass'; inpTesto.value = S.subtitle || '';
+            var lb1 = document.createElement('label'); lb1.textContent = t('loc_label_subtitle_text', 'Subtitle text'); fTesto.appendChild(lb1);
+            var inpTesto = document.createElement('input'); inpTesto.type = 'text'; inpTesto.placeholder = t('loc_ph_subtitle', 'E.g. Talk & Masterclass'); inpTesto.value = S.subtitle || '';
             inpTesto.addEventListener('input', function () { S.subtitle = inpTesto.value; updateAllDisplayVals(); requestRenderCanvas(); });
             fTesto.appendChild(inpTesto); body.appendChild(fTesto);
 
             var fFont = document.createElement('div'); fFont.className = 'wv-field';
-            var lb2 = document.createElement('label'); lb2.textContent = '1. Font / Carattere'; fFont.appendChild(lb2);
+            var lb2 = document.createElement('label'); lb2.textContent = t('loc_label_font', '1. Font / Typeface'); fFont.appendChild(lb2);
             var selFont = document.createElement('select');
             FONTS.forEach(function (f) { var opt = document.createElement('option'); opt.value = f.value; opt.textContent = f.label; if (f.value === S.subtitleFont) opt.selected = true; selFont.appendChild(opt); });
             selFont.addEventListener('change', function () { S.subtitleFont = selFont.value; if (document.fonts && document.fonts.ready) { document.fonts.ready.then(requestRenderCanvas); } else { requestRenderCanvas(); } });
@@ -768,13 +772,13 @@
             var currSize = S.subtitleFontSize || (S.format === 'fb' ? 28 : S.format === 'story' ? 38 : 34);
             var fSize = document.createElement('div'); fSize.className = 'wv-field';
             var lb3 = document.createElement('label'); var sizeSpan = document.createElement('span'); sizeSpan.style.float = 'right'; sizeSpan.textContent = currSize + 'px';
-            lb3.textContent = '2. Dimensione Font '; lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
+            lb3.textContent = t('loc_label_font_size', '2. Font Size '); lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
             var inpSize = document.createElement('input'); inpSize.type = 'range'; inpSize.min = 10; inpSize.max = 100; inpSize.value = currSize; inpSize.style.width = '100%';
             inpSize.addEventListener('input', function () { S.subtitleFontSize = +inpSize.value; sizeSpan.textContent = inpSize.value + 'px'; requestRenderCanvas(); });
             fSize.appendChild(inpSize); body.appendChild(fSize);
 
             var fColor = document.createElement('div'); fColor.className = 'wv-field';
-            var lb4 = document.createElement('label'); lb4.textContent = '3. Colore Testo'; fColor.appendChild(lb4);
+            var lb4 = document.createElement('label'); lb4.textContent = t('loc_label_color', '3. Text Color'); fColor.appendChild(lb4);
             var colorWrap = document.createElement('div'); colorWrap.style.cssText = 'display:flex;gap:10px;align-items:center;';
             var inpColor = document.createElement('input'); inpColor.type = 'color'; inpColor.value = S.subtitleColor || '#ffffff'; inpColor.style.cssText = 'width:44px;height:36px;padding:0;border:none;background:none;cursor:pointer;';
             var hexText = document.createElement('input'); hexText.type = 'text'; hexText.value = S.subtitleColor || '#ffffff'; hexText.style.flex = '1';
@@ -783,18 +787,18 @@
             colorWrap.appendChild(inpColor); colorWrap.appendChild(hexText); fColor.appendChild(colorWrap); body.appendChild(fColor);
 
             var fPos = document.createElement('div'); fPos.className = 'wv-field';
-            var lb5 = document.createElement('label'); lb5.textContent = '4. Posizione (Orizzontale / Verticale)'; fPos.appendChild(lb5);
+            var lb5 = document.createElement('label'); lb5.textContent = t('loc_label_position', '4. Position (Horizontal / Vertical)'); fPos.appendChild(lb5);
             var defaultX = S.format === 'fb' ? 60 : (fmt().w / 2); var defaultY = S.format === 'fb' ? 290 : (S.format === 'story' ? 1220 : 605);
             var currX = (S.subtitleX !== null && S.subtitleX !== undefined) ? S.subtitleX : defaultX; var currY = (S.subtitleY !== null && S.subtitleY !== undefined) ? S.subtitleY : defaultY;
             var posXWrap = document.createElement('div'); posXWrap.style.marginBottom = '10px';
             var lbX = document.createElement('div'); lbX.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
-            var spanX = document.createElement('span'); spanX.textContent = Math.round(currX) + 'px'; lbX.innerHTML = 'Orizzontale (X): '; lbX.appendChild(spanX);
+            var spanX = document.createElement('span'); spanX.textContent = Math.round(currX) + 'px'; lbX.innerHTML = t('loc_label_x', 'Horizontal (X): '); lbX.appendChild(spanX);
             var inpX = document.createElement('input'); inpX.type = 'range'; inpX.min = 0; inpX.max = 1200; inpX.value = currX; inpX.style.width = '100%';
             inpX.addEventListener('input', function () { S.subtitleX = +inpX.value; spanX.textContent = inpX.value + 'px'; requestRenderCanvas(); });
             posXWrap.appendChild(lbX); posXWrap.appendChild(inpX); fPos.appendChild(posXWrap);
 
             var posYWrap = document.createElement('div'); var lbY = document.createElement('div'); lbY.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
-            var spanY = document.createElement('span'); spanY.textContent = Math.round(currY) + 'px'; lbY.innerHTML = 'Verticale (Y): '; lbY.appendChild(spanY);
+            var spanY = document.createElement('span'); spanY.textContent = Math.round(currY) + 'px'; lbY.innerHTML = t('loc_label_y', 'Vertical (Y): '); lbY.appendChild(spanY);
             var inpY = document.createElement('input'); inpY.type = 'range'; inpY.min = 0; inpY.max = 1920; inpY.value = currY; inpY.style.width = '100%';
             inpY.addEventListener('input', function () { S.subtitleY = +inpY.value; spanY.textContent = inpY.value + 'px'; requestRenderCanvas(); });
             posYWrap.appendChild(lbY); posYWrap.appendChild(inpY); fPos.appendChild(posYWrap);
@@ -802,16 +806,16 @@
             body.appendChild(fPos);
 
         } else if (type === 'dates') {
-            title.textContent = 'Data / Periodo';
+            title.textContent = t('loc_drawer_dates', 'Date / Period');
 
             var fTesto = document.createElement('div'); fTesto.className = 'wv-field';
-            var lb1 = document.createElement('label'); lb1.textContent = 'Testo Data / Periodo'; fTesto.appendChild(lb1);
-            var inpTesto = document.createElement('input'); inpTesto.type = 'text'; inpTesto.placeholder = "Es. 16 - 18 OTT'26"; inpTesto.value = S.dates || '';
+            var lb1 = document.createElement('label'); lb1.textContent = t('loc_label_dates_text', 'Date / Period text'); fTesto.appendChild(lb1);
+            var inpTesto = document.createElement('input'); inpTesto.type = 'text'; inpTesto.placeholder = t('loc_ph_dates', "E.g. 16 - 18 OCT'26"); inpTesto.value = S.dates || '';
             inpTesto.addEventListener('input', function () { S.dates = inpTesto.value; updateAllDisplayVals(); requestRenderCanvas(); });
             fTesto.appendChild(inpTesto); body.appendChild(fTesto);
 
             var fFont = document.createElement('div'); fFont.className = 'wv-field';
-            var lb2 = document.createElement('label'); lb2.textContent = '1. Font / Carattere'; fFont.appendChild(lb2);
+            var lb2 = document.createElement('label'); lb2.textContent = t('loc_label_font', '1. Font / Typeface'); fFont.appendChild(lb2);
             var selFont = document.createElement('select');
             FONTS.forEach(function (f) { var opt = document.createElement('option'); opt.value = f.value; opt.textContent = f.label; if (f.value === S.datesFont) opt.selected = true; selFont.appendChild(opt); });
             selFont.addEventListener('change', function () { S.datesFont = selFont.value; if (document.fonts && document.fonts.ready) { document.fonts.ready.then(requestRenderCanvas); } else { requestRenderCanvas(); } });
@@ -820,13 +824,13 @@
             var currSize = S.datesFontSize || (S.format === 'fb' ? 30 : S.format === 'story' ? 40 : 36);
             var fSize = document.createElement('div'); fSize.className = 'wv-field';
             var lb3 = document.createElement('label'); var sizeSpan = document.createElement('span'); sizeSpan.style.float = 'right'; sizeSpan.textContent = currSize + 'px';
-            lb3.textContent = '2. Dimensione Font '; lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
+            lb3.textContent = t('loc_label_font_size', '2. Font Size '); lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
             var inpSize = document.createElement('input'); inpSize.type = 'range'; inpSize.min = 10; inpSize.max = 100; inpSize.value = currSize; inpSize.style.width = '100%';
             inpSize.addEventListener('input', function () { S.datesFontSize = +inpSize.value; sizeSpan.textContent = inpSize.value + 'px'; requestRenderCanvas(); });
             fSize.appendChild(inpSize); body.appendChild(fSize);
 
             var fColor = document.createElement('div'); fColor.className = 'wv-field';
-            var lb4 = document.createElement('label'); lb4.textContent = '3. Colore Testo'; fColor.appendChild(lb4);
+            var lb4 = document.createElement('label'); lb4.textContent = t('loc_label_color', '3. Text Color'); fColor.appendChild(lb4);
             var colorWrap = document.createElement('div'); colorWrap.style.cssText = 'display:flex;gap:10px;align-items:center;';
             var inpColor = document.createElement('input'); inpColor.type = 'color'; inpColor.value = S.datesColor || '#ffffff'; inpColor.style.cssText = 'width:44px;height:36px;padding:0;border:none;background:none;cursor:pointer;';
             var hexText = document.createElement('input'); hexText.type = 'text'; hexText.value = S.datesColor || '#ffffff'; hexText.style.flex = '1';
@@ -835,18 +839,18 @@
             colorWrap.appendChild(inpColor); colorWrap.appendChild(hexText); fColor.appendChild(colorWrap); body.appendChild(fColor);
 
             var fPos = document.createElement('div'); fPos.className = 'wv-field';
-            var lb5 = document.createElement('label'); lb5.textContent = '4. Posizione (Orizzontale / Verticale)'; fPos.appendChild(lb5);
+            var lb5 = document.createElement('label'); lb5.textContent = t('loc_label_position', '4. Position (Horizontal / Vertical)'); fPos.appendChild(lb5);
             var defaultX = S.format === 'fb' ? 60 : (fmt().w / 2); var defaultY = S.format === 'fb' ? 340 : (S.format === 'story' ? 1300 : 665);
             var currX = (S.datesX !== null && S.datesX !== undefined) ? S.datesX : defaultX; var currY = (S.datesY !== null && S.datesY !== undefined) ? S.datesY : defaultY;
             var posXWrap = document.createElement('div'); posXWrap.style.marginBottom = '10px';
             var lbX = document.createElement('div'); lbX.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
-            var spanX = document.createElement('span'); spanX.textContent = Math.round(currX) + 'px'; lbX.innerHTML = 'Orizzontale (X): '; lbX.appendChild(spanX);
+            var spanX = document.createElement('span'); spanX.textContent = Math.round(currX) + 'px'; lbX.innerHTML = t('loc_label_x', 'Horizontal (X): '); lbX.appendChild(spanX);
             var inpX = document.createElement('input'); inpX.type = 'range'; inpX.min = 0; inpX.max = 1200; inpX.value = currX; inpX.style.width = '100%';
             inpX.addEventListener('input', function () { S.datesX = +inpX.value; spanX.textContent = inpX.value + 'px'; requestRenderCanvas(); });
             posXWrap.appendChild(lbX); posXWrap.appendChild(inpX); fPos.appendChild(posXWrap);
 
             var posYWrap = document.createElement('div'); var lbY = document.createElement('div'); lbY.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
-            var spanY = document.createElement('span'); spanY.textContent = Math.round(currY) + 'px'; lbY.innerHTML = 'Verticale (Y): '; lbY.appendChild(spanY);
+            var spanY = document.createElement('span'); spanY.textContent = Math.round(currY) + 'px'; lbY.innerHTML = t('loc_label_y', 'Vertical (Y): '); lbY.appendChild(spanY);
             var inpY = document.createElement('input'); inpY.type = 'range'; inpY.min = 0; inpY.max = 1920; inpY.value = currY; inpY.style.width = '100%';
             inpY.addEventListener('input', function () { S.datesY = +inpY.value; spanY.textContent = inpY.value + 'px'; requestRenderCanvas(); });
             posYWrap.appendChild(lbY); posYWrap.appendChild(inpY); fPos.appendChild(posYWrap);
@@ -854,13 +858,13 @@
             body.appendChild(fPos);
 
         } else if (type === 'description') {
-            title.textContent = 'Descrizione / Programma';
+            title.textContent = t('loc_drawer_description', 'Description / Program');
 
             /* 1. Testo */
             var fTesto = document.createElement('div'); fTesto.className = 'wv-field';
-            var lb1 = document.createElement('label'); lb1.textContent = 'Testo Descrizione / Programma'; fTesto.appendChild(lb1);
+            var lb1 = document.createElement('label'); lb1.textContent = t('loc_label_desc_text', 'Description / Program text'); fTesto.appendChild(lb1);
             var taTesto = document.createElement('textarea'); taTesto.rows = 4;
-            taTesto.placeholder = 'Es. 3 GIORNATE DI STREET PHOTOGRAPHY...'; taTesto.value = S.description || '';
+            taTesto.placeholder = t('loc_ph_desc', 'E.g. 3 DAYS OF STREET PHOTOGRAPHY...'); taTesto.value = S.description || '';
             taTesto.addEventListener('input', function () {
                 S.description = taTesto.value;
                 updateAllDisplayVals();
@@ -870,7 +874,7 @@
 
             /* 2. Font */
             var fFont = document.createElement('div'); fFont.className = 'wv-field';
-            var lb2 = document.createElement('label'); lb2.textContent = '1. Font / Carattere'; fFont.appendChild(lb2);
+            var lb2 = document.createElement('label'); lb2.textContent = t('loc_label_font', '1. Font / Typeface'); fFont.appendChild(lb2);
             var selFont = document.createElement('select');
             FONTS.forEach(function (f) {
                 var opt = document.createElement('option'); opt.value = f.value; opt.textContent = f.label;
@@ -886,14 +890,14 @@
             var currSize = S.descFontSize || (S.format === 'fb' ? 17 : S.format === 'story' ? 24 : 22);
             var fSize = document.createElement('div'); fSize.className = 'wv-field';
             var lb3 = document.createElement('label'); var sizeSpan = document.createElement('span'); sizeSpan.style.float = 'right'; sizeSpan.textContent = currSize + 'px';
-            lb3.textContent = '2. Dimensione Font '; lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
+            lb3.textContent = t('loc_label_font_size', '2. Font Size '); lb3.appendChild(sizeSpan); fSize.appendChild(lb3);
             var inpSize = document.createElement('input'); inpSize.type = 'range'; inpSize.min = 10; inpSize.max = 80; inpSize.value = currSize; inpSize.style.width = '100%';
             inpSize.addEventListener('input', function () { S.descFontSize = +inpSize.value; sizeSpan.textContent = inpSize.value + 'px'; requestRenderCanvas(); });
             fSize.appendChild(inpSize); body.appendChild(fSize);
 
             /* 4. Colore */
             var fColor = document.createElement('div'); fColor.className = 'wv-field';
-            var lb4 = document.createElement('label'); lb4.textContent = '3. Colore Testo'; fColor.appendChild(lb4);
+            var lb4 = document.createElement('label'); lb4.textContent = t('loc_label_color', '3. Text Color'); fColor.appendChild(lb4);
             var colorWrap = document.createElement('div'); colorWrap.style.cssText = 'display:flex;gap:10px;align-items:center;';
             var inpColor = document.createElement('input'); inpColor.type = 'color'; inpColor.value = S.descColor || '#ffffff'; inpColor.style.cssText = 'width:44px;height:36px;padding:0;border:none;background:none;cursor:pointer;';
             var hexText = document.createElement('input'); hexText.type = 'text'; hexText.value = S.descColor || '#ffffff'; hexText.style.flex = '1';
@@ -903,18 +907,18 @@
 
             /* 5. Posizione (X e Y) */
             var fPos = document.createElement('div'); fPos.className = 'wv-field';
-            var lb5 = document.createElement('label'); lb5.textContent = '4. Posizione (Orizzontale / Verticale)'; fPos.appendChild(lb5);
+            var lb5 = document.createElement('label'); lb5.textContent = t('loc_label_position', '4. Position (Horizontal / Vertical)'); fPos.appendChild(lb5);
             var defaultX = S.format === 'fb' ? 60 : (fmt().w / 2); var defaultY = S.format === 'fb' ? 400 : (S.format === 'story' ? 1390 : 740);
             var currX = (S.descX !== null && S.descX !== undefined) ? S.descX : defaultX; var currY = (S.descY !== null && S.descY !== undefined) ? S.descY : defaultY;
             var posXWrap = document.createElement('div'); posXWrap.style.marginBottom = '10px';
             var lbX = document.createElement('div'); lbX.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
-            var spanX = document.createElement('span'); spanX.textContent = Math.round(currX) + 'px'; lbX.innerHTML = 'Orizzontale (X): '; lbX.appendChild(spanX);
+            var spanX = document.createElement('span'); spanX.textContent = Math.round(currX) + 'px'; lbX.innerHTML = t('loc_label_x', 'Horizontal (X): '); lbX.appendChild(spanX);
             var inpX = document.createElement('input'); inpX.type = 'range'; inpX.min = 0; inpX.max = 1200; inpX.value = currX; inpX.style.width = '100%';
             inpX.addEventListener('input', function () { S.descX = +inpX.value; spanX.textContent = inpX.value + 'px'; requestRenderCanvas(); });
             posXWrap.appendChild(lbX); posXWrap.appendChild(inpX); fPos.appendChild(posXWrap);
 
             var posYWrap = document.createElement('div'); var lbY = document.createElement('div'); lbY.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
-            var spanY = document.createElement('span'); spanY.textContent = Math.round(currY) + 'px'; lbY.innerHTML = 'Verticale (Y): '; lbY.appendChild(spanY);
+            var spanY = document.createElement('span'); spanY.textContent = Math.round(currY) + 'px'; lbY.innerHTML = t('loc_label_y', 'Vertical (Y): '); lbY.appendChild(spanY);
             var inpY = document.createElement('input'); inpY.type = 'range'; inpY.min = 0; inpY.max = 1920; inpY.value = currY; inpY.style.width = '100%';
             inpY.addEventListener('input', function () { S.descY = +inpY.value; spanY.textContent = inpY.value + 'px'; requestRenderCanvas(); });
             posYWrap.appendChild(lbY); posYWrap.appendChild(inpY); fPos.appendChild(posYWrap);
@@ -922,21 +926,21 @@
             body.appendChild(fPos);
 
         } else if (type === 'image') {
-            title.textContent = 'Fotografia di Sfondo';
+            title.textContent = t('loc_drawer_image', 'Background Photo');
 
             /* 1. Selezione Media / Upload */
             var fMedia = document.createElement('div'); fMedia.className = 'wv-field';
-            var lb1 = document.createElement('label'); lb1.textContent = 'Immagine Sfondo (URL / WP Media / Upload)'; fMedia.appendChild(lb1);
+            var lb1 = document.createElement('label'); lb1.textContent = t('loc_label_image_field', 'Background Image (URL / WP Media / Upload)'); fMedia.appendChild(lb1);
 
             var row = document.createElement('div'); row.className = 'fvw-photo-row';
-            var ti = document.createElement('input'); ti.type = 'text'; ti.id = 'fvw-img-single'; ti.placeholder = 'URL o carica\u2026'; ti.value = S.imageUrl || '';
+            var ti = document.createElement('input'); ti.type = 'text'; ti.id = 'fvw-img-single'; ti.placeholder = t('loc_ph_image_url', 'URL or upload\u2026'); ti.value = S.imageUrl || '';
             ti.addEventListener('input', function () { S.imageUrl = ti.value; updateAllDisplayVals(); requestRenderCanvas(); });
 
             var bM = document.createElement('button'); bM.type = 'button'; bM.className = 'wv-btn wv-btn-sm';
-            bM.textContent = 'Media'; bM.addEventListener('click', mediaPickerSingle);
+            bM.textContent = t('loc_btn_media', 'Media'); bM.addEventListener('click', mediaPickerSingle);
 
             var lbF = document.createElement('label'); lbF.className = 'wv-btn wv-btn-sm fvw-file-label';
-            lbF.textContent = 'Carica';
+            lbF.textContent = t('loc_btn_upload', 'Upload');
             var fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/*'; fi.style.display = 'none';
             fi.addEventListener('change', function () {
                 var file = fi.files && fi.files[0]; if (!file) return;
@@ -957,7 +961,7 @@
             var fScale = document.createElement('div'); fScale.className = 'wv-field';
             var lbScale = document.createElement('label');
             var scaleSpan = document.createElement('span'); scaleSpan.style.float = 'right'; scaleSpan.textContent = Math.round((S.imgScale || 1.0) * 100) + '%';
-            lbScale.textContent = '1. Zoom (Scala) '; lbScale.appendChild(scaleSpan); fScale.appendChild(lbScale);
+            lbScale.textContent = t('loc_label_zoom', '1. Zoom (Scale) '); lbScale.appendChild(scaleSpan); fScale.appendChild(lbScale);
             var inpScale = document.createElement('input'); inpScale.type = 'range';
             inpScale.min = 0.5; inpScale.max = 3.0; inpScale.step = 0.05; inpScale.value = S.imgScale || 1.0; inpScale.style.width = '100%';
             inpScale.addEventListener('input', function () {
@@ -969,12 +973,12 @@
 
             /* 3. Posizione X e Y */
             var fPos = document.createElement('div'); fPos.className = 'wv-field';
-            var lbPos = document.createElement('label'); lbPos.textContent = '2. Posizione Immagine (X / Y)'; fPos.appendChild(lbPos);
+            var lbPos = document.createElement('label'); lbPos.textContent = t('loc_label_image_position', '2. Image Position (X / Y)'); fPos.appendChild(lbPos);
 
             var posXWrap = document.createElement('div'); posXWrap.style.marginBottom = '10px';
             var lbX = document.createElement('div'); lbX.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
             var spanX = document.createElement('span'); spanX.textContent = (S.imgOffsetX || 0) + 'px';
-            lbX.innerHTML = 'Orizzontale (X): '; lbX.appendChild(spanX);
+            lbX.innerHTML = t('loc_label_x', 'Horizontal (X): '); lbX.appendChild(spanX);
             var inpX = document.createElement('input'); inpX.type = 'range'; inpX.min = -500; inpX.max = 500; inpX.step = 5; inpX.value = S.imgOffsetX || 0; inpX.style.width = '100%';
             inpX.addEventListener('input', function () {
                 S.imgOffsetX = +inpX.value; spanX.textContent = inpX.value + 'px'; requestRenderCanvas();
@@ -984,7 +988,7 @@
             var posYWrap = document.createElement('div');
             var lbY = document.createElement('div'); lbY.style.cssText = 'font-size:11px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between;';
             var spanY = document.createElement('span'); spanY.textContent = (S.imgOffsetY || 0) + 'px';
-            lbY.innerHTML = 'Verticale (Y): '; lbY.appendChild(spanY);
+            lbY.innerHTML = t('loc_label_y', 'Vertical (Y): '); lbY.appendChild(spanY);
             var inpY = document.createElement('input'); inpY.type = 'range'; inpY.min = -500; inpY.max = 500; inpY.step = 5; inpY.value = S.imgOffsetY || 0; inpY.style.width = '100%';
             inpY.addEventListener('input', function () {
                 S.imgOffsetY = +inpY.value; spanY.textContent = inpY.value + 'px'; requestRenderCanvas();
@@ -996,7 +1000,7 @@
             var fOverlay = document.createElement('div'); fOverlay.className = 'wv-field';
             var lbOv = document.createElement('label');
             var ovSpan = document.createElement('span'); ovSpan.style.float = 'right'; ovSpan.textContent = Math.round((S.darkOverlay || 0.5) * 100) + '%';
-            lbOv.textContent = '3. Intensit\u00e0 Overlay Scuro '; lbOv.appendChild(ovSpan); fOverlay.appendChild(lbOv);
+            lbOv.textContent = t('loc_label_overlay', '3. Dark Overlay Intensity '); lbOv.appendChild(ovSpan); fOverlay.appendChild(lbOv);
             var inpOv = document.createElement('input'); inpOv.type = 'range';
             inpOv.min = 0.0; inpOv.max = 0.95; inpOv.step = 0.05; inpOv.value = S.darkOverlay || 0.5; inpOv.style.width = '100%';
             inpOv.addEventListener('input', function () {
@@ -1012,7 +1016,7 @@
     function refreshEvtSel() {
         var s = document.getElementById('fvw-evt-sel'); if (!s) return;
         while (s.firstChild) s.removeChild(s.firstChild);
-        var o = document.createElement('option'); o.value = '0'; o.textContent = '\u2014 scegli \u2014'; s.appendChild(o);
+        var o = document.createElement('option'); o.value = '0'; o.textContent = t('loc_choose', '\u2014 choose \u2014'); s.appendChild(o);
         S.eventsList.forEach(function (ev) {
             var opt = document.createElement('option'); opt.value = ev.id; opt.textContent = ev.label; s.appendChild(opt);
         });
@@ -1022,7 +1026,7 @@
         var c = document.getElementById('fvw-models'); if (!c) return;
         while (c.firstChild) c.removeChild(c.firstChild);
         if (!S.savedModels.length) {
-            var p = document.createElement('p'); p.className = 'hint'; p.style.cssText = 'color:#646970;font-size:13px;font-style:italic;'; p.textContent = 'Nessun modello salvato.'; c.appendChild(p); return;
+            var p = document.createElement('p'); p.className = 'hint'; p.style.cssText = 'color:#646970;font-size:13px;font-style:italic;'; p.textContent = t('loc_no_models', 'No saved templates.'); c.appendChild(p); return;
         }
         S.savedModels.forEach(function (m) {
             var card = document.createElement('div'); card.className = 'fvw-model-card';
@@ -1049,13 +1053,13 @@
             var bL = document.createElement('button');
             bL.type = 'button';
             bL.className = 'button button-small button-primary';
-            bL.textContent = 'Carica';
+            bL.textContent = t('loc_btn_load_model', 'Load');
             bL.addEventListener('click', function () { applyModel(m); });
 
             var bD = document.createElement('button');
             bD.type = 'button';
             bD.className = 'button button-small button-link-delete';
-            bD.textContent = 'Elimina';
+            bD.textContent = t('loc_btn_delete', 'Delete');
             bD.addEventListener('click', function () { deleteModel(m.id); });
 
             acts.appendChild(bL);
@@ -1085,7 +1089,7 @@
             var bEdit = document.createElement('button');
             bEdit.type = 'button';
             bEdit.className = 'button button-small button-secondary';
-            bEdit.textContent = 'Modifica';
+            bEdit.textContent = t('loc_btn_edit', 'Edit');
             bEdit.addEventListener('click', function () {
                 openModal(btnEditType);
             });
@@ -1120,7 +1124,7 @@
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'button button-small button-secondary';
-        btn.textContent = 'Modifica';
+        btn.textContent = t('loc_btn_edit', 'Edit');
         btn.addEventListener('click', function () { openModal(modalType); });
         wrap.appendChild(btn);
 
@@ -1132,13 +1136,13 @@
         var f = document.createDocumentFragment();
 
         /* title */
-        var h3 = document.createElement('h3'); h3.textContent = 'Modello'; f.appendChild(h3);
+        var h3 = document.createElement('h3'); h3.textContent = t('loc_h3_model', 'Template'); f.appendChild(h3);
 
         /* model name + save inline */
         var modelField = document.createElement('div');
         modelField.className = 'wv-field';
         var lbModel = document.createElement('label');
-        lbModel.textContent = 'Nome modello';
+        lbModel.textContent = t('loc_label_model_name', 'Template name');
         modelField.appendChild(lbModel);
 
         var modelRow = document.createElement('div');
@@ -1146,7 +1150,7 @@
 
         var inpModel = document.createElement('input');
         inpModel.type = 'text';
-        inpModel.placeholder = 'Es. Locandina Street Quadrato';
+        inpModel.placeholder = t('loc_ph_model_name', 'E.g. Street Square Poster');
         inpModel.value = S.modelName || '';
         inpModel.style.flex = '1';
         inpModel.addEventListener('input', function () { S.modelName = inpModel.value; });
@@ -1156,7 +1160,7 @@
         bSave.type = 'button';
         bSave.className = 'button button-primary';
         bSave.style.whiteSpace = 'nowrap';
-        bSave.textContent = S.currentModelId ? 'Aggiorna' : 'Salva modello';
+        bSave.textContent = S.currentModelId ? t('loc_btn_update', 'Update') : t('loc_btn_save_model', 'Save template');
         bSave.addEventListener('click', saveModel);
         modelRow.appendChild(bSave);
 
@@ -1165,7 +1169,7 @@
             bNew.type = 'button';
             bNew.className = 'button button-secondary';
             bNew.style.whiteSpace = 'nowrap';
-            bNew.textContent = 'Nuovo';
+            bNew.textContent = t('loc_btn_new', 'New');
             bNew.addEventListener('click', reset);
             modelRow.appendChild(bNew);
         }
@@ -1173,11 +1177,11 @@
         modelField.appendChild(modelRow);
         f.appendChild(modelField);
 
-        var h3b = document.createElement('h3'); h3b.textContent = 'Contenuto'; f.appendChild(h3b);
+        var h3b = document.createElement('h3'); h3b.textContent = t('loc_h3_content', 'Content'); f.appendChild(h3b);
 
         /* event prefill */
         var evSel = document.createElement('select'); evSel.id = 'fvw-evt-sel';
-        var defOpt = document.createElement('option'); defOpt.value = '0'; defOpt.textContent = '\u2014 scegli \u2014'; evSel.appendChild(defOpt);
+        var defOpt = document.createElement('option'); defOpt.value = '0'; defOpt.textContent = t('loc_choose', '\u2014 choose \u2014'); evSel.appendChild(defOpt);
         evSel.addEventListener('change', function () {
             if (!evSel.value || evSel.value === '0') return;
             var ev = S.eventsList.find(function (e) { return e.id == evSel.value; });
@@ -1198,41 +1202,41 @@
                 requestRenderCanvas();
             }
         });
-        f.appendChild(field('Precompila da evento', evSel));
+        f.appendChild(field(t('loc_label_prefill_event', 'Prefill from event'), evSel));
 
         /* format */
-        f.appendChild(field('Formato grafica',
+        f.appendChild(field(t('loc_label_format', 'Graphic format'),
             selInput(FORMATS.map(function (ff) { return { v: ff.value, l: ff.label }; }), 'format')));
 
         /* 1. Brand display row */
-        f.appendChild(field('Brand / intestazione',
+        f.appendChild(field(t('loc_field_brand', 'Brand / header'),
             createDisplayRow('fvw-brand-display-val', S.brand || 'FRANCESCOVEROLINO', 'brand')));
 
         /* 2. Categoria / Titolo Principale display row */
-        f.appendChild(field('Categoria / titolo principale',
+        f.appendChild(field(t('loc_field_title', 'Category / main title'),
             createDisplayRow('fvw-title-display-val', S.title || 'FIRENZE STREET', 'title', '#E11D48')));
 
         /* 3. Tipologia / Sottotitolo display row */
-        f.appendChild(field('Tipologia / sottotitolo',
+        f.appendChild(field(t('loc_field_subtitle', 'Type / subtitle'),
             createDisplayRow('fvw-sub-display-val', S.subtitle || 'Talk & Masterclass', 'subtitle')));
 
         /* 4. Data / Periodo display row */
-        f.appendChild(field('Data / periodo',
+        f.appendChild(field(t('loc_field_dates', 'Date / period'),
             createDisplayRow('fvw-dates-display-val', S.dates || "16 - 18 OTT'26", 'dates')));
 
         /* 5. Descrizione / Programma display row */
-        var descInitLabel = S.description ? (S.description.slice(0, 30) + (S.description.length > 30 ? '...' : '')) : '3 GIORNATE DI STREET...';
-        f.appendChild(field('Descrizione / programma',
+        var descInitLabel = S.description ? (S.description.slice(0, 30) + (S.description.length > 30 ? '...' : '')) : t('loc_desc_fallback_short', '3 DAYS OF STREET...');
+        f.appendChild(field(t('loc_field_description', 'Description / program'),
             createDisplayRow('fvw-desc-display-val', descInitLabel, 'description')));
 
         /* 6. Immagine di sfondo display row */
         var imgInitLabel = formatImgLabel(S.imageUrl);
-        f.appendChild(field('Immagine di sfondo',
+        f.appendChild(field(t('loc_field_image', 'Background image'),
             createDisplayRow('fvw-img-display-val', imgInitLabel, 'image')));
 
         var actsBot = document.createElement('div'); actsBot.className = 'wv-form-actions';
         var bDl = document.createElement('button'); bDl.type = 'button'; bDl.className = 'button button-primary';
-        bDl.textContent = 'Scarica PNG'; bDl.addEventListener('click', downloadPng);
+        bDl.textContent = t('loc_btn_download', 'Download PNG'); bDl.addEventListener('click', downloadPng);
         actsBot.appendChild(bDl); f.appendChild(actsBot);
 
         return f;
@@ -1254,7 +1258,7 @@
         var dash = document.createElement('div'); dash.className = 'wv-dash';
 
         /* heading */
-        var h2 = document.createElement('h2'); h2.textContent = 'Modelli Locandine';
+        var h2 = document.createElement('h2'); h2.textContent = t('loc_h2_main', 'Poster Templates');
         dash.appendChild(h2);
 
         /* notify bar */
@@ -1277,13 +1281,13 @@
         
         var drawerTitle = document.createElement('h3');
         drawerTitle.id = 'fvw-drawer-title';
-        drawerTitle.textContent = 'Modifica Elemento';
+        drawerTitle.textContent = t('loc_drawer_default_title', 'Edit Element');
         drawerHeader.appendChild(drawerTitle);
 
         var closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.className = 'wv-btn wv-btn-sm';
-        closeBtn.textContent = '✕ Chiudi';
+        closeBtn.textContent = '✕ ' + t('loc_btn_close', 'Close');
         closeBtn.addEventListener('click', closeModal);
         drawerHeader.appendChild(closeBtn);
 
@@ -1314,7 +1318,7 @@
         /* Colonna 3: Modelli realizzati / salvati (Grid 2 colonne) */
         var col3 = document.createElement('div'); col3.className = 'fvw-loc-col-3';
         var modSec = document.createElement('div'); modSec.className = 'fvw-models-section';
-        var modH3 = document.createElement('h3'); modH3.textContent = 'Modelli Salvati';
+        var modH3 = document.createElement('h3'); modH3.textContent = t('loc_h3_saved_models', 'Saved Templates');
         var modList = document.createElement('div'); modList.id = 'fvw-models';
         modSec.appendChild(modH3); modSec.appendChild(modList);
         col3.appendChild(modSec);

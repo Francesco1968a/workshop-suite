@@ -19,7 +19,7 @@ msgid "ACTIVE"
 msgstr "ATTIVA"
 
 msgid "AI Workshop Assistant & Copywriter"
-msgstr "AI Workshop Assistant & Copywriter"
+msgstr "Assistente AI Workshop & Copywriter"
 
 msgid "AI assistant to generate engaging course descriptions, teaching programs, Instagram post copy, and email replies to students."
 msgstr "Assistente AI per generare descrizioni accattivanti dei corsi, programmi didattici, testi per i post di Instagram e risposte email agli allievi."
@@ -49,7 +49,7 @@ msgid "Address that reply/reminder emails will be sent from, and that will recei
 msgstr "Indirizzo da cui partiranno le mail di risposta/promemoria, ed a cui arriveranno gli avvisi di nuove richieste dal form di iscrizione."
 
 msgid "Admin Calendar"
-msgstr "Admin Calendar"
+msgstr "Calendario Admin"
 
 msgid "All statuses"
 msgstr "Tutti gli stati"
@@ -94,7 +94,7 @@ msgid "Cancel"
 msgstr "Annulla"
 
 msgid "Categories & Types"
-msgstr "Categories & Types"
+msgstr "Categorie e Tipologie"
 
 msgid "Category"
 msgstr "Categoria"
@@ -115,7 +115,7 @@ msgid "Confirmed"
 msgstr "Confermato"
 
 msgid "Contacts & Participants"
-msgstr "Contacts & Participants"
+msgstr "Contatti e Partecipanti"
 
 msgid "Contacts & Web Presence"
 msgstr "Contatti & Presenza Web"
@@ -196,10 +196,10 @@ msgid "Events"
 msgstr "Eventi"
 
 msgid "Events & Registrations"
-msgstr "Events & Registrations"
+msgstr "Eventi e Iscrizioni"
 
 msgid "Events Archive"
-msgstr "Events Archive"
+msgstr "Archivio Eventi"
 
 msgid "Every new request from the registration form is added as a contact, with the tag and/or list below (created automatically if they don't exist)."
 msgstr "Ogni nuova richiesta dal form di iscrizione viene aggiunta come contatto, con il tag e/o la lista qui sotto (creati automaticamente se non esistono)."
@@ -223,7 +223,7 @@ msgid "FluentCRM Connector"
 msgstr "Connettore FluentCRM"
 
 msgid "General"
-msgstr "General"
+msgstr "Generale"
 
 msgid "Geolocation Service URL"
 msgstr "URL servizio geolocalizzazione"
@@ -232,7 +232,7 @@ msgid "Go to the video call →"
 msgstr "Vai alla videochiamata →"
 
 msgid "Google Calendar & Apple iCal Auto-Sync"
-msgstr "Google Calendar & Apple iCal Auto-Sync"
+msgstr "Sincronizzazione automatica Google Calendar & Apple iCal"
 
 msgid "Honeypot Protection"
 msgstr "Protezione Honeypot"
@@ -277,7 +277,7 @@ msgid "Last Name"
 msgstr "Cognome"
 
 msgid "License"
-msgstr "License"
+msgstr "Licenza"
 
 msgid "License Key"
 msgstr "Chiave di Licenza"
@@ -292,10 +292,10 @@ msgid "Live (real payments)"
 msgstr "Live (pagamenti reali)"
 
 msgid "Mail Configuration"
-msgstr "Mail Configuration"
+msgstr "Configurazione Mail"
 
 msgid "Mail Inbox"
-msgstr "Mail Inbox"
+msgstr "Posta in Arrivo"
 
 msgid "Mailbox"
 msgstr "Casella mail"
@@ -409,10 +409,10 @@ msgid "Phone / WhatsApp"
 msgstr "Telefono / WhatsApp"
 
 msgid "Poster Studio & Social Banner Builder"
-msgstr "Poster Studio & Social Banner Builder"
+msgstr "Poster Studio & Creazione Grafiche Social"
 
 msgid "Poster Templates"
-msgstr "Poster Templates"
+msgstr "Modelli Locandine"
 
 msgid "Profile Photo / Avatar"
 msgstr "Foto Profilo / Avatar"
@@ -517,16 +517,16 @@ msgid "Set up now →"
 msgstr "Configura ora →"
 
 msgid "Settings"
-msgstr "Settings"
+msgstr "Impostazioni"
 
 msgid "Setup Wizard"
 msgstr "Configurazione guidata"
 
 msgid "Shortcode Tag"
-msgstr "Shortcode Tag"
+msgstr "Tag Shortcode"
 
 msgid "Shortcodes"
-msgstr "Shortcodes"
+msgstr "Shortcode"
 
 msgid "Social Channels"
 msgstr "Canali Social"
@@ -589,7 +589,7 @@ msgid "Trainer / Presenter Details"
 msgstr "Dati Docente / Proponente"
 
 msgid "Trainer Profile / Bio"
-msgstr "Trainer Profile / Bio"
+msgstr "Profilo Formatore / Bio"
 
 msgid "Trainer profile and bio card saved successfully."
 msgstr "Profilo del proponente e scheda Bio salvati con successo."
@@ -613,10 +613,10 @@ msgid "WSMaker"
 msgstr "WSMaker"
 
 msgid "WSMaker Dashboard"
-msgstr "WSMaker Dashboard"
+msgstr "Dashboard WSMaker"
 
 msgid "WSMaker Settings"
-msgstr "WSMaker Settings"
+msgstr "Impostazioni WSMaker"
 
 msgid "WSMaker can send confirmations, reminders, and reply to participants directly from your mailbox. You can set it up now, or later from Settings → Mail."
 msgstr "WSMaker può inviare conferme, promemoria e rispondere ai partecipanti direttamente dalla tua casella mail. Puoi configurarla ora, oppure più tardi da Impostazioni → Mail."
@@ -634,7 +634,7 @@ msgid "Webhook URL"
 msgstr "URL Webhook"
 
 msgid "Webhooks"
-msgstr "Webhooks"
+msgstr "Webhook"
 
 msgid "Welcome to WSMaker 👋"
 msgstr "Benvenuto in WSMaker 👋"
@@ -646,7 +646,7 @@ msgid "WooCommerce Cart Integration"
 msgstr "Integrazione Carrello WooCommerce"
 
 msgid "Woorkshoop Global Hub & World Map Sync"
-msgstr "Woorkshoop Global Hub & World Map Sync"
+msgstr "Hub Globale Workshop & Sincronizzazione Mappa Mondiale"
 
 msgid "Workshop Categories"
 msgstr "Categorie Workshop"
@@ -685,5 +685,5 @@ msgid "💡 How to show the Bio on your site"
 msgstr "💡 Come mostrare la Bio nel sito"
 
 msgid "🔌 Webhooks"
-msgstr "🔌 Webhooks"
+msgstr "🔌 Webhook"
 
