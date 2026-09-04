@@ -1,6 +1,6 @@
 === WSMaker — All-in-One Event Manager, CRM & Social Banner Builder ===
 Contributors: frak68
-Tags: workshop, events, event management, crm, poster builder
+Tags: workshop, training management system, events, event management, crm
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
@@ -12,7 +12,7 @@ All-in-one suite to manage workshops, courses and events, attendee CRM with comm
 
 == Description ==
 
-**WSMaker** is an all-in-one event management, attendee CRM, and marketing creative suite designed for course creators, educators, trainers, agencies, academies, and event organizers across any industry.
+**WSMaker** is a full Training Management System (TMS) — not just a CRM, not just an LMS. It combines event and workshop scheduling, an attendee CRM with two-way communication tracking, and a marketing creative suite in one plugin, designed for course creators, educators, trainers, agencies, academies, and event organizers across any industry.
 
 Full, human-readable source code (including the Vue.js source behind the compiled admin panel bundles in assets/dist/, under `admin-src/`) is publicly available at: [github.com/Francesco1968a/wsmaker](https://github.com/Francesco1968a/wsmaker) — to rebuild a bundle: `cd admin-src && npm install && WS_BUNDLE=<bundle-name> npx vite build` (bundle names match the `assets/dist/*.js` filenames).
 
