@@ -334,10 +334,10 @@ onMounted(() => {
             <img :src="catForm.foto" style="height: 65px; width: 100px; object-fit: cover; border-radius: 4px" />
             <button type="button" class="wv-btn wv-btn-sm wv-btn-del" @click="catForm.foto = ''">✕ Rimuovi foto</button>
           </div>
-          <div class="hint">Usata anche come Hero image in testa alla pagina generata dallo shortcode [ws_workshop_page]. Consigliata una risoluzione tra 1600 e 2000px di larghezza per una buona resa a piena larghezza.</div>
+          <div class="hint">Usata anche come Hero image in testa alla pagina generata dallo shortcode [wsma_workshop_page]. Consigliata una risoluzione tra 1600 e 2000px di larghezza per una buona resa a piena larghezza.</div>
         </div>
 
-        <div class="hint" style="margin: 0 0 4px">Questi campi compaiono nella pagina generata con [ws_workshop_page] — non sull'Aula virtuale, che resta puramente funzionale. Puoi anche incollare ogni singolo blocco altrove con lo shortcode indicato in etichetta (aggiungi <code>slug="{{ editingCategoria ? editingCategoria.slug : '...' }}"</code>).</div>
+        <div class="hint" style="margin: 0 0 4px">Questi campi compaiono nella pagina generata con [wsma_workshop_page] — non sull'Aula virtuale, che resta puramente funzionale. Puoi anche incollare ogni singolo blocco altrove con lo shortcode indicato in etichetta (aggiungi <code>slug="{{ editingCategoria ? editingCategoria.slug : '...' }}"</code>).</div>
 
         <div style="background: rgba(255,102,8,0.06); border: 1px solid rgba(255,102,8,0.3); border-radius: 6px; padding: 14px 16px; margin: 4px 0 18px">
           <label style="display:block; font-weight:600; margin-bottom:6px;">✨ Genera bozza con AI (opzionale)</label>
