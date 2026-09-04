@@ -8,7 +8,7 @@ Stable tag: 1.1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A full Training Management System (TMS) for WordPress: workshop and event scheduling, attendee CRM with communication tracking, and a social banner builder.
+Training Management System (TMS): workshop & event scheduling, attendee CRM, communication tracking, and social banners.
 
 == Description ==
 
