@@ -331,8 +331,24 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
             'restUrl'       => esc_url_raw(rest_url('workshop-suite/v1/')),
             'nonce'         => wp_create_nonce('wp_rest'),
             'brandName'     => WSMA_Settings::get('site_brand_name', 'WSMaker'),
+            'i18n'          => self::vue_i18n_map(),
         ], $extra_config);
         wp_localize_script($handle, 'WSMA_CONFIG', $config);
+    }
+
+    /**
+     * Flat key => translated-string map for the Vue admin panels, for the
+     * current site locale. English is the plugin's source language and has
+     * no map file of its own — every Vue call site already carries its own
+     * English fallback (see admin-src/src/shared/i18n.js), so an empty map
+     * here is correct for en_US, not a missing translation.
+     */
+    private static function vue_i18n_map(): array {
+        $locale = determine_locale();
+        $file = WSMA_PATH . 'includes/i18n/' . $locale . '.php';
+        if (!file_exists($file)) return [];
+        $map = include $file;
+        return is_array($map) ? $map : [];
     }
 
     private function render_panel_wrapper(string $app_id, string $handle, string $js_file, string $css_file, array $extra_config = []): void {

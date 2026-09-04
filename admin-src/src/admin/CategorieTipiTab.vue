@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue';
+import { t } from '../shared/i18n.js';
 
 const props = defineProps({
   sub: { type: String, default: 'categorie' },
@@ -23,7 +24,7 @@ const aiError = ref('');
 
 async function generateAiDraft() {
   if (!catForm.nome || !aiNotes.value) {
-    aiError.value = 'Inserisci il nome della categoria e almeno un punto chiave.';
+    aiError.value = t('cat_err_nome_e_punto_chiave', 'Enter the category name and at least one key point.');
     return;
   }
   aiLoading.value = true;
@@ -36,7 +37,7 @@ async function generateAiDraft() {
     });
     const data = await res.json();
     if (!res.ok || !data.success) {
-      aiError.value = data.message || 'Errore nella generazione.';
+      aiError.value = data.message || t('cat_err_generazione', 'Error during generation.');
       return;
     }
     catForm.intro = data.intro || catForm.intro;
@@ -44,7 +45,7 @@ async function generateAiDraft() {
     catForm.requirements = data.requirements || catForm.requirements;
     catForm.important_notes = data.important_notes || catForm.important_notes;
   } catch (e) {
-    aiError.value = 'Errore di rete.';
+    aiError.value = t('cat_err_rete', 'Network error.');
   } finally {
     aiLoading.value = false;
   }
@@ -71,7 +72,7 @@ async function translateFields() {
     });
     const data = await res.json();
     if (!res.ok || !data.success) {
-      translateError.value = data.message || 'Errore nella traduzione.';
+      translateError.value = data.message || t('cat_err_traduzione', 'Error during translation.');
       return;
     }
     catForm.intro = data.intro || catForm.intro;
@@ -79,7 +80,7 @@ async function translateFields() {
     catForm.requirements = data.requirements || catForm.requirements;
     catForm.important_notes = data.important_notes || catForm.important_notes;
   } catch (e) {
-    translateError.value = 'Errore di rete.';
+    translateError.value = t('cat_err_rete', 'Network error.');
   } finally {
     translateLoading.value = false;
   }
@@ -142,7 +143,7 @@ async function loadCategorie() {
 
 function openCatMedia() {
   if (window.wp && window.wp.media) {
-    const frame = window.wp.media({ title: 'Seleziona foto categoria', button: { text: 'Usa questa foto' }, multiple: false });
+    const frame = window.wp.media({ title: t('cat_media_titolo', 'Select category photo'), button: { text: t('cat_media_usa_foto', 'Use this photo') }, multiple: false });
     frame.on('select', () => {
       const att = frame.state().get('selection').first().toJSON();
       if (att && att.url) catForm.foto = att.url;
@@ -172,7 +173,7 @@ async function submitCategoria(keepOpen = false) {
     });
     const data = await res.json();
     if (!res.ok) {
-      emit('message', data.message || 'Errore.');
+      emit('message', data.message || t('cat_err_generico', 'Error.'));
       return;
     }
     emit('message', data.msg);
@@ -190,11 +191,11 @@ async function submitCategoria(keepOpen = false) {
 }
 
 async function creaPaginaCategoria() {
-  const defT = catForm.nome ? 'Workshop ' + catForm.nome : 'Nuovo Workshop';
-  const titolo = window.prompt('Titolo della nuova pagina WordPress da creare:', defT);
+  const defT = catForm.nome ? 'Workshop ' + catForm.nome : t('cat_nuovo_workshop', 'New Workshop');
+  const titolo = window.prompt(t('cat_prompt_titolo_pagina', 'Title of the new WordPress page to create:'), defT);
   if (!titolo) return;
   if (!editCat.value) {
-    window.alert('Salva prima la categoria, poi potrai generare automaticamente la pagina con lo shortcode collegato.');
+    window.alert(t('cat_alert_salva_prima', 'Save the category first, then you can automatically generate the page with the linked shortcode.'));
     return;
   }
   savingCategoria.value = true;
@@ -206,21 +207,21 @@ async function creaPaginaCategoria() {
     });
     const data = await res.json();
     if (!res.ok) {
-      emit('message', data.message || 'Errore.');
+      emit('message', data.message || t('cat_err_generico', 'Error.'));
       return;
     }
     pagine.value.unshift({ id: data.id, title: data.title, url: data.url });
     catForm.url = data.url;
-    emit('message', 'Pagina creata e collegata: ' + data.title);
+    emit('message', t('cat_msg_pagina_creata', 'Page created and linked: ') + data.title);
   } catch {
-    emit('message', 'Errore creazione pagina.');
+    emit('message', t('cat_err_creazione_pagina', 'Error creating the page.'));
   } finally {
     savingCategoria.value = false;
   }
 }
 
 async function eliminaCategoria(c) {
-  if (!window.confirm('Eliminare la categoria?')) return;
+  if (!window.confirm(t('cat_confirm_elimina', 'Delete the category?'))) return;
   const data = await (await fetch(apiUrl('admin/categorie/' + c.id), { method: 'DELETE', headers: headers() })).json();
   emit('message', data.msg);
   if (data.deleted) loadCategorie();
@@ -257,10 +258,10 @@ async function submitTipi() {
     });
     const data = await res.json();
     if (!res.ok) {
-      emit('message', data.message || 'Errore.');
+      emit('message', data.message || t('cat_err_generico', 'Error.'));
       return;
     }
-    emit('message', data.msg || 'Tipi salvati.');
+    emit('message', data.msg || t('cat_msg_tipi_salvati', 'Types saved.'));
     tipi.value = data.tipi || [];
   } finally {
     savingTipi.value = false;
@@ -284,116 +285,116 @@ onMounted(() => {
 <template>
   <div v-if="sub === 'categorie'" class="wv-dash">
     <template v-if="!loadingCat">
-      <h3>{{ editingCategoria ? 'Modifica categoria' : 'Crea categoria' }}</h3>
+      <h3>{{ editingCategoria ? t('cat_h3_modifica', 'Edit category') : t('cat_h3_crea', 'Create category') }}</h3>
       <form @submit.prevent="submitCategoria(true)">
-        <div class="wv-field"><label>Nome (es. NapoliVelata)</label><input type="text" v-model="catForm.nome" required /></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_nome', 'Name (e.g. NapoliVelata)') }}</label><input type="text" v-model="catForm.nome" required /></div>
 
         <div class="wv-field">
-          <label>Tipo</label>
+          <label>{{ t('cat_lbl_tipo', 'Type') }}</label>
           <select v-model="catForm.tipo">
-            <option value="">— non specificato —</option>
+            <option value="">{{ t('cat_opt_non_specificato', '— not specified —') }}</option>
             <option v-for="(label, key) in tipiMap" :key="key" :value="key">{{ label }}</option>
           </select>
         </div>
 
-        <div class="wv-field"><label>Città <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="city"]</code></label><input type="text" v-model="catForm.citta" placeholder="Napoli" /></div>
-        <div class="wv-field"><label>Nazione <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="country"]</code></label><input type="text" v-model="catForm.nazione" placeholder="Italia" /></div>
-        <div class="wv-field"><label>Indirizzo (opzionale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="address"]</code></label><input type="text" v-model="catForm.indirizzo" placeholder="Via/Piazza..." /></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_citta', 'City') }} <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="city"]</code></label><input type="text" v-model="catForm.citta" :placeholder="t('cat_ph_napoli', 'Naples')" /></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_nazione', 'Country') }} <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="country"]</code></label><input type="text" v-model="catForm.nazione" :placeholder="t('cat_ph_italia', 'Italy')" /></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_indirizzo', 'Address (optional)') }} <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="address"]</code></label><input type="text" v-model="catForm.indirizzo" :placeholder="t('cat_ph_indirizzo', 'Street/Square...')" /></div>
 
         <div class="wv-field">
           <label>
             <input type="checkbox" v-model="catForm.fb_share_enabled" style="margin-right: 6px" />
-            Consenti condivisione su Facebook per gli eventi di questa categoria
+            {{ t('cat_lbl_fb_share', 'Allow Facebook sharing for events in this category') }}
           </label>
         </div>
 
         <div class="wv-field">
-          <label>Pagina di presentazione (Seleziona pagina o inserisci URL)</label>
+          <label>{{ t('cat_lbl_pagina', 'Landing page (select a page or enter a URL)') }}</label>
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 6px">
             <select style="flex: 1; min-width: 220px" @change="$event.target.value && (catForm.url = $event.target.value)">
-              <option value="">— Scegli una pagina del sito —</option>
+              <option value="">{{ t('cat_opt_scegli_pagina', '— Choose a page from your site —') }}</option>
               <option v-for="p in pagine" :key="p.id" :value="p.url">{{ p.title }} ({{ p.url }})</option>
             </select>
             <input type="url" v-model="catForm.url" placeholder="https://..." style="flex: 1; min-width: 220px" />
-            <button type="button" class="wv-btn wv-btn-sm wv-btn-ghost" style="white-space: nowrap" @click="creaPaginaCategoria">+ Crea Pagina</button>
+            <button type="button" class="wv-btn wv-btn-sm wv-btn-ghost" style="white-space: nowrap" @click="creaPaginaCategoria">+ {{ t('cat_btn_crea_pagina', 'Create Page') }}</button>
           </div>
-          <div class="hint">Puoi selezionare una pagina esistente, incollarla, oppure cliccare su [+ Crea Pagina] per crearla subito con lo shortcode della categoria già inserito.</div>
+          <div class="hint">{{ t('cat_hint_pagina', 'You can select an existing page, paste one in, or click [+ Create Page] to generate one right away with the category shortcode already inserted.') }}</div>
         </div>
 
         <div class="wv-field">
-          <label>Foto Categoria (URL / Libreria Media / Upload locale) <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="photo"]</code></label>
+          <label>{{ t('cat_lbl_foto', 'Category Photo (URL / Media Library / local upload)') }} <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="photo"]</code></label>
           <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px">
-            <input type="text" v-model="catForm.foto" placeholder="URL immagine o carica..." style="flex: 1" />
-            <button type="button" class="wv-btn wv-btn-sm" @click="openCatMedia">Media</button>
+            <input type="text" v-model="catForm.foto" :placeholder="t('cat_ph_foto_url', 'Image URL or upload...')" style="flex: 1" />
+            <button type="button" class="wv-btn wv-btn-sm" @click="openCatMedia">{{ t('cat_btn_media', 'Media') }}</button>
             <label class="wv-btn wv-btn-sm" style="cursor: pointer; display: inline-flex; align-items: center">
-              Carica
+              {{ t('cat_btn_carica', 'Upload') }}
               <input type="file" accept="image/*" style="display: none" @change="onCatFile" />
             </label>
           </div>
           <div v-if="catForm.foto" style="display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; border: 1px solid rgba(255,255,255,0.1)">
             <img :src="catForm.foto" style="height: 65px; width: 100px; object-fit: cover; border-radius: 4px" />
-            <button type="button" class="wv-btn wv-btn-sm wv-btn-del" @click="catForm.foto = ''">✕ Rimuovi foto</button>
+            <button type="button" class="wv-btn wv-btn-sm wv-btn-del" @click="catForm.foto = ''">✕ {{ t('cat_btn_rimuovi_foto', 'Remove photo') }}</button>
           </div>
-          <div class="hint">Usata anche come Hero image in testa alla pagina generata dallo shortcode [wsma_workshop_page]. Consigliata una risoluzione tra 1600 e 2000px di larghezza per una buona resa a piena larghezza.</div>
+          <div class="hint">{{ t('cat_hint_foto', 'Also used as the hero image at the top of the page generated by the [wsma_workshop_page] shortcode. A high-resolution square-ish image at least 1600–2000px wide is recommended for a good full-width result.') }}</div>
         </div>
 
-        <div class="hint" style="margin: 0 0 4px">Questi campi compaiono nella pagina generata con [wsma_workshop_page] — non sull'Aula virtuale, che resta puramente funzionale. Puoi anche incollare ogni singolo blocco altrove con lo shortcode indicato in etichetta (aggiungi <code>slug="{{ editingCategoria ? editingCategoria.slug : '...' }}"</code>).</div>
+        <div class="hint" style="margin: 0 0 4px">{{ t('cat_hint_campi_pagina', "These fields appear on the page generated with [wsma_workshop_page] — not on the Virtual Classroom, which stays purely functional. You can also paste any single block elsewhere using the shortcode shown in its label (add") }} <code>slug="{{ editingCategoria ? editingCategoria.slug : '...' }}"</code>).</div>
 
         <div style="background: rgba(255,102,8,0.06); border: 1px solid rgba(255,102,8,0.3); border-radius: 6px; padding: 14px 16px; margin: 4px 0 18px">
-          <label style="display:block; font-weight:600; margin-bottom:6px;">✨ Genera bozza con AI (opzionale)</label>
-          <textarea v-model="aiNotes" rows="2" placeholder="Punti chiave, es: 3 giorni, street photography, Napoli, gruppo piccolo max 6 persone..." style="width:100%; margin-bottom:8px"></textarea>
-          <button type="button" class="wv-btn wv-btn-sm" :disabled="aiLoading" @click="generateAiDraft">{{ aiLoading ? 'Generazione…' : '✨ Genera bozza (Intro/Programma/Requisiti/Note)' }}</button>
+          <label style="display:block; font-weight:600; margin-bottom:6px;">✨ {{ t('cat_lbl_ai_draft', 'Generate a draft with AI (optional)') }}</label>
+          <textarea v-model="aiNotes" rows="2" :placeholder="t('cat_ph_ai_notes', 'Key points, e.g.: 3 days, street photography, Naples, small group max 6 people...')" style="width:100%; margin-bottom:8px"></textarea>
+          <button type="button" class="wv-btn wv-btn-sm" :disabled="aiLoading" @click="generateAiDraft">{{ aiLoading ? t('cat_btn_generazione_corso', 'Generating…') : '✨ ' + t('cat_btn_genera_bozza', 'Generate draft (Intro/Program/Requirements/Notes)') }}</button>
           <div v-if="aiError" style="color:#ff6b6b; font-size:13px; margin-top:6px">{{ aiError }}</div>
-          <div class="hint" style="margin-top:6px">Compila i campi qui sotto con una proposta — resta sempre da rivedere prima di salvare. Richiede un connettore AI configurato e la funzione attiva in AI Assistant.</div>
+          <div class="hint" style="margin-top:6px">{{ t('cat_hint_ai_draft', 'Fills the fields below with a proposal — always review it before saving. Requires a configured AI connector and the AI Assistant feature enabled.') }}</div>
         </div>
-        <div class="wv-field"><label>Introduzione <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="intro"]</code></label><textarea v-model="catForm.intro" rows="3" placeholder="Uno o due paragrafi di presentazione del workshop..."></textarea></div>
-        <div class="wv-field"><label>Programma <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="program"]</code></label><textarea v-model="catForm.program" rows="6" placeholder="Giorno 1: ...&#10;Giorno 2: ..."></textarea></div>
-        <div class="wv-field"><label>Requisiti <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="requirements"]</code></label><textarea v-model="catForm.requirements" rows="3" placeholder="Es. Fotocamera reflex o mirrorless, nessuna esperienza richiesta..."></textarea></div>
-        <div class="wv-field"><label>Note importanti <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="important_notes"]</code></label><textarea v-model="catForm.important_notes" rows="3" placeholder="Es. Punto di ritrovo, cosa portare, condizioni meteo..."></textarea></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_intro', 'Introduction') }} <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="intro"]</code></label><textarea v-model="catForm.intro" rows="3" :placeholder="t('cat_ph_intro', 'One or two introductory paragraphs about the workshop...')"></textarea></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_programma', 'Program') }} <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="program"]</code></label><textarea v-model="catForm.program" rows="6" :placeholder="t('cat_ph_programma', 'Day 1: ...\nDay 2: ...')"></textarea></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_requisiti', 'Requirements') }} <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="requirements"]</code></label><textarea v-model="catForm.requirements" rows="3" :placeholder="t('cat_ph_requisiti', 'E.g. DSLR or mirrorless camera, no experience required...')"></textarea></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_note', 'Important notes') }} <code style="font-weight: normal; opacity: .6; font-size: 11px">[wsma_workshop_text field="important_notes"]</code></label><textarea v-model="catForm.important_notes" rows="3" :placeholder="t('cat_ph_note', 'E.g. Meeting point, what to bring, weather conditions...')"></textarea></div>
 
         <div style="background: rgba(255,102,8,0.06); border: 1px solid rgba(255,102,8,0.3); border-radius: 6px; padding: 14px 16px; margin: 4px 0 18px">
-          <label style="display:block; font-weight:600; margin-bottom:6px;">🌐 Traduci con AI (opzionale)</label>
+          <label style="display:block; font-weight:600; margin-bottom:6px;">🌐 {{ t('cat_lbl_traduci_ai', 'Translate with AI (optional)') }}</label>
           <div style="display:flex; gap:8px; align-items:center;">
-            <input type="text" v-model="translateLanguage" placeholder="Es. Inglese, Francese..." style="flex:1" />
-            <button type="button" class="wv-btn wv-btn-sm" :disabled="translateLoading" @click="translateFields">{{ translateLoading ? 'Traduzione…' : 'Traduci i 4 campi sopra' }}</button>
+            <input type="text" v-model="translateLanguage" :placeholder="t('cat_ph_lingua', 'E.g. English, French...')" style="flex:1" />
+            <button type="button" class="wv-btn wv-btn-sm" :disabled="translateLoading" @click="translateFields">{{ translateLoading ? t('cat_btn_traduzione_corso', 'Translating…') : t('cat_btn_traduci_campi', 'Translate the 4 fields above') }}</button>
           </div>
           <div v-if="translateError" style="color:#ff6b6b; font-size:13px; margin-top:6px">{{ translateError }}</div>
-          <div class="hint" style="margin-top:6px">Sostituisce Intro/Programma/Requisiti/Note con la traduzione — salva solo dopo aver controllato il risultato (o annulla senza salvare).</div>
+          <div class="hint" style="margin-top:6px">{{ t('cat_hint_traduci', 'Replaces Intro/Program/Requirements/Notes with the translation — save only after checking the result (or discard without saving).') }}</div>
         </div>
 
         <div class="wv-field">
-          <label>Oggetto mail di conferma</label>
+          <label>{{ t('cat_lbl_oggetto_conferma', 'Confirmation email subject') }}</label>
           <input type="text" v-model="catForm.oggetto_conferma" :placeholder="defaultOggettoConferma" />
         </div>
         <div class="wv-field">
-          <label>Testo mail di conferma</label>
+          <label>{{ t('cat_lbl_testo_conferma', 'Confirmation email body') }}</label>
           <textarea v-model="catForm.mail_conferma" rows="8" :placeholder="defaultMailConferma"></textarea>
           <div class="hint">
-            Se lasci vuoto usa il testo di default qui sopra (mostrato come placeholder). Parte quando premi "Conferma" in Riepilogo, con allegato .ics — nessuna AI coinvolta. Segnaposto disponibili:
+            {{ t('cat_hint_mail_conferma', 'If left empty, uses the default text above (shown as placeholder). Sent when you press "Confirm" in Overview, with an .ics attachment — no AI involved. Available placeholders:') }}
             <code v-for="(desc, ph) in placeholders" :key="ph" :title="desc">{{ ph }}</code>
           </div>
         </div>
         <div class="wv-field">
-          <label>Oggetto promemoria T-15</label>
+          <label>{{ t('cat_lbl_oggetto_t15', 'T-15 reminder subject') }}</label>
           <input type="text" v-model="catForm.oggetto_t15" :placeholder="defaultOggettoT15" />
         </div>
         <div class="wv-field">
-          <label>Testo promemoria T-15</label>
+          <label>{{ t('cat_lbl_testo_t15', 'T-15 reminder body') }}</label>
           <textarea v-model="catForm.mail_t15" rows="8" :placeholder="defaultMailT15"></textarea>
-          <div class="hint">Parte in automatico 15 giorni prima dell'evento ai Confermati — nessuna AI coinvolta. Stessi segnaposto di sopra.</div>
+          <div class="hint">{{ t('cat_hint_t15', 'Sent automatically 15 days before the event to Confirmed participants — no AI involved. Same placeholders as above.') }}</div>
         </div>
 
-        <div class="wv-field"><label>Prezzo (€)</label><input type="number" step="0.01" v-model.number="catForm.prezzo" /></div>
-        <div class="wv-field"><label>Acconto (€)</label><input type="number" step="0.01" v-model.number="catForm.acconto" /></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_prezzo', 'Price (€)') }}</label><input type="number" step="0.01" v-model.number="catForm.prezzo" /></div>
+        <div class="wv-field"><label>{{ t('cat_lbl_acconto', 'Deposit (€)') }}</label><input type="number" step="0.01" v-model.number="catForm.acconto" /></div>
 
         <div class="wv-form-actions">
-          <button type="submit" :disabled="savingCategoria">{{ editingCategoria ? 'Salva modifiche' : 'Crea categoria' }}</button>
-          <button v-if="editingCategoria" type="button" class="wv-btn" :disabled="savingCategoria" @click="submitCategoria(false)">Salva e chiudi</button>
-          <a v-if="editingCategoria" class="wv-btn wv-btn-ghost" @click="navigate({ vista: 'categorie' })">Annulla</a>
+          <button type="submit" :disabled="savingCategoria">{{ editingCategoria ? t('cat_btn_salva_modifiche', 'Save changes') : t('cat_h3_crea', 'Create category') }}</button>
+          <button v-if="editingCategoria" type="button" class="wv-btn" :disabled="savingCategoria" @click="submitCategoria(false)">{{ t('cat_btn_salva_chiudi', 'Save and close') }}</button>
+          <a v-if="editingCategoria" class="wv-btn wv-btn-ghost" @click="navigate({ vista: 'categorie' })">{{ t('cat_btn_annulla', 'Cancel') }}</a>
         </div>
       </form>
 
-      <h3>Categorie esistenti</h3>
+      <h3>{{ t('cat_h3_esistenti', 'Existing categories') }}</h3>
       <div class="wv-categorie-grid">
         <div v-for="c in categorie" :key="c.id" class="wv-row wv-catcard-grid">
           <div class="wv-catcard-foto" :style="c.foto ? { backgroundImage: `url('${c.foto}')` } : {}"></div>
@@ -403,15 +404,15 @@ onMounted(() => {
             · slug: <code>{{ c.slug }}</code>
             <template v-if="c.url">
               ·
-              <a :href="c.url" target="_blank" style="color: rgba(255,255,255,.7); text-decoration: none; border-bottom: 1px dotted rgba(255,255,255,.3)">pagina</a>
+              <a :href="c.url" target="_blank" style="color: rgba(255,255,255,.7); text-decoration: none; border-bottom: 1px dotted rgba(255,255,255,.3)">{{ t('cat_link_pagina', 'page') }}</a>
             </template>
-            <template v-if="c.count"> · {{ c.count }} eventi</template>
-            <div v-if="c.prossimo_evento" class="wv-catcard-prossimo">Prossimo: {{ c.prossimo_evento }}</div>
-            <div v-else class="wv-catcard-prossimo wv-catcard-prossimo--none">Nessuna data in programma</div>
+            <template v-if="c.count"> · {{ c.count }} {{ t('cat_word_eventi', 'events') }}</template>
+            <div v-if="c.prossimo_evento" class="wv-catcard-prossimo">{{ t('cat_prossimo', 'Next:') }} {{ c.prossimo_evento }}</div>
+            <div v-else class="wv-catcard-prossimo wv-catcard-prossimo--none">{{ t('cat_nessuna_data', 'No date scheduled') }}</div>
           </span>
           <span class="wv-actions">
-            <a class="wv-btn wv-btn-sm wv-btn-ghost" @click="navigate({ vista: 'categorie', edit_cat: c.id })">Modifica</a>
-            <button class="wv-btn-sm wv-btn-del" @click="eliminaCategoria(c)">Elimina</button>
+            <a class="wv-btn wv-btn-sm wv-btn-ghost" @click="navigate({ vista: 'categorie', edit_cat: c.id })">{{ t('cat_btn_modifica', 'Edit') }}</a>
+            <button class="wv-btn-sm wv-btn-del" @click="eliminaCategoria(c)">{{ t('cat_btn_elimina', 'Delete') }}</button>
           </span>
         </div>
       </div>
@@ -420,16 +421,16 @@ onMounted(() => {
 
   <div v-else class="wv-dash">
     <template v-if="!loadingTipi">
-      <h3>Gestisci Tipi di Evento</h3>
-      <p style="color: #888; margin-bottom: 20px; font-size: 13px">Aggiungi, modifica o rimuovi i tipi di evento disponibili per le categorie.</p>
+      <h3>{{ t('cat_h3_gestisci_tipi', 'Manage Event Types') }}</h3>
+      <p style="color: #888; margin-bottom: 20px; font-size: 13px">{{ t('cat_p_gestisci_tipi', 'Add, edit, or remove the event types available for categories.') }}</p>
       <form @submit.prevent="submitTipi">
-        <div v-for="(t, i) in tipi" :key="i" class="wv-field" style="display: flex; gap: 10px; align-items: center">
-          <input type="text" v-model="tipi[i]" placeholder="Es. Workshop" required style="flex: 1" />
+        <div v-for="(tipoVal, i) in tipi" :key="i" class="wv-field" style="display: flex; gap: 10px; align-items: center">
+          <input type="text" v-model="tipi[i]" :placeholder="t('cat_ph_es_workshop', 'e.g. Workshop')" required style="flex: 1" />
           <button type="button" class="wv-btn-sm wv-btn-del" @click="rimuoviTipo(i)">✕</button>
         </div>
         <div class="wv-form-actions" style="margin-top: 24px">
-          <button type="button" class="wv-btn wv-btn-ghost" @click="aggiungiTipo">+ Aggiungi Tipo</button>
-          <button type="submit" :disabled="savingTipi">Salva Tipi</button>
+          <button type="button" class="wv-btn wv-btn-ghost" @click="aggiungiTipo">+ {{ t('cat_btn_aggiungi_tipo', 'Add Type') }}</button>
+          <button type="submit" :disabled="savingTipi">{{ t('cat_btn_salva_tipi', 'Save Types') }}</button>
         </div>
       </form>
     </template>

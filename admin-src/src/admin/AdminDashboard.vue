@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import PartecipantiTab from './PartecipantiTab.vue';
 import EventiTab from './EventiTab.vue';
 import CategorieTipiTab from './CategorieTipiTab.vue';
+import { t } from '../shared/i18n.js';
 
 // wp-admin backend: distinguished by the ?page= WP always appends for its
 // own submenu URLs. Frontend shortcodes have no such URL naturally, so
@@ -12,10 +13,10 @@ const page = new URL(window.location.href).searchParams.get('page');
 const isCatPage = page === 'workshop-suite-categorie' || window.WSMA_CONFIG?.panelMode === 'categorie';
 const isVirtualPage = window.WSMA_CONFIG?.panelMode === 'virtuale';
 const tabs = isCatPage
-  ? { categorie: 'Categorie', tipologia: 'Tipologia' }
+  ? { categorie: t('admin_tab_categorie', 'Categories'), tipologia: t('admin_tab_tipologia', 'Types') }
   : isVirtualPage
-    ? { categorie: 'Categoria', eventi: 'Eventi', partecipanti: 'Partecipanti' }
-    : { eventi: 'Eventi', partecipanti: 'Aggiungi Partecipante' };
+    ? { categorie: t('admin_tab_categoria', 'Category'), eventi: t('admin_tab_eventi', 'Events'), partecipanti: t('admin_tab_partecipanti', 'Participants') }
+    : { eventi: t('admin_tab_eventi', 'Events'), partecipanti: t('admin_tab_aggiungi_partecipante', 'Add Participant') };
 
 const initVista = new URL(window.location.href).searchParams.get('vista') || Object.keys(tabs)[0];
 const vista = ref(initVista);
@@ -53,7 +54,7 @@ onMounted(() => {
 
 <template>
   <div class="wv-dash">
-    <h2>{{ isVirtualPage ? '💻 Aula Virtuale' : isCatPage ? 'Categoria e tipologia' : 'Dashboard' }}</h2>
+    <h2>{{ isVirtualPage ? t('admin_h2_aula_virtuale', '💻 Virtual Classroom') : isCatPage ? t('admin_h2_categoria_tipologia', 'Category & Type') : 'Dashboard' }}</h2>
     <div v-if="msg" class="msg">{{ msg }}</div>
     <nav>
       <a v-for="(label, key) in tabs" :key="key" :class="{ active: vista === key }" @click="goTo(key)">{{ label }}</a>
