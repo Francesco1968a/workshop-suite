@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { t } from '../shared/i18n.js';
 
 const loading = ref(true);
 const autosend = ref(true);
@@ -41,7 +42,7 @@ async function saveImpostazioni() {
     headers: headers({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({ autosend: autosend.value }),
   });
-  flash('Impostazioni salvate.');
+  flash(t('rg_impostazioni_salvate', 'Settings saved.'));
 }
 
 async function inviaUna(item) {
@@ -50,10 +51,10 @@ async function inviaUna(item) {
     const res = await fetch(apiUrl('ringraziamento/iscrizione/' + item.isc_id + '/invia'), { method: 'POST', headers: headers() });
     const data = await res.json();
     if (!res.ok) {
-      flash(data.message || 'Invio fallito.');
+      flash(data.message || t('msg_err_invio', 'Send failed.'));
       return;
     }
-    flash('Mail inviata a ' + item.nome + '.');
+    flash(t('rg_mail_inviata_a', 'Email sent to') + ' ' + item.nome + '.');
     load();
   } finally {
     busy.value.delete(item.isc_id);
@@ -61,11 +62,11 @@ async function inviaUna(item) {
 }
 
 async function saltaUna(item) {
-  if (!window.confirm('Saltare questa iscrizione?')) return;
+  if (!window.confirm(t('rg_confirm_salta', 'Skip this registration?'))) return;
   busy.value.add(item.isc_id);
   try {
     await fetch(apiUrl('ringraziamento/iscrizione/' + item.isc_id + '/salta'), { method: 'POST', headers: headers() });
-    flash(item.nome + ' saltato.');
+    flash(item.nome + ' ' + t('rg_saltato', 'skipped.'));
     load();
   } finally {
     busy.value.delete(item.isc_id);
@@ -77,7 +78,7 @@ async function inviaTutte() {
   try {
     const res = await fetch(apiUrl('ringraziamento/invia-tutte'), { method: 'POST', headers: headers() });
     const data = await res.json();
-    flash('Inviate ' + data.inviate + ' mail ringraziamento.');
+    flash(t('rg_inviate_n_mail', 'Sent') + ' ' + data.inviate + ' ' + t('rg_mail_ringraziamento', 'thank-you emails.'));
     load();
   } finally {
     busy.value.delete('all');
@@ -94,51 +95,51 @@ onMounted(load);
 
 <template>
   <div v-if="!loading" class="wvring">
-    <h2>Mail #4 · Ringraziamento T+2</h2>
+    <h2>{{ t('rg_h2', 'Email #4 · Thank You T+2') }}</h2>
     <div v-if="msg" class="notice">{{ msg }}</div>
     <div class="info-box">
-      Ogni mattina alle 10:00 il sistema invia <strong style="color: #7ddc8e">Mail #4</strong>
-      ai Confermati di eventi conclusi esattamente 2 giorni fa. Tono amichevole: ringraziamento + Drive condiviso per le foto.
+      {{ t('rg_info_pre', 'Every morning at 10:00 the system sends') }} <strong style="color: #7ddc8e">{{ t('rg_mail4', 'Email #4') }}</strong>
+      {{ t('rg_info_post', 'to Confirmed participants of events that ended exactly 2 days ago. Friendly tone: thank-you + shared Drive folder for photos.') }}
     </div>
 
     <div class="card">
-      <h3>Impostazioni</h3>
-      <label>Stato</label>
+      <h3>{{ t('rg_impostazioni', 'Settings') }}</h3>
+      <label>{{ t('ev_lbl_stato', 'Status') }}</label>
       <div style="display: flex; gap: 8px">
-        <button :class="{ accent: autosend }" @click="setAutosend(true)">ATTIVO — invia automaticamente</button>
-        <button @click="setAutosend(false)">SOSPESO</button>
+        <button :class="{ accent: autosend }" @click="setAutosend(true)">{{ t('rg_attivo', 'ACTIVE — sends automatically') }}</button>
+        <button @click="setAutosend(false)">{{ t('rg_sospeso', 'PAUSED') }}</button>
       </div>
       <div class="hint" style="margin-top: 14px">
-        Prossimo invio automatico: <strong style="color: #fff">{{ nextCron || '(non pianificato)' }}</strong>
+        {{ t('rg_prossimo_invio', 'Next automatic send:') }} <strong style="color: #fff">{{ nextCron || t('rg_non_pianificato', '(not scheduled)') }}</strong>
       </div>
     </div>
 
     <div class="card">
-      <h3>Da inviare oggi (eventi conclusi 2gg fa)</h3>
+      <h3>{{ t('rg_da_inviare_oggi', 'To send today (events that ended 2 days ago)') }}</h3>
       <template v-if="oggi.length">
         <p style="color: rgba(255, 255, 255, 0.7); font-size: 13px">
-          Sono <strong style="color: #7ddc8e">{{ oggi.length }}</strong> iscrizioni di eventi appena conclusi:
+          {{ t('rg_sono', 'There are') }} <strong style="color: #7ddc8e">{{ oggi.length }}</strong> {{ t('rg_iscrizioni_appena_concluso', 'registrations from events that just ended:') }}
         </p>
         <div v-for="item in oggi" :key="item.isc_id" class="item">
           <div class="info">
             <strong>{{ item.nome }}</strong> · {{ item.evento }}
             <div class="meta">{{ item.email }}</div>
           </div>
-          <button class="accent btn-sm" :disabled="busy.has(item.isc_id)" @click="inviaUna(item)">🙏 Invia ora</button>
-          <button class="btn-sm btn-ghost" :disabled="busy.has(item.isc_id)" @click="saltaUna(item)">⏭ Salta</button>
+          <button class="accent btn-sm" :disabled="busy.has(item.isc_id)" @click="inviaUna(item)">🙏 {{ t('rg_invia_ora', 'Send now') }}</button>
+          <button class="btn-sm btn-ghost" :disabled="busy.has(item.isc_id)" @click="saltaUna(item)">⏭ {{ t('rg_salta', 'Skip') }}</button>
         </div>
         <div class="row-actions">
-          <button :disabled="busy.has('all')" @click="inviaTutte">⚡ Invia tutte adesso</button>
+          <button :disabled="busy.has('all')" @click="inviaTutte">⚡ {{ t('rg_invia_tutte', 'Send all now') }}</button>
         </div>
       </template>
-      <div v-else class="empty">Nessun evento concluso 2 giorni fa con partecipanti confermati.</div>
+      <div v-else class="empty">{{ t('rg_nessun_evento_2gg', 'No events ended 2 days ago with confirmed participants.') }}</div>
     </div>
 
     <div v-if="prossimi.length" class="card">
-      <h3>In arrivo nei prossimi giorni</h3>
+      <h3>{{ t('rg_in_arrivo', 'Coming up in the next few days') }}</h3>
       <div v-for="g in prossimi" :key="g.giorni" class="prossimi-group">
         <div class="prossimi-head">
-          Tra <span class="countdown">{{ g.giorni }} giorni</span> → {{ g.iscrizioni.length }} iscrizione/i
+          {{ t('ed_tra', 'in') }} <span class="countdown">{{ g.giorni }} {{ t('rg_giorni', 'days') }}</span> → {{ g.iscrizioni.length }} {{ t('rg_iscrizione_i', 'registration(s)') }}
         </div>
         <div v-for="item in g.iscrizioni" :key="item.isc_id" class="prossimi-row">
           • {{ item.nome }} · {{ item.evento }}

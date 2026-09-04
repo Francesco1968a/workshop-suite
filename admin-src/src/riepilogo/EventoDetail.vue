@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import Ring from './Ring.vue';
+import { t } from '../shared/i18n.js';
 
 const props = defineProps({
   eventoId: { type: Number, required: true },
@@ -38,11 +39,11 @@ async function conferma(isc) {
     const res = await fetch(apiUrl('riepilogo/iscrizione/' + isc.id + '/conferma'), { method: 'POST', headers: headers() });
     if (!res.ok) {
       const err = await res.json();
-      emit('message', err.message || 'Impossibile inviare la mail (email mancante?).');
+      emit('message', err.message || t('ed_err_invio_mail', 'Could not send the email (missing address?).'));
       return;
     }
     isc.stato = 'confermato';
-    emit('message', 'Conferma inviata. Stato → Confermato.');
+    emit('message', t('ed_conferma_inviata', 'Confirmation sent. Status → Confirmed.'));
   } finally {
     confermando.value.delete(isc.id);
   }
@@ -58,11 +59,11 @@ async function aggiornaStatoPagamento(isc, stato) {
     });
     if (!res.ok) {
       const err = await res.json();
-      emit('message', err.message || 'Impossibile aggiornare lo stato pagamento.');
+      emit('message', err.message || t('ed_err_stato_pagamento', 'Could not update the payment status.'));
       return;
     }
     isc.stato_pagamento = stato;
-    emit('message', 'Stato pagamento aggiornato.');
+    emit('message', t('ed_stato_pagamento_ok', 'Payment status updated.'));
   } finally {
     aggiornandoPagamento.value.delete(isc.id);
   }
@@ -86,19 +87,19 @@ async function salvaNote() {
     const isc = data.value.iscrizioni.find((i) => i.id === noteIscId.value);
     if (isc) isc.note = result.note;
     dialogAperto.value = false;
-    emit('message', 'Nota aggiornata.');
+    emit('message', t('ed_nota_aggiornata', 'Note updated.'));
   } finally {
     salvandoNote.value = false;
   }
 }
 
 async function elimina(isc) {
-  if (!window.confirm("Eliminare questo partecipante dall'evento?")) return;
+  if (!window.confirm(t('ed_confirm_elimina', 'Remove this participant from the event?'))) return;
   eliminando.value.add(isc.id);
   try {
     await fetch(apiUrl('riepilogo/iscrizione/' + isc.id), { method: 'DELETE', headers: headers() });
     data.value.iscrizioni = data.value.iscrizioni.filter((i) => i.id !== isc.id);
-    emit('message', "Partecipante eliminato dall'evento.");
+    emit('message', t('ed_partecipante_eliminato', 'Participant removed from the event.'));
   } finally {
     eliminando.value.delete(isc.id);
   }
@@ -128,7 +129,7 @@ onMounted(load);
 
 <template>
   <div v-if="data">
-    <a class="wvr-back" @click="emit('back')">← Torna al riepilogo</a>
+    <a class="wvr-back" @click="emit('back')">← {{ t('ed_torna_riepilogo', 'Back to overview') }}</a>
     <h2>{{ data.label }}</h2>
 
     <div class="wvr-evento-grid">
@@ -138,7 +139,7 @@ onMounted(load);
             <span class="wvr-card-cat">{{ data.cat_name }}</span>
             <span class="wvr-card-date">{{ data.periodo }}</span>
           </div>
-          <span v-if="data.concluso" class="wvr-card-concluso">concluso</span>
+          <span v-if="data.concluso" class="wvr-card-concluso">{{ t('cp_concluso', 'ended') }}</span>
         </div>
       </div>
 
@@ -147,65 +148,65 @@ onMounted(load);
           <div class="v">{{ data.ring.pct }}%</div>
           <div class="s">{{ data.ring.occupati }}/{{ data.ring.totali }}</div>
         </Ring>
-        <div class="lbl">Prenotazione</div>
-        <div class="big">{{ data.ring.occupati }} <span>su {{ data.ring.totali }}</span></div>
+        <div class="lbl">{{ t('ed_prenotazione', 'Bookings') }}</div>
+        <div class="big">{{ data.ring.occupati }} <span>{{ t('ed_su', 'of') }} {{ data.ring.totali }}</span></div>
         <div class="sub">
-          {{ data.n_iscritti }} iscritti
-          <template v-if="data.giorni_a_evento !== null && data.giorni_a_evento > 0"> · tra {{ data.giorni_a_evento }} gg</template>
+          {{ data.n_iscritti }} {{ t('ed_iscritti', 'registered') }}
+          <template v-if="data.giorni_a_evento !== null && data.giorni_a_evento > 0"> · {{ t('ed_tra', 'in') }} {{ data.giorni_a_evento }} {{ t('ed_gg_abbr', 'days') }}</template>
         </div>
       </div>
 
       <div class="wvr-evento-todo-col">
         <div v-if="data.todo.richieste + data.todo.pagamenti_mancanti + data.todo.welcome_da_inviare > 0" class="wvr-section wvr-todo">
-          <h3>⚠ Da fare</h3>
+          <h3>⚠ {{ t('cp_da_fare', 'To do') }}</h3>
           <ul>
             <li v-if="data.todo.richieste > 0">
               <span class="ico">🔀</span>
-              <span class="txt"><strong>{{ data.todo.richieste }}</strong> richiest{{ data.todo.richieste > 1 ? 'e' : 'a' }}</span>
-              <a :href="data.urls.checkpoint">vai</a>
+              <span class="txt"><strong>{{ data.todo.richieste }}</strong> {{ data.todo.richieste > 1 ? t('ev_richieste_plural', 'Requests') : t('ev_richiesta_singular', 'Request') }}</span>
+              <a :href="data.urls.checkpoint">{{ t('cp_vai', 'go') }}</a>
             </li>
             <li v-if="data.todo.pagamenti_mancanti > 0">
               <span class="ico">💰</span>
-              <span class="txt"><strong>{{ data.todo.pagamenti_mancanti }}</strong> pagament{{ data.todo.pagamenti_mancanti > 1 ? 'i' : 'o' }}</span>
+              <span class="txt"><strong>{{ data.todo.pagamenti_mancanti }}</strong> {{ data.todo.pagamenti_mancanti > 1 ? t('cp_pagamenti_plural_bare', 'payments') : t('cp_pagamenti_singular_bare', 'payment') }}</span>
             </li>
             <li v-if="data.todo.welcome_da_inviare > 0">
               <span class="ico">👋</span>
-              <span class="txt"><strong>{{ data.todo.welcome_da_inviare }}</strong> mail a presto</span>
-              <a :href="data.urls.apresto">vai</a>
+              <span class="txt"><strong>{{ data.todo.welcome_da_inviare }}</strong> {{ t('ed_mail_a_presto', 'welcome emails') }}</span>
+              <a :href="data.urls.apresto">{{ t('cp_vai', 'go') }}</a>
             </li>
           </ul>
         </div>
-        <div v-else class="empty-todo">Nessun task aperto</div>
+        <div v-else class="empty-todo">{{ t('ed_nessun_task', 'No open tasks') }}</div>
 
         <div class="wvr-evento-actions">
-          <a v-if="data.cat_url" class="wvr-link" :href="data.cat_url" target="_blank" rel="noopener">Vai a pagina</a>
-          <a class="wvr-link" :href="data.edit_ev_link">Modifica</a>
+          <a v-if="data.cat_url" class="wvr-link" :href="data.cat_url" target="_blank" rel="noopener">{{ t('ed_vai_a_pagina', 'Go to page') }}</a>
+          <a class="wvr-link" :href="data.edit_ev_link">{{ t('ev_btn_modifica', 'Edit') }}</a>
           <button v-if="data.fb_share_enabled" class="wvr-link" @click="preparaEventoFacebook">
-            {{ fbCopiato ? '✓ Copiato, apro Facebook…' : '📘 Prepara evento Facebook' }}
+            {{ fbCopiato ? '✓ ' + t('ed_copiato_apro_fb', 'Copied, opening Facebook…') : '📘 ' + t('ed_prepara_fb', 'Prepare Facebook event') }}
           </button>
         </div>
       </div>
 
       <aside class="wvr-evento-right">
-        <h3>Altri eventi · {{ data.cat_name }}</h3>
+        <h3>{{ t('ed_altri_eventi', 'Other events') }} · {{ data.cat_name }}</h3>
         <div v-if="data.altri_eventi.length" class="wvr-altri-grid">
           <a v-for="e in data.altri_eventi" :key="e.id" class="wvr-altri-chip" @click="emit('open-evento', e.id)">
             <span class="d">{{ e.periodo }}</span>
             <span class="st">{{ e.stato }}</span>
           </a>
         </div>
-        <div v-else class="wvr-empty" style="padding: 14px 0; font-size: 11px">Nessun altro evento.</div>
+        <div v-else class="wvr-empty" style="padding: 14px 0; font-size: 11px">{{ t('ed_nessun_altro_evento', 'No other events.') }}</div>
       </aside>
     </div>
 
-    <h3>Partecipanti</h3>
+    <h3>{{ t('pl_h2', 'Participants') }}</h3>
     <template v-if="data.iscrizioni.length">
       <div class="wvr-table-wrap">
         <table class="wvr-table">
           <thead>
             <tr>
-              <th>Nome</th><th>Email</th><th>Città</th><th>Telefono</th><th>Persone</th>
-              <th>Stato</th><th>Pagamento</th><th>Anticipo</th><th>Saldo</th><th>Azioni</th>
+              <th>{{ t('px_lbl_nome', 'First name') }}</th><th>Email</th><th>{{ t('px_lbl_citta', 'City') }}</th><th>{{ t('px_lbl_telefono', 'Phone') }}</th><th>{{ t('ed_persone', 'People') }}</th>
+              <th>{{ t('ev_lbl_stato', 'Status') }}</th><th>{{ t('ev_lbl_stato_pagamento', 'Payment status') }}</th><th>{{ t('ev_lbl_anticipo', 'Deposit (€)') }}</th><th>{{ t('ev_lbl_saldo', 'Balance (€)') }}</th><th>{{ t('ed_azioni', 'Actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -217,7 +218,7 @@ onMounted(load);
               <td>{{ isc.num_persone }}</td>
               <td>
                 <span class="wvr-badge" :class="isc.stato === 'confermato' ? 'wvr-confermato' : 'wvr-richiesta'">
-                  {{ isc.stato === 'confermato' ? 'Confermato' : 'Richiesta' }}
+                  {{ isc.stato === 'confermato' ? t('ev_opt_confermato', 'Confirmed') : t('ev_richiesta_singular', 'Request') }}
                 </span>
               </td>
               <td>
@@ -226,19 +227,19 @@ onMounted(load);
                   :disabled="aggiornandoPagamento.has(isc.id)"
                   @change="aggiornaStatoPagamento(isc, $event.target.value)"
                 >
-                  <option value="in_attesa">In attesa</option>
-                  <option value="acconto_pagato">Acconto pagato</option>
-                  <option value="saldato">Saldato</option>
+                  <option value="in_attesa">{{ t('ev_opt_in_attesa', 'Pending') }}</option>
+                  <option value="acconto_pagato">{{ t('ev_opt_acconto_pagato', 'Deposit paid') }}</option>
+                  <option value="saldato">{{ t('ev_opt_saldato', 'Paid in full') }}</option>
                 </select>
               </td>
               <td>{{ euro(isc.anticipo) }}</td>
               <td>{{ euro(isc.saldo) }}</td>
               <td>
                 <div class="wvr-actions-cell">
-                  <button v-if="isc.stato !== 'confermato'" class="wvr-link" :disabled="confermando.has(isc.id)" @click="conferma(isc)">Conferma</button>
-                  <button class="wvr-link" @click="apriNote(isc)">Note<template v-if="isc.note"> •</template></button>
-                  <a class="wvr-link" :href="isc.edit_link">Modifica</a>
-                  <button class="wvr-link wvr-link-del" :disabled="eliminando.has(isc.id)" @click="elimina(isc)">Elimina</button>
+                  <button v-if="isc.stato !== 'confermato'" class="wvr-link" :disabled="confermando.has(isc.id)" @click="conferma(isc)">{{ t('msg_btn_conferma', 'Confirm') }}</button>
+                  <button class="wvr-link" @click="apriNote(isc)">{{ t('ed_note', 'Notes') }}<template v-if="isc.note"> •</template></button>
+                  <a class="wvr-link" :href="isc.edit_link">{{ t('ev_btn_modifica', 'Edit') }}</a>
+                  <button class="wvr-link wvr-link-del" :disabled="eliminando.has(isc.id)" @click="elimina(isc)">{{ t('ev_btn_elimina', 'Delete') }}</button>
                 </div>
               </td>
             </tr>
@@ -246,19 +247,19 @@ onMounted(load);
         </table>
       </div>
       <div style="text-align: center; margin-top: 24px">
-        <a class="wvr-link" :href="data.aggiungi_link">+ Aggiungi partecipante a questo evento</a>
+        <a class="wvr-link" :href="data.aggiungi_link">+ {{ t('ed_aggiungi_partecipante', 'Add participant to this event') }}</a>
       </div>
     </template>
-    <div v-else class="wvr-empty">Nessun iscritto a questo evento.</div>
+    <div v-else class="wvr-empty">{{ t('ed_nessun_iscritto', 'No one registered for this event yet.') }}</div>
 
     <div v-if="dialogAperto" class="wvr-dialog-mask" @click.self="dialogAperto = false">
       <div class="wvr-dialog">
-        <h4>Note partecipante</h4>
-        <textarea v-model="noteText" maxlength="200" placeholder="Massimo 200 caratteri…"></textarea>
+        <h4>{{ t('ed_note_partecipante', 'Participant notes') }}</h4>
+        <textarea v-model="noteText" maxlength="200" :placeholder="t('ed_ph_note', 'Up to 200 characters…')"></textarea>
         <div class="wvr-note-count">{{ noteText.length }}/200</div>
         <div class="wvr-dialog-actions">
-          <button class="wvr-link" @click="dialogAperto = false">Annulla</button>
-          <button class="wvr-link" :disabled="salvandoNote" @click="salvaNote">Salva</button>
+          <button class="wvr-link" @click="dialogAperto = false">{{ t('ev_btn_annulla', 'Cancel') }}</button>
+          <button class="wvr-link" :disabled="salvandoNote" @click="salvaNote">{{ t('ev_btn_salva', 'Save') }}</button>
         </div>
       </div>
     </div>
