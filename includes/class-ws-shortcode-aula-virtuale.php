@@ -57,12 +57,12 @@ final class WSMA_Shortcode_Aula_Virtuale implements WSMA_Module {
         $theme = in_array($theme, ['dark', 'light'], true) ? $theme : 'dark';
 
         if (!$evento_id || get_post_type($evento_id) !== 'wsma_evento') {
-            return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><p class="ws-av-msg">Nessuna aula virtuale specificata.</p></div>';
+            return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><p class="ws-av-msg">' . esc_html__('No virtual classroom specified.', 'wsmaker') . '</p></div>';
         }
 
         $modalita = WSMA_Data::get_field('modalita', $evento_id) ?: 'fisico';
         if ($modalita !== 'virtuale') {
-            return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><p class="ws-av-msg">Questo evento non è un\'aula virtuale.</p></div>';
+            return '<div class="ws-theme-wrapper ws-theme-' . esc_attr($theme) . '"><p class="ws-av-msg">' . esc_html__('This event is not a virtual classroom.', 'wsmaker') . '</p></div>';
         }
 
         $piattaforma = WSMA_Data::get_field('piattaforma_virtuale', $evento_id) ?: 'jitsi';
@@ -97,11 +97,15 @@ final class WSMA_Shortcode_Aula_Virtuale implements WSMA_Module {
                     <div id="ws-av-jitsi-<?php echo (int) $evento_id; ?>" class="ws-av-frame"></div>
                 <?php elseif ($link): ?>
                     <div class="ws-av-external">
-                        <p class="ws-av-msg">La videochiamata si svolge su <?php echo esc_html(ucfirst($piattaforma)); ?>.</p>
-                        <a href="<?php echo esc_url($link); ?>" target="_blank" rel="noopener" class="ws-av-btn">Vai alla videochiamata →</a>
+                        <p class="ws-av-msg"><?php echo esc_html(sprintf(
+                            /* translators: %s: video platform name (e.g. Zoom, Meet) */
+                            __('The video call takes place on %s.', 'wsmaker'),
+                            ucfirst($piattaforma)
+                        )); ?></p>
+                        <a href="<?php echo esc_url($link); ?>" target="_blank" rel="noopener" class="ws-av-btn"><?php esc_html_e('Go to the video call →', 'wsmaker'); ?></a>
                     </div>
                 <?php else: ?>
-                    <p class="ws-av-msg">Il link dell'aula virtuale non è ancora disponibile.</p>
+                    <p class="ws-av-msg"><?php esc_html_e('The virtual classroom link is not available yet.', 'wsmaker'); ?></p>
                 <?php endif; ?>
             </div>
         </div>

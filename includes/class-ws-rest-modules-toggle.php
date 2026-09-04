@@ -40,7 +40,7 @@ final class WSMA_Rest_Modules_Toggle {
             'success' => true,
             'module'  => $mod_key,
             'active'  => $active,
-            'message' => $active ? __('Modulo attivato con successo', 'wsmaker') : __('Modulo disattivato', 'wsmaker'),
+            'message' => $active ? __('Module activated successfully', 'wsmaker') : __('Module deactivated', 'wsmaker'),
         ], 200);
     }
 }

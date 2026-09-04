@@ -262,8 +262,8 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
         // Submenu: Moduli & Add-on (con separatore visuale sopra)
         add_submenu_page(
             'workshop-suite-dashboard',
-            __('Moduli & Add-on', 'wsmaker'),
-            __('Moduli & Add-on', 'wsmaker'),
+            __('Modules & Add-ons', 'wsmaker'),
+            __('Modules & Add-ons', 'wsmaker'),
             'manage_options',
             'admin.php?page=workshop-suite-settings&tab=modules'
         );
@@ -427,14 +427,14 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
         <div class="wrap ws-theme-wrapper ws-theme-<?php echo esc_attr($default_theme); ?> ws-dashboard-wrapper" id="ws-dashboard-wrapper">
             
             <div class="ws-theme-switch-bar">
-                <span class="ws-s1"><?php esc_html_e('Tema:', 'wsmaker'); ?></span>
+                <span class="ws-s1"><?php esc_html_e('Theme:', 'wsmaker'); ?></span>
                 <button type="button" class="ws-theme-btn <?php echo esc_attr($default_theme === 'dark' ? 'active' : ''); ?>" id="btn-theme-dark" onclick="fvwSetTheme('dark')">🌙 Dark</button>
                 <button type="button" class="ws-theme-btn <?php echo esc_attr($default_theme === 'light' ? 'active' : ''); ?>" id="btn-theme-light" onclick="fvwSetTheme('light')">☀️ Light</button>
             </div>
 
             <div class="ws-s2">
-                <h2 class="ws-s3"><?php esc_html_e('🏷️ Tipi di Evento', 'wsmaker'); ?></h2>
-                <p class="ws-s4"><?php esc_html_e('Gestisci la lista dei tipi di evento predefiniti (es. Workshop, Viaggio Fotografico, Masterclass). Puoi modificarli o aggiungerne di nuovi.', 'wsmaker'); ?></p>
+                <h2 class="ws-s3"><?php esc_html_e('🏷️ Event Types', 'wsmaker'); ?></h2>
+                <p class="ws-s4"><?php esc_html_e('Manage the list of default event types (e.g. Workshop, Photo Tour, Masterclass). You can edit them or add new ones.', 'wsmaker'); ?></p>
 
                 <form method="post" action="options.php">
                     <?php settings_fields('wsma_settings_group'); ?>
@@ -459,8 +459,8 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     </div>
 
                     <div class="ws-s8">
-                        <button type="button" class="button button-secondary" onclick="fvwAddEventTypeRow()">+ <?php esc_html_e('Aggiungi Tipo Evento', 'wsmaker'); ?></button>
-                        <?php submit_button(__('Salva Tipi Evento', 'wsmaker'), 'primary', 'submit', false); ?>
+                        <button type="button" class="button button-secondary" onclick="fvwAddEventTypeRow()">+ <?php esc_html_e('Add Event Type', 'wsmaker'); ?></button>
+                        <?php submit_button(__('Save Event Types', 'wsmaker'), 'primary', 'submit', false); ?>
                     </div>
                 </form>
             </div>
@@ -554,73 +554,73 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                         <tbody>
                             <tr>
                                 <th scope="row">
-                                    <label for="site_brand_name"><?php esc_html_e('Nome Brand / Organizzazione', 'wsmaker'); ?></label>
+                                    <label for="site_brand_name"><?php esc_html_e('Brand / Organization Name', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
                                     <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[site_brand_name]" type="text" id="site_brand_name" value="<?php echo esc_attr($settings['site_brand_name']); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e('Usato nelle firme email automatiche e nei calendari ICS.', 'wsmaker'); ?></p>
+                                    <p class="description"><?php esc_html_e('Used in automatic email signatures and ICS calendar files.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <th scope="row">
-                                    <label for="sender_name"><?php esc_html_e('Nome Mittente Email', 'wsmaker'); ?></label>
+                                    <label for="sender_name"><?php esc_html_e('Email Sender Name', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
                                     <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[sender_name]" type="text" id="sender_name" value="<?php echo esc_attr($settings['sender_name']); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e('Nome visualizzato dal destinatario come mittente delle notifiche.', 'wsmaker'); ?></p>
+                                    <p class="description"><?php esc_html_e('Name shown to the recipient as the sender of notifications.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <th scope="row">
-                                    <label for="sender_email"><?php esc_html_e('Email Organizzazione', 'wsmaker'); ?></label>
+                                    <label for="sender_email"><?php esc_html_e('Organization Email', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
                                     <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[sender_email]" type="email" id="sender_email" value="<?php echo esc_attr($settings['sender_email']); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e('Indirizzo da cui partiranno le mail di risposta/promemoria, ed a cui arriveranno gli avvisi di nuove richieste dal form di iscrizione.', 'wsmaker'); ?></p>
+                                    <p class="description"><?php esc_html_e('Address that reply/reminder emails will be sent from, and that will receive alerts for new requests from the registration form.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <th scope="row">
-                                    <label for="currency_symbol"><?php esc_html_e('Simbolo Valuta', 'wsmaker'); ?></label>
+                                    <label for="currency_symbol"><?php esc_html_e('Currency Symbol', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
                                     <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[currency_symbol]" type="text" id="currency_symbol" value="<?php echo esc_attr($settings['currency_symbol']); ?>" class="small-text">
-                                    <p class="description"><?php esc_html_e('Simbolo valuta mostrato nei form di iscrizione (es. €).', 'wsmaker'); ?></p>
+                                    <p class="description"><?php esc_html_e('Currency symbol shown in registration forms (e.g. €).', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <th scope="row">
-                                    <label for="default_theme_mode"><?php esc_html_e('Tema Frontend Predefinito', 'wsmaker'); ?></label>
+                                    <label for="default_theme_mode"><?php esc_html_e('Default Frontend Theme', 'wsmaker'); ?></label>
                                 </th>
                                 <td>
                                     <select name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[default_theme_mode]" id="default_theme_mode">
-                                        <option value="dark" <?php selected('dark', $settings['default_theme_mode']); ?>><?php esc_html_e('Tema Dark (Scuro)', 'wsmaker'); ?></option>
-                                        <option value="light" <?php selected('light', $settings['default_theme_mode']); ?>><?php esc_html_e('Tema Light (Chiaro)', 'wsmaker'); ?></option>
+                                        <option value="dark" <?php selected('dark', $settings['default_theme_mode']); ?>><?php esc_html_e('Dark Theme', 'wsmaker'); ?></option>
+                                        <option value="light" <?php selected('light', $settings['default_theme_mode']); ?>><?php esc_html_e('Light Theme', 'wsmaker'); ?></option>
                                     </select>
-                                    <p class="description"><?php esc_html_e('Stile grafico applicato agli shortcode e ai moduli pubblici nel frontend del sito.', 'wsmaker'); ?></p>
+                                    <p class="description"><?php esc_html_e('Visual style applied to shortcodes and public modules on the site\'s frontend.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
 
                             <tr>
-                                <th scope="row"><?php esc_html_e('Automazioni Promemoria', 'wsmaker'); ?></th>
+                                <th scope="row"><?php esc_html_e('Reminder Automations', 'wsmaker'); ?></th>
                                 <td>
                                     <fieldset>
                                         <label for="enable_t15_reminders">
                                             <input name="<?php echo esc_attr(WSMA_Settings::OPTION_KEY); ?>[enable_t15_reminders]" type="checkbox" id="enable_t15_reminders" value="1" <?php checked(1, $settings['enable_t15_reminders']); ?>>
-                                            <?php esc_html_e('Abilita invio automatico promemoria a 15 giorni dall\'evento (T-15)', 'wsmaker'); ?>
+                                            <?php esc_html_e('Enable automatic reminder emails 15 days before the event (T-15)', 'wsmaker'); ?>
                                         </label>
-                                        <p class="description"><?php esc_html_e('Invia in automatico una mail riassuntiva ai partecipanti confermati 15 giorni prima della data inizio.', 'wsmaker'); ?></p>
+                                        <p class="description"><?php esc_html_e('Automatically sends a summary email to confirmed participants 15 days before the start date.', 'wsmaker'); ?></p>
                                     </fieldset>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <?php submit_button(__('Salva Impostazioni', 'wsmaker')); ?>
+                    <?php submit_button(__('Save Settings', 'wsmaker')); ?>
                 </form>
             <?php elseif ($tab === 'modules') : 
                 $is_pro_active = defined('WS_PRO_VERSION');
@@ -629,7 +629,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     'global_hub_pro' => [
                         'icon'        => '🌐',
                         'title'       => __('Woorkshoop Global Hub & World Map Sync', 'wsmaker'),
-                        'desc'        => __('Sincronizza in automatico i tuoi workshop ed eventi sulla directory globale woorkshoop.space / wsmaker.pro e sulla mappa interattiva mondiale.', 'wsmaker'),
+                        'desc'        => __('Automatically syncs your workshops and events to the global woorkshoop.space / wsmaker.pro directory and the interactive world map.', 'wsmaker'),
                         'badge'       => 'GLOBAL HUB',
                         'is_pro'      => false,
                         'default'     => 1,
@@ -637,15 +637,15 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     'courses_academy' => [
                         'icon'        => '🎬',
                         'title'       => __('Workshop Online & LMS', 'wsmaker'),
-                        'desc'        => __('Piattaforma videocorsi on-demand, masterclass registrate, gestione moduli/lezioni con player video avanzato e streaming Zoom/Meet.', 'wsmaker'),
+                        'desc'        => __('On-demand video course platform, recorded masterclasses, module/lesson management with an advanced video player and Zoom/Meet streaming.', 'wsmaker'),
                         'badge'       => 'LMS',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'voucher_pdf' => [
                         'icon'        => '🎟️',
-                        'title'       => __('Voucher di Partecipazione & PDF Pass', 'wsmaker'),
-                        'desc'        => __('Genera e invia in automatico all\'email di conferma il Voucher/Pass PDF personalizzato con QR-code e dettagli logistici per il corsista.', 'wsmaker'),
+                        'title'       => __('Participation Voucher & PDF Pass', 'wsmaker'),
+                        'desc'        => __('Automatically generates and attaches to the confirmation email a personalized PDF Voucher/Pass with QR code and logistics details for the participant.', 'wsmaker'),
                         'badge'       => 'CONFIRMATION',
                         'is_pro'      => true,
                         'default'     => 0,
@@ -653,15 +653,15 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     'ai_assistant' => [
                         'icon'        => '🤖',
                         'title'       => __('AI Workshop Assistant & Copywriter', 'wsmaker'),
-                        'desc'        => __('Assistente AI per generare descrizioni accattivanti dei corsi, programmi didattici, testi per i post di Instagram e risposte email agli allievi.', 'wsmaker'),
+                        'desc'        => __('AI assistant to generate engaging course descriptions, teaching programs, Instagram post copy, and email replies to students.', 'wsmaker'),
                         'badge'       => 'AI ENGINE',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'stripe_payments' => [
                         'icon'        => '💳',
-                        'title'       => __('Pagamenti Nativi Stripe & Apple Pay', 'wsmaker'),
-                        'desc'        => __('Incasso istantaneo di anticipi o saldi tramite carta di credito, Apple Pay e Google Pay con zero plugin intermedi.', 'wsmaker'),
+                        'title'       => __('Native Stripe & Apple Pay Payments', 'wsmaker'),
+                        'desc'        => __('Instant collection of deposits or balances via credit card, Apple Pay, and Google Pay, with zero middleman plugins.', 'wsmaker'),
                         'badge'       => 'PAYMENTS',
                         'is_pro'      => true,
                         'default'     => 0,
@@ -669,15 +669,15 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     'calendar_sync' => [
                         'icon'        => '📅',
                         'title'       => __('Google Calendar & Apple iCal Auto-Sync', 'wsmaker'),
-                        'desc'        => __('Feed ICS dinamico che sincronizza in tempo reale le date dei workshop sul calendario personale del docente e dei partecipanti.', 'wsmaker'),
+                        'desc'        => __('Dynamic ICS feed that syncs workshop dates in real time to the trainer\'s and participants\' personal calendars.', 'wsmaker'),
                         'badge'       => 'CALENDAR',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'webhooks' => [
                         'icon'        => '🔌',
-                        'title'       => __('Webhook & Connettori Zapier / Make', 'wsmaker'),
-                        'desc'        => __('Invia payload JSON in tempo reale a Make.com, Zapier, Zoho CRM o Google Sheets ad ogni nuova iscrizione o conferma pagamento.', 'wsmaker'),
+                        'title'       => __('Webhook & Zapier / Make Connectors', 'wsmaker'),
+                        'desc'        => __('Sends a real-time JSON payload to Make.com, Zapier, Zoho CRM, or Google Sheets on every new registration or payment confirmation.', 'wsmaker'),
                         'badge'       => 'INTEGRATION',
                         'is_pro'      => true,
                         'default'     => 0,
@@ -685,47 +685,47 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     'poster_studio' => [
                         'icon'        => '🎨',
                         'title'       => __('Poster Studio & Social Banner Builder', 'wsmaker'),
-                        'desc'        => __('Generatore grafico in-browser di locandine pronte per Instagram Feed (1:1), Stories (9:16) e Facebook con rendering HTML5 Canvas.', 'wsmaker'),
+                        'desc'        => __('In-browser graphic generator for posters ready for Instagram Feed (1:1), Stories (9:16), and Facebook, rendered with HTML5 Canvas.', 'wsmaker'),
                         'badge'       => 'GRAPHIC',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'analytics' => [
                         'icon'        => '📊',
-                        'title'       => __('Statistiche & Analytics', 'wsmaker'),
-                        'desc'        => __('Estende il pannello Riepilogo con incassi (30 giorni e totali) suddivisi per categoria, e — se il modulo Marketing è attivo — coupon emessi/utilizzati e sconto concesso.', 'wsmaker'),
+                        'title'       => __('Statistics & Analytics', 'wsmaker'),
+                        'desc'        => __('Extends the Overview panel with revenue (30-day and total) broken down by category, and — if the Marketing module is active — coupons issued/used and discounts granted.', 'wsmaker'),
                         'badge'       => 'ANALYTICS',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'marketing' => [
                         'icon'        => '🎁',
-                        'title'       => __('Marketing: Fidelity & Coupon', 'wsmaker'),
-                        'desc'        => __('Coupon manuali per offerte speciali (Earlybird ecc.) e programma fedeltà automatico: chi partecipa a più eventi/corsi negli ultimi 12 mesi riceve uno sconto crescente. Funziona sia con i pagamenti Stripe nativi che con WooCommerce.', 'wsmaker'),
+                        'title'       => __('Marketing: Loyalty & Coupons', 'wsmaker'),
+                        'desc'        => __('Manual coupons for special offers (Earlybird, etc.) and an automatic loyalty program: attendees who join more events/courses within the last 12 months get an increasing discount. Works with both native Stripe payments and WooCommerce.', 'wsmaker'),
                         'badge'       => 'MARKETING',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'fluentcrm' => [
                         'icon'        => '📇',
-                        'title'       => __('Connettore FluentCRM', 'wsmaker'),
-                        'desc'        => __('Aggiunge automaticamente ogni nuova richiesta dal form di iscrizione come contatto FluentCRM, con tag e/o lista configurabili.', 'wsmaker'),
+                        'title'       => __('FluentCRM Connector', 'wsmaker'),
+                        'desc'        => __('Automatically adds every new request from the registration form as a FluentCRM contact, with configurable tag and/or list.', 'wsmaker'),
                         'badge'       => 'CRM',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'woocommerce' => [
                         'icon'        => '🛒',
-                        'title'       => __('Integrazione Carrello WooCommerce', 'wsmaker'),
-                        'desc'        => __('Sincronizza i workshop come prodotti nel carrello WooCommerce per utilizzare i tuoi gateway e la fatturazione elettronica.', 'wsmaker'),
+                        'title'       => __('WooCommerce Cart Integration', 'wsmaker'),
+                        'desc'        => __('Syncs workshops as WooCommerce cart products so you can use your own payment gateways and electronic invoicing.', 'wsmaker'),
                         'badge'       => 'ECOMMERCE',
                         'is_pro'      => true,
                         'default'     => 0,
                     ],
                     'academy' => [
                         'icon'        => '🏫',
-                        'title'       => __('Academy: Multi-Docente & Ruoli', 'wsmaker'),
-                        'desc'        => __('Account Docente/Manager con permessi separati, categorie e corsi assegnati per docente, con isolamento dati completo tra docenti.', 'wsmaker'),
+                        'title'       => __('Academy: Multi-Trainer & Roles', 'wsmaker'),
+                        'desc'        => __('Trainer/Manager accounts with separate permissions, categories and courses assigned per trainer, with complete data isolation between trainers.', 'wsmaker'),
                         'badge'       => 'ACADEMY',
                         'is_pro'      => true,
                         'default'     => 0,
@@ -797,16 +797,16 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
 
                                 <div class="ws-s22">
                                     <span class="ws-mod-status-label ws-mod-status <?php echo esc_attr($is_locked ? 'ws-mod-status--locked' : ($is_active ? 'ws-mod-status--active' : 'ws-mod-status--inactive')); ?>">
-                                        ● <?php echo $is_locked ? esc_html__('Richiede PRO', 'wsmaker') : ($is_active ? esc_html__('Attivo', 'wsmaker') : esc_html__('Disattivato', 'wsmaker')); ?>
+                                        ● <?php echo $is_locked ? esc_html__('Requires PRO', 'wsmaker') : ($is_active ? esc_html__('Active', 'wsmaker') : esc_html__('Inactive', 'wsmaker')); ?>
                                     </span>
                                     <span class="ws-s23">
                                         <code>ws-mod-<?php echo esc_html($mod_key); ?></code>
                                     </span>
                                     <?php if ($mod_key === 'fluentcrm' && !$is_locked): ?>
-                                        <button type="button" class="button button-small ws-fluentcrm-configure-btn" style="margin-left:auto;<?php echo $is_active ? '' : 'display:none;'; ?>" onclick="wsOpenFluentCrmModal()">⚙️ <?php esc_html_e('Configura', 'wsmaker'); ?></button>
+                                        <button type="button" class="button button-small ws-fluentcrm-configure-btn" style="margin-left:auto;<?php echo $is_active ? '' : 'display:none;'; ?>" onclick="wsOpenFluentCrmModal()">⚙️ <?php esc_html_e('Configure', 'wsmaker'); ?></button>
                                     <?php endif; ?>
                                     <?php if ($mod_key === 'stripe_payments' && !$is_locked): ?>
-                                        <button type="button" class="button button-small ws-stripe-configure-btn" style="margin-left:auto;<?php echo $is_active ? '' : 'display:none;'; ?>" onclick="wsOpenStripeModal()">⚙️ <?php esc_html_e('Configura', 'wsmaker'); ?></button>
+                                        <button type="button" class="button button-small ws-stripe-configure-btn" style="margin-left:auto;<?php echo $is_active ? '' : 'display:none;'; ?>" onclick="wsOpenStripeModal()">⚙️ <?php esc_html_e('Configure', 'wsmaker'); ?></button>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -817,11 +817,11 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     <div id="ws-fluentcrm-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100000;align-items:center;justify-content:center;">
                         <div style="background:#fff;border-radius:12px;width:100%;max-width:460px;padding:24px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                                <h2 style="margin:0;font-size:18px;">📇 <?php esc_html_e('Connettore FluentCRM', 'wsmaker'); ?></h2>
+                                <h2 style="margin:0;font-size:18px;">📇 <?php esc_html_e('FluentCRM Connector', 'wsmaker'); ?></h2>
                                 <span id="ws-fluentcrm-detected-badge" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;"></span>
                             </div>
                             <p style="font-size:13px;color:#64748b;margin-top:4px;">
-                                <?php esc_html_e('Ogni nuova richiesta dal form di iscrizione viene aggiunta come contatto, con il tag e/o la lista qui sotto (creati automaticamente se non esistono).', 'wsmaker'); ?>
+                                <?php esc_html_e('Every new request from the registration form is added as a contact, with the tag and/or list below (created automatically if they don\'t exist).', 'wsmaker'); ?>
                             </p>
 
                             <div style="margin:18px 0 14px;position:relative;">
@@ -838,8 +838,8 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                             </div>
 
                             <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:22px;">
-                                <button type="button" class="button" onclick="wsCloseFluentCrmModal()"><?php esc_html_e('Annulla', 'wsmaker'); ?></button>
-                                <button type="button" class="button button-primary" onclick="wsSaveFluentCrmModal()">💾 <?php esc_html_e('Salva', 'wsmaker'); ?></button>
+                                <button type="button" class="button" onclick="wsCloseFluentCrmModal()"><?php esc_html_e('Cancel', 'wsmaker'); ?></button>
+                                <button type="button" class="button button-primary" onclick="wsSaveFluentCrmModal()">💾 <?php esc_html_e('Save', 'wsmaker'); ?></button>
                             </div>
                             <p id="ws-fluentcrm-modal-msg" style="font-size:12px;margin:10px 0 0;"></p>
                         </div>
@@ -850,13 +850,13 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                         <div style="background:#fff;border-radius:12px;width:100%;max-width:520px;padding:24px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
                             <h2 style="margin:0 0 6px;font-size:18px;">💳 <?php esc_html_e('Stripe', 'wsmaker'); ?></h2>
                             <p style="font-size:13px;color:#64748b;margin-top:4px;">
-                                <?php esc_html_e('Pagamento acconto/saldo workshop tramite Stripe Checkout (pagina ospitata da Stripe — Apple Pay/Google Pay compaiono automaticamente quando supportati).', 'wsmaker'); ?>
+                                <?php esc_html_e('Workshop deposit/balance payment via Stripe Checkout (page hosted by Stripe — Apple Pay/Google Pay appear automatically when supported).', 'wsmaker'); ?>
                             </p>
 
                             <div style="margin:16px 0;">
-                                <label style="display:block;font-weight:600;margin-bottom:8px;font-size:13px;">Modalità</label>
+                                <label style="display:block;font-weight:600;margin-bottom:8px;font-size:13px;"><?php esc_html_e('Mode', 'wsmaker'); ?></label>
                                 <label style="margin-right:16px;font-size:13px;"><input type="radio" name="ws-stripe-mode" id="ws-stripe-mode-test" value="test"> Test</label>
-                                <label style="font-size:13px;"><input type="radio" name="ws-stripe-mode" id="ws-stripe-mode-live" value="live"> Live (pagamenti reali)</label>
+                                <label style="font-size:13px;"><input type="radio" name="ws-stripe-mode" id="ws-stripe-mode-live" value="live"> <?php esc_html_e('Live (real payments)', 'wsmaker'); ?></label>
                             </div>
 
                             <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
@@ -887,8 +887,8 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                             </div>
 
                             <div style="display:flex;justify-content:flex-end;gap:8px;">
-                                <button type="button" class="button" onclick="wsCloseStripeModal()"><?php esc_html_e('Annulla', 'wsmaker'); ?></button>
-                                <button type="button" class="button button-primary" onclick="wsSaveStripeModal()">💾 <?php esc_html_e('Salva', 'wsmaker'); ?></button>
+                                <button type="button" class="button" onclick="wsCloseStripeModal()"><?php esc_html_e('Cancel', 'wsmaker'); ?></button>
+                                <button type="button" class="button button-primary" onclick="wsSaveStripeModal()">💾 <?php esc_html_e('Save', 'wsmaker'); ?></button>
                             </div>
                             <p id="ws-stripe-modal-msg" style="font-size:12px;margin:10px 0 0;"></p>
                         </div>
@@ -897,16 +897,16 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     <div class="ws-card-native" style="margin-top: 24px; padding: 20px; border-left: 4px solid #00d2b4; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                         <div>
                             <h4 style="margin: 0 0 6px 0; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                <span>🌐</span> <?php esc_html_e('Sincronizzazione Manuale Global Hub & Mappa Mondiale', 'wsmaker'); ?>
+                                <span>🌐</span> <?php esc_html_e('Manual Global Hub & World Map Sync', 'wsmaker'); ?>
                             </h4>
                             <p style="margin: 0; font-size: 13px; color: #64748b;">
-                                <?php esc_html_e('Invia in un colpo solo tutti i tuoi workshop ed eventi pubblicati alla directory wsmaker.pro e alla mappa interattiva.', 'wsmaker'); ?>
+                                <?php esc_html_e('Sends all your published workshops and events to the wsmaker.pro directory and the interactive map in one go.', 'wsmaker'); ?>
                             </p>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <span id="ws-sync-hub-msg" style="font-size: 13px; font-weight: 600;"></span>
                             <button type="button" class="button button-primary" id="btn-sync-hub-now" onclick="wsSyncHubNow(this)" style="background: linear-gradient(135deg, #0088ff, #00d2b4); border-color: transparent; color: #fff; font-weight: 600; padding: 4px 14px; height: 34px;">
-                                🚀 <?php esc_html_e('Sincronizza tutti i Workshop con l\'Hub adesso', 'wsmaker'); ?>
+                                🚀 <?php esc_html_e('Sync all Workshops with the Hub now', 'wsmaker'); ?>
                             </button>
                         </div>
                     </div>
@@ -1161,7 +1161,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     <?php WSMA_Data::enqueue_inline_script(ob_get_clean()); ?>
 
                     <div class="ws-s24">
-                        <?php submit_button(__('Salva Stato Moduli', 'wsmaker')); ?>
+                        <?php submit_button(__('Save Module Status', 'wsmaker')); ?>
                     </div>
                 </form>
             <?php elseif ($tab === 'proponente') : 
@@ -1178,7 +1178,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                 <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only success-message flag after a redirect, no form data is processed. ?>
                 <?php if (isset($_GET['updated']) && sanitize_text_field(wp_unslash($_GET['updated'])) === '1') : ?>
                     <div class="notice notice-success is-dismissible">
-                        <p><?php esc_html_e('Profilo del proponente e scheda Bio salvati con successo.', 'wsmaker'); ?></p>
+                        <p><?php esc_html_e('Trainer profile and bio card saved successfully.', 'wsmaker'); ?></p>
                     </div>
                 <?php endif; ?>
 
@@ -1191,12 +1191,12 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                         <!-- Colonna 1: Bio & Dati Personali -->
                         <div class="ws-card-native">
                             <h2 class="ws-s26">
-                                👤 <?php esc_html_e('Dati Docente / Proponente', 'wsmaker'); ?>
+                                👤 <?php esc_html_e('Trainer / Presenter Details', 'wsmaker'); ?>
                             </h2>
 
                             <!-- Foto Profilo con Uploader WP Media -->
                             <div class="ws-s27">
-                                <label class="ws-s28"><?php esc_html_e('Foto Profilo / Avatar', 'wsmaker'); ?></label>
+                                <label class="ws-s28"><?php esc_html_e('Profile Photo / Avatar', 'wsmaker'); ?></label>
                                 <div class="ws-s29">
                                     <div class="ws-s30" id="ws-photo-preview-wrap">
                                         <?php if (!empty($settings['proponente_foto'])) : ?>
@@ -1208,9 +1208,9 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                                     </div>
                                     <div class="ws-s33">
                                         <input type="hidden" name="ws_proponente[proponente_foto]" id="ws_proponente_foto" value="<?php echo esc_attr($settings['proponente_foto']); ?>">
-                                        <button type="button" class="button button-secondary" id="ws-upload-photo-btn"><?php esc_html_e('Carica / Scegli Foto', 'wsmaker'); ?></button>
-                                        <button type="button" class="button button-link-delete ws-remove-photo-btn<?php echo empty($settings['proponente_foto']) ? ' ws-hidden' : ''; ?>" id="ws-remove-photo-btn"><?php esc_html_e('Rimuovi', 'wsmaker'); ?></button>
-                                        <p class="description ws-s34"><?php esc_html_e('Consigliata immagine quadrata ad alta risoluzione (min. 400x400 px).', 'wsmaker'); ?></p>
+                                        <button type="button" class="button button-secondary" id="ws-upload-photo-btn"><?php esc_html_e('Upload / Choose Photo', 'wsmaker'); ?></button>
+                                        <button type="button" class="button button-link-delete ws-remove-photo-btn<?php echo empty($settings['proponente_foto']) ? ' ws-hidden' : ''; ?>" id="ws-remove-photo-btn"><?php esc_html_e('Remove', 'wsmaker'); ?></button>
+                                        <p class="description ws-s34"><?php esc_html_e('A high-resolution square image is recommended (min. 400x400 px).', 'wsmaker'); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -1218,32 +1218,32 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                             <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
-                                        <th scope="row"><label for="prop_nome"><?php esc_html_e('Nome & Cognome', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="prop_nome"><?php esc_html_e('First & Last Name', 'wsmaker'); ?></label></th>
                                         <td>
                                             <input name="ws_proponente[proponente_nome]" type="text" id="prop_nome" value="<?php echo esc_attr($settings['proponente_nome']); ?>" class="regular-text" placeholder="Es. Francesco Verolino">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="prop_ruolo"><?php esc_html_e('Titolo / Ruolo', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="prop_ruolo"><?php esc_html_e('Title / Role', 'wsmaker'); ?></label></th>
                                         <td>
                                             <input name="ws_proponente[proponente_ruolo]" type="text" id="prop_ruolo" value="<?php echo esc_attr($settings['proponente_ruolo']); ?>" class="regular-text" placeholder="Es. Masterclass Trainer & Docente">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="prop_citta"><?php esc_html_e('Sede / Città Base', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="prop_citta"><?php esc_html_e('Base Location / City', 'wsmaker'); ?></label></th>
                                         <td>
                                             <input name="ws_proponente[proponente_citta]" type="text" id="prop_citta" value="<?php echo esc_attr($settings['proponente_citta']); ?>" class="regular-text" placeholder="Es. Napoli, Italia">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="prop_bio"><?php esc_html_e('Biografia / Presentazione', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="prop_bio"><?php esc_html_e('Biography / Introduction', 'wsmaker'); ?></label></th>
                                         <td>
-                                            <textarea name="ws_proponente[proponente_bio]" id="prop_bio" rows="6" class="large-text" placeholder="<?php esc_attr_e('Descrivi la tua esperienza, il tuo approccio didattico e i traguardi raggiunti...', 'wsmaker'); ?>"><?php echo esc_textarea($settings['proponente_bio']); ?></textarea>
-                                            <p class="description"><?php esc_html_e('Questa biografia verrà mostrata nella scheda docente sul tuo sito e sul portale mondiale Workshop Hub.', 'wsmaker'); ?></p>
+                                            <textarea name="ws_proponente[proponente_bio]" id="prop_bio" rows="6" class="large-text" placeholder="<?php esc_attr_e('Describe your experience, your teaching approach, and your achievements...', 'wsmaker'); ?>"><?php echo esc_textarea($settings['proponente_bio']); ?></textarea>
+                                            <p class="description"><?php esc_html_e('This biography will be shown on the trainer card on your site and on the global Workshop Hub portal.', 'wsmaker'); ?></p>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><?php esc_html_e('Lingue Parlate', 'wsmaker'); ?></th>
+                                        <th scope="row"><?php esc_html_e('Languages Spoken', 'wsmaker'); ?></th>
                                         <td>
                                             <div class="ws-s36">
                                                 <?php foreach ($lingue_disponibili as $key => $label) : ?>
@@ -1253,7 +1253,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                                                     </label>
                                                 <?php endforeach; ?>
                                             </div>
-                                            <p class="description ws-s38"><?php esc_html_e('Indica le lingue in cui puoi condurre i workshop o comunicare con i corsisti.', 'wsmaker'); ?></p>
+                                            <p class="description ws-s38"><?php esc_html_e('Indicate the languages you can teach workshops or communicate with participants in.', 'wsmaker'); ?></p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -1266,24 +1266,24 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                             <!-- Card Contatti -->
                             <div class="ws-card-native">
                                 <h2 class="ws-s26">
-                                    🌐 <?php esc_html_e('Contatti & Presenza Web', 'wsmaker'); ?>
+                                    🌐 <?php esc_html_e('Contacts & Web Presence', 'wsmaker'); ?>
                                 </h2>
                                 <table class="form-table ws-s35" role="presentation">
                                     <tbody>
                                         <tr>
-                                            <th scope="row"><label for="prop_sito"><?php esc_html_e('Sito Web Ufficiale', 'wsmaker'); ?></label></th>
+                                            <th scope="row"><label for="prop_sito"><?php esc_html_e('Official Website', 'wsmaker'); ?></label></th>
                                             <td>
                                                 <input name="ws_proponente[proponente_sito]" type="url" id="prop_sito" value="<?php echo esc_attr($settings['proponente_sito']); ?>" class="regular-text" placeholder="https://tuosito.com">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th scope="row"><label for="prop_email"><?php esc_html_e('Email Pubblica', 'wsmaker'); ?></label></th>
+                                            <th scope="row"><label for="prop_email"><?php esc_html_e('Public Email', 'wsmaker'); ?></label></th>
                                             <td>
                                                 <input name="ws_proponente[proponente_email]" type="email" id="prop_email" value="<?php echo esc_attr($settings['proponente_email']); ?>" class="regular-text" placeholder="info@tuosito.com">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th scope="row"><label for="prop_tel"><?php esc_html_e('Telefono / WhatsApp', 'wsmaker'); ?></label></th>
+                                            <th scope="row"><label for="prop_tel"><?php esc_html_e('Phone / WhatsApp', 'wsmaker'); ?></label></th>
                                             <td>
                                                 <input name="ws_proponente[proponente_telefono]" type="text" id="prop_tel" value="<?php echo esc_attr($settings['proponente_telefono']); ?>" class="regular-text" placeholder="+39 333 1234567">
                                             </td>
@@ -1295,7 +1295,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                             <!-- Card Social Links -->
                             <div class="ws-card-native">
                                 <h2 class="ws-s26">
-                                    📱 <?php esc_html_e('Canali Social', 'wsmaker'); ?>
+                                    📱 <?php esc_html_e('Social Channels', 'wsmaker'); ?>
                                 </h2>
                                 <table class="form-table ws-s35" role="presentation">
                                     <tbody>
@@ -1341,15 +1341,15 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
 
                             <!-- Card Shortcode -->
                             <div class="ws-card-native ws-s40">
-                                <h2 class="ws-s41"><?php esc_html_e('💡 Come mostrare la Bio nel sito', 'wsmaker'); ?></h2>
-                                <p class="ws-s42"><?php esc_html_e('Incolla questo shortcode in qualsiasi pagina, articolo o footer:', 'wsmaker'); ?></p>
+                                <h2 class="ws-s41"><?php esc_html_e('💡 How to show the Bio on your site', 'wsmaker'); ?></h2>
+                                <p class="ws-s42"><?php esc_html_e('Paste this shortcode into any page, post, or footer:', 'wsmaker'); ?></p>
                                 <code class="ws-s43">[ws_proponente]</code>
                             </div>
 
                         </div>
                     </div>
 
-                    <?php submit_button(__('Salva Profilo Proponente', 'wsmaker')); ?>
+                    <?php submit_button(__('Save Trainer Profile', 'wsmaker')); ?>
                 </form>
 
                 <?php
@@ -1406,7 +1406,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                 <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only success-message flag after a redirect, no form data is processed. ?>
                 <?php if (isset($_GET['updated']) && sanitize_text_field(wp_unslash($_GET['updated'])) === '1') : ?>
                     <div class="notice notice-success is-dismissible">
-                        <p><?php esc_html_e('Impostazioni della casella mail salvate e protette con crittografia AES-256.', 'wsmaker'); ?></p>
+                        <p><?php esc_html_e('Mailbox settings saved and protected with AES-256 encryption.', 'wsmaker'); ?></p>
                     </div>
                 <?php endif; ?>
 
@@ -1417,20 +1417,20 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     <div class="ws-s44">
                         <!-- Column 1: IMAP (Reading) -->
                         <div class="ws-card-native">
-                            <h2 class="ws-s26"><?php esc_html_e('Lettura Mail (IMAP)', 'wsmaker'); ?></h2>
+                            <h2 class="ws-s26"><?php esc_html_e('Reading Mail (IMAP)', 'wsmaker'); ?></h2>
                             
                             <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
-                                        <th scope="row"><label for="imap_host"><?php esc_html_e('Host IMAP', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="imap_host"><?php esc_html_e('IMAP Host', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[host]" type="text" id="imap_host" value="<?php echo esc_attr($mail_settings['host']); ?>" class="regular-text" placeholder="imap.zoho.com"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="imap_port"><?php esc_html_e('Porta IMAP', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="imap_port"><?php esc_html_e('IMAP Port', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[port]" type="number" id="imap_port" value="<?php echo esc_attr($mail_settings['port']); ?>" class="small-text" placeholder="993"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="imap_enc"><?php esc_html_e('Crittografia', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="imap_enc"><?php esc_html_e('Encryption', 'wsmaker'); ?></label></th>
                                         <td>
                                             <select name="ws_mail[encryption]" id="imap_enc">
                                                 <option value="ssl" <?php selected('ssl', $mail_settings['encryption']); ?>>SSL</option>
@@ -1440,15 +1440,15 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="imap_username"><?php esc_html_e('Utente IMAP', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="imap_username"><?php esc_html_e('IMAP Username', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[username]" type="text" id="imap_username" value="<?php echo esc_attr($mail_settings['username']); ?>" class="regular-text" placeholder="info@domain.com"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="imap_password"><?php esc_html_e('Password Account', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="imap_password"><?php esc_html_e('Account Password', 'wsmaker'); ?></label></th>
                                         <td>
-                                            <input name="ws_mail[password]" type="password" id="imap_password" value="" class="regular-text" placeholder="<?php echo esc_attr($has_password ? __('•••••••• (Inalterata)', 'wsmaker') : __('Inserisci password', 'wsmaker')); ?>">
+                                            <input name="ws_mail[password]" type="password" id="imap_password" value="" class="regular-text" placeholder="<?php echo esc_attr($has_password ? __('•••••••• (Unchanged)', 'wsmaker') : __('Enter password', 'wsmaker')); ?>">
                                             <?php if ($has_password) : ?>
-                                                <p class="description ws-s45">🔒 <?php esc_html_e('Password protetta con cifratura OpenSSL AES-256.', 'wsmaker'); ?></p>
+                                                <p class="description ws-s45">🔒 <?php esc_html_e('Password protected with OpenSSL AES-256 encryption.', 'wsmaker'); ?></p>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
@@ -1458,28 +1458,28 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
 
                         <!-- Column 2: SMTP & Sender (Writing) -->
                         <div class="ws-card-native">
-                            <h2 class="ws-s26"><?php esc_html_e('Invio Mail (SMTP / Mittente)', 'wsmaker'); ?></h2>
+                            <h2 class="ws-s26"><?php esc_html_e('Sending Mail (SMTP / Sender)', 'wsmaker'); ?></h2>
                             
                             <table class="form-table ws-s35" role="presentation">
                                 <tbody>
                                     <tr>
-                                        <th scope="row"><label for="reply_from_name"><?php esc_html_e('Nome Mittente', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="reply_from_name"><?php esc_html_e('Sender Name', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[reply_from_name]" type="text" id="reply_from_name" value="<?php echo esc_attr($mail_settings['reply_from_name']); ?>" class="regular-text" placeholder="Francesco Verolino"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="reply_from_email"><?php esc_html_e('Email Mittente', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="reply_from_email"><?php esc_html_e('Sender Email', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[reply_from_email]" type="email" id="reply_from_email" value="<?php echo esc_attr($mail_settings['reply_from_email']); ?>" class="regular-text" placeholder="workshop@domain.com"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="smtp_host"><?php esc_html_e('Host SMTP', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="smtp_host"><?php esc_html_e('SMTP Host', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[smtp_host]" type="text" id="smtp_host" value="<?php echo esc_attr($mail_settings['smtp_host']); ?>" class="regular-text" placeholder="smtp.zoho.com"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="smtp_port"><?php esc_html_e('Porta SMTP', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="smtp_port"><?php esc_html_e('SMTP Port', 'wsmaker'); ?></label></th>
                                         <td><input name="ws_mail[smtp_port]" type="number" id="smtp_port" value="<?php echo esc_attr($mail_settings['smtp_port']); ?>" class="small-text" placeholder="587"></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row"><label for="smtp_enc"><?php esc_html_e('Crittografia', 'wsmaker'); ?></label></th>
+                                        <th scope="row"><label for="smtp_enc"><?php esc_html_e('Encryption', 'wsmaker'); ?></label></th>
                                         <td>
                                             <select name="ws_mail[smtp_encryption]" id="smtp_enc">
                                                 <option value="tls" <?php selected('tls', $mail_settings['smtp_encryption']); ?>>TLS</option>
@@ -1495,70 +1495,70 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
 
                     <!-- Anti-Spam & Rate Limiting Section -->
                     <div class="ws-card-native ws-s46">
-                        <h2 class="ws-s26"><?php esc_html_e('Protezione Anti-Spam & Rate Limit Iscrizioni', 'wsmaker'); ?></h2>
-                        <p class="description ws-s47"><?php esc_html_e('Proteggi il server e l\'endpoint delle iscrizioni da invii automatici di bot e attacchi flood.', 'wsmaker'); ?></p>
+                        <h2 class="ws-s26"><?php esc_html_e('Anti-Spam Protection & Registration Rate Limiting', 'wsmaker'); ?></h2>
+                        <p class="description ws-s47"><?php esc_html_e('Protect the server and the registration endpoint from automated bot submissions and flood attacks.', 'wsmaker'); ?></p>
                         
                         <table class="form-table ws-s35" role="presentation">
                             <tbody>
                                 <tr>
-                                    <th scope="row"><?php esc_html_e('Rate Limiting IP', 'wsmaker'); ?></th>
+                                    <th scope="row"><?php esc_html_e('IP Rate Limiting', 'wsmaker'); ?></th>
                                     <td>
                                         <label for="intake_rate_limit_enabled">
                                             <input name="ws_security[intake_rate_limit_enabled]" type="checkbox" id="intake_rate_limit_enabled" value="1" <?php checked(1, $settings['intake_rate_limit_enabled'] ?? 1); ?>>
-                                            <?php esc_html_e('Attiva limitazione richieste per indirizzo IP', 'wsmaker'); ?>
+                                            <?php esc_html_e('Enable request limiting per IP address', 'wsmaker'); ?>
                                         </label>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><label for="intake_rate_limit_requests"><?php esc_html_e('Soglia Massima Richieste', 'wsmaker'); ?></label></th>
+                                    <th scope="row"><label for="intake_rate_limit_requests"><?php esc_html_e('Maximum Request Threshold', 'wsmaker'); ?></label></th>
                                     <td>
                                         <input name="ws_security[intake_rate_limit_requests]" type="number" id="intake_rate_limit_requests" value="<?php echo esc_attr($settings['intake_rate_limit_requests'] ?? 5); ?>" class="small-text" min="1" max="100">
-                                        <span class="description"><?php esc_html_e('Numero massimo di iscrizioni consentite dallo stesso IP (default: 5).', 'wsmaker'); ?></span>
+                                        <span class="description"><?php esc_html_e('Maximum number of registrations allowed from the same IP (default: 5).', 'wsmaker'); ?></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><label for="intake_rate_limit_window"><?php esc_html_e('Finestra Temporale (secondi)', 'wsmaker'); ?></label></th>
+                                    <th scope="row"><label for="intake_rate_limit_window"><?php esc_html_e('Time Window (seconds)', 'wsmaker'); ?></label></th>
                                     <td>
                                         <input name="ws_security[intake_rate_limit_window]" type="number" id="intake_rate_limit_window" value="<?php echo esc_attr($settings['intake_rate_limit_window'] ?? 60); ?>" class="small-text" min="10" max="3600">
-                                        <span class="description"><?php esc_html_e('Intervallo di tempo per il calcolo del limite (default: 60 secondi).', 'wsmaker'); ?></span>
+                                        <span class="description"><?php esc_html_e('Time interval used to calculate the limit (default: 60 seconds).', 'wsmaker'); ?></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><?php esc_html_e('Protezione Honeypot', 'wsmaker'); ?></th>
+                                    <th scope="row"><?php esc_html_e('Honeypot Protection', 'wsmaker'); ?></th>
                                     <td>
                                         <label for="intake_honeypot_enabled">
                                             <input name="ws_security[intake_honeypot_enabled]" type="checkbox" id="intake_honeypot_enabled" value="1" <?php checked(1, $settings['intake_honeypot_enabled'] ?? 1); ?>>
-                                            <?php esc_html_e('Blocca invii con campo trappola compilato (anti-bot invisibile)', 'wsmaker'); ?>
+                                            <?php esc_html_e('Blocks submissions with the trap field filled in (invisible anti-bot)', 'wsmaker'); ?>
                                         </label>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><?php esc_html_e('Geolocalizzazione IP', 'wsmaker'); ?></th>
+                                    <th scope="row"><?php esc_html_e('IP Geolocation', 'wsmaker'); ?></th>
                                     <td>
                                         <label for="intake_geolocation_enabled">
                                             <input name="ws_security[intake_geolocation_enabled]" type="checkbox" id="intake_geolocation_enabled" value="1" <?php checked(1, $settings['intake_geolocation_enabled'] ?? 0); ?>>
-                                            <?php esc_html_e('Aggiungi città/paese dedotti dall\'IP nella mail di notifica (invia l\'IP a ip-api.com)', 'wsmaker'); ?>
+                                            <?php esc_html_e('Add city/country inferred from the IP to the notification email (sends the IP to ip-api.com)', 'wsmaker'); ?>
                                         </label>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><label for="intake_geolocation_api_url"><?php esc_html_e('URL servizio geolocalizzazione', 'wsmaker'); ?></label></th>
+                                    <th scope="row"><label for="intake_geolocation_api_url"><?php esc_html_e('Geolocation Service URL', 'wsmaker'); ?></label></th>
                                     <td>
                                         <input name="ws_security[intake_geolocation_api_url]" type="url" id="intake_geolocation_api_url" value="<?php echo esc_attr($settings['intake_geolocation_api_url'] ?? ''); ?>" class="regular-text" placeholder="https://tuoservizio.esempio.com/lookup">
-                                        <p class="description"><?php esc_html_e('Facoltativo. Lascia vuoto per usare ip-api.com (gratuito, adatto a un uso non commerciale). Se hai un tuo provider di geolocalizzazione (per un uso commerciale conforme ai termini, o per volumi elevati), inserisci qui il suo URL: deve accettare l\'IP e rispondere con un JSON contenente i campi "city" e "country".', 'wsmaker'); ?></p>
+                                        <p class="description"><?php esc_html_e('Optional. Leave empty to use ip-api.com (free, suited to non-commercial use). If you have your own geolocation provider (for commercial use compliant with its terms, or higher volumes), enter its URL here: it must accept the IP and respond with JSON containing "city" and "country" fields.', 'wsmaker'); ?></p>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <?php submit_button(__('Salva Configurazione Posta & Sicurezza', 'wsmaker')); ?>
+                    <?php submit_button(__('Save Mail & Security Configuration', 'wsmaker')); ?>
                 </form>
             <?php elseif ($tab === 'shortcodes') : ?>
                 <div class="ws-card-native">
-                    <h2 class="ws-s35"><?php esc_html_e('Elenco Shortcode Disponibili', 'wsmaker'); ?></h2>
+                    <h2 class="ws-s35"><?php esc_html_e('Available Shortcodes List', 'wsmaker'); ?></h2>
                     <p class="description ws-s48">
-                        <?php esc_html_e('Copia e incolla questi shortcode nelle pagine WordPress del tuo sito per integrare le funzionalità di WSMaker.', 'wsmaker'); ?>
+                        <?php esc_html_e('Copy and paste these shortcodes into your site\'s WordPress pages to integrate WSMaker\'s features.', 'wsmaker'); ?>
                     </p>
 
                     <?php
@@ -1591,10 +1591,10 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     <table class="widefat striped ws-s53">
                         <thead>
                             <tr>
-                                <th class="ws-s54"><?php esc_html_e('Funzionalità', 'wsmaker'); ?></th>
-                                <th class="ws-s55"><?php esc_html_e('Descrizione', 'wsmaker'); ?></th>
+                                <th class="ws-s54"><?php esc_html_e('Feature', 'wsmaker'); ?></th>
+                                <th class="ws-s55"><?php esc_html_e('Description', 'wsmaker'); ?></th>
                                 <th class="ws-s56"><?php esc_html_e('Shortcode Tag', 'wsmaker'); ?></th>
-                                <th class="ws-s57"><?php esc_html_e('Azione', 'wsmaker'); ?></th>
+                                <th class="ws-s57"><?php esc_html_e('Action', 'wsmaker'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1616,7 +1616,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                                     </td>
                                     <td class="ws-s59">
                                         <button type="button" class="button button-small" onclick="navigator.clipboard.writeText('<?php echo esc_js($sc['tag']); ?>'); this.innerText='✓ Copiato!'; setTimeout(() => this.innerText='Copia', 2000);">
-                                            <?php esc_html_e('Copia', 'wsmaker'); ?>
+                                            <?php esc_html_e('Copy', 'wsmaker'); ?>
                                         </button>
                                     </td>
                                 </tr>
@@ -1631,31 +1631,31 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                     <table class="form-table" role="presentation">
                         <tbody>
                             <tr>
-                                <th scope="row"><label for="ws_license_key"><?php esc_html_e('Chiave di Licenza', 'wsmaker'); ?></label></th>
+                                <th scope="row"><label for="ws_license_key"><?php esc_html_e('License Key', 'wsmaker'); ?></label></th>
                                 <td>
                                     <input name="<?php echo esc_attr(WSMA_License_Manager::LICENSE_OPTION_KEY); ?>[key]" type="password" id="ws_license_key" value="<?php echo esc_attr($license['key']); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e('Inserisci la chiave di licenza acquistata per abilitare il supporto e gli aggiornamenti automatici.', 'wsmaker'); ?></p>
+                                    <p class="description"><?php esc_html_e('Enter your purchased license key to enable support and automatic updates.', 'wsmaker'); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th scope="row"><?php esc_html_e('Stato Licenza', 'wsmaker'); ?></th>
+                                <th scope="row"><?php esc_html_e('License Status', 'wsmaker'); ?></th>
                                 <td>
                                     <?php if ($license['status'] === 'active') : ?>
                                         <span class="dashicons dashicons-yes-alt ws-s60"></span>
-                                        <strong class="ws-s45"><?php esc_html_e('ATTIVA', 'wsmaker'); ?></strong> (Piano: <?php echo esc_html(strtoupper($license['type'])); ?>)
+                                        <strong class="ws-s45"><?php esc_html_e('ACTIVE', 'wsmaker'); ?></strong> (Piano: <?php echo esc_html(strtoupper($license['type'])); ?>)
                                         <?php if ($license['expires']) : ?>
-                                            — <?php /* translators: %s: license expiration date */ printf(esc_html__('Scade il: %s', 'wsmaker'), esc_html($license['expires'])); ?>
+                                            — <?php /* translators: %s: license expiration date */ printf(esc_html__('Expires on: %s', 'wsmaker'), esc_html($license['expires'])); ?>
                                         <?php endif; ?>
                                     <?php else : ?>
                                         <span class="dashicons dashicons-dismiss ws-s61"></span>
-                                        <strong class="ws-s62"><?php esc_html_e('NON ATTIVA / NON VALIDA', 'wsmaker'); ?></strong>
+                                        <strong class="ws-s62"><?php esc_html_e('NOT ACTIVE / INVALID', 'wsmaker'); ?></strong>
                                     <?php endif; ?>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <?php submit_button(__('Salva e Verifica Licenza', 'wsmaker')); ?>
+                    <?php submit_button(__('Save and Verify License', 'wsmaker')); ?>
                 </form>
             <?php endif; ?>
         </div>

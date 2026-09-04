@@ -81,7 +81,7 @@ final class WSMA_Mail_Poller implements WSMA_Module {
         ?>
         <div class="notice notice-error is-dismissible ws-mail-poll-error">
             <p>
-                ⚠️ <?php /* translators: %s: date and time of the last failed poll */ printf(esc_html__('Attenzione: Il controllo automatico della casella mail (Cron IMAP) è fallito il %s con errore:', 'wsmaker'), esc_html($error['date'] ?? '')); ?>
+                ⚠️ <?php /* translators: %s: date and time of the last failed poll */ printf(esc_html__('Warning: the automatic mailbox check (IMAP Cron) failed on %s with error:', 'wsmaker'), esc_html($error['date'] ?? '')); ?>
                 <code><?php echo esc_html($error['msg'] ?? ''); ?></code>
             </p>
         </div>

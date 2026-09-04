@@ -115,33 +115,33 @@ final class WSMA_Post_Types implements WSMA_Module {
     public function register_post_types(): void {
         register_post_type('wsma_evento', [
             'labels' => [
-                'name'          => __('Eventi', 'wsmaker'),
-                'singular_name' => __('Evento', 'wsmaker'),
+                'name'          => __('Events', 'wsmaker'),
+                'singular_name' => __('Event', 'wsmaker'),
             ],
             'public' => false, 'show_ui' => true, 'show_in_menu' => true,
             'menu_icon' => 'dashicons-calendar-alt', 'supports' => ['title'], 'has_archive' => false,
         ]);
         register_post_type('wsma_partecipante', [
             'labels' => [
-                'name'          => __('Partecipanti', 'wsmaker'),
-                'singular_name' => __('Partecipante', 'wsmaker'),
+                'name'          => __('Participants', 'wsmaker'),
+                'singular_name' => __('Participant', 'wsmaker'),
             ],
             'public' => false, 'show_ui' => true, 'show_in_menu' => true,
             'menu_icon' => 'dashicons-groups', 'supports' => ['title'], 'has_archive' => false,
         ]);
         register_post_type('wsma_iscrizione', [
             'labels' => [
-                'name'          => __('Iscrizioni', 'wsmaker'),
-                'singular_name' => __('Iscrizione', 'wsmaker'),
-                'menu_name'     => __('Richieste', 'wsmaker'),
+                'name'          => __('Registrations', 'wsmaker'),
+                'singular_name' => __('Registration', 'wsmaker'),
+                'menu_name'     => __('Requests', 'wsmaker'),
             ],
             'public' => false, 'show_ui' => true, 'show_in_menu' => 'workshop-suite-dashboard',
             'menu_icon' => 'dashicons-tickets-alt', 'supports' => ['title'], 'has_archive' => false,
         ]);
         register_taxonomy('wsma_categoria_evento', ['wsma_evento'], [
             'labels' => [
-                'name'          => __('Categorie Workshop', 'wsmaker'),
-                'singular_name' => __('Categoria', 'wsmaker'),
+                'name'          => __('Workshop Categories', 'wsmaker'),
+                'singular_name' => __('Category', 'wsmaker'),
             ],
             'hierarchical' => true, 'show_ui' => true, 'show_admin_column' => true,
         ]);

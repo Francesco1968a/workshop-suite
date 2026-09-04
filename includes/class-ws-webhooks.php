@@ -209,7 +209,7 @@ final class WSMA_Webhooks implements WSMA_Module {
         <div class="wrap" style="max-width: 900px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
             <h1>🔌 <?php esc_html_e('Webhooks', 'wsmaker'); ?></h1>
             <p style="font-size: 14px; color: #64748b;">
-                <?php esc_html_e('Invia un payload JSON a Zapier, Make.com, Zoho CRM o Google Sheets (tramite il loro trigger "Catch Webhook") ad ogni nuova iscrizione e/o conferma.', 'wsmaker'); ?>
+                <?php esc_html_e('Sends a JSON payload to Zapier, Make.com, Zoho CRM, or Google Sheets (via their "Catch Webhook" trigger) on every new registration and/or confirmation.', 'wsmaker'); ?>
             </p>
 
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only success-message flag after a redirect, no form data is processed. ?>
@@ -228,10 +228,10 @@ final class WSMA_Webhooks implements WSMA_Module {
                 <table class="widefat" style="margin-bottom: 16px;">
                     <thead>
                         <tr>
-                            <th style="width:20%">Nome</th>
-                            <th>URL Webhook</th>
-                            <th style="width:120px">Nuova iscrizione</th>
-                            <th style="width:120px">Conferma</th>
+                            <th style="width:20%"><?php esc_html_e('Name', 'wsmaker'); ?></th>
+                            <th><?php esc_html_e('Webhook URL', 'wsmaker'); ?></th>
+                            <th style="width:120px"><?php esc_html_e('New registration', 'wsmaker'); ?></th>
+                            <th style="width:120px"><?php esc_html_e('Confirmation', 'wsmaker'); ?></th>
                         </tr>
                     </thead>
                     <tbody id="wsma-webhooks-rows">

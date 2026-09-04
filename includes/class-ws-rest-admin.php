@@ -60,7 +60,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
             'synced'  => $results['synced'] ?? 0,
             'failed'  => $results['failed'] ?? 0,
             /* translators: %d: number of workshops synced */
-            'msg'     => sprintf(__('Sincronizzazione completata: %d workshop inviati all\'Hub con successo!', 'wsmaker'), $results['synced'] ?? 0),
+            'msg'     => sprintf(__('Sync complete: %d workshops successfully sent to the Hub!', 'wsmaker'), $results['synced'] ?? 0),
         ], 200);
     }
 
@@ -118,7 +118,7 @@ final class WSMA_Rest_Admin implements WSMA_Module {
 
         $page_id = wp_insert_post([
             'post_type' => 'page',
-            'post_title' => WSMA_Data::evento_label($evento_id) ?: __('Aula virtuale', 'wsmaker'),
+            'post_title' => WSMA_Data::evento_label($evento_id) ?: __('Virtual classroom', 'wsmaker'),
             'post_content' => '[ws_aula_virtuale evento_id="' . $evento_id . '"]',
             'post_status' => 'publish',
         ], true);

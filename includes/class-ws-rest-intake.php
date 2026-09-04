@@ -78,7 +78,7 @@ final class WSMA_Rest_Intake implements WSMA_Module {
         if (!empty($settings['intake_honeypot_enabled'])) {
             if (!empty($request->get_param('website_url'))) {
                 // Silently discard bot submission
-                return new WP_REST_Response(['success' => true, 'message' => __('Richiesta ricevuta.', 'wsmaker')], 200);
+                return new WP_REST_Response(['success' => true, 'message' => __('Request received.', 'wsmaker')], 200);
             }
         }
 
@@ -104,7 +104,7 @@ final class WSMA_Rest_Intake implements WSMA_Module {
             if ($count >= $max_requests) {
                 return new WP_REST_Response([
                     'success' => false,
-                    'message' => __('Hai inviato troppe richieste in poco tempo. Attendi qualche minuto prima di riprovare.', 'wsmaker'),
+                    'message' => __('You\'ve sent too many requests in a short time. Please wait a few minutes before trying again.', 'wsmaker'),
                 ], 429);
             }
 
@@ -113,11 +113,11 @@ final class WSMA_Rest_Intake implements WSMA_Module {
 
         $evento_id = $request->get_param('evento_id');
         if (!$evento_id || get_post_type($evento_id) !== 'wsma_evento') {
-            return new WP_REST_Response(['success' => false, 'message' => __('Evento selezionato non valido.', 'wsmaker')], 400);
+            return new WP_REST_Response(['success' => false, 'message' => __('Selected event is not valid.', 'wsmaker')], 400);
         }
 
         if (WSMA_Data::evento_concluso($evento_id)) {
-            return new WP_REST_Response(['success' => false, 'message' => __('Questo evento si è già concluso.', 'wsmaker')], 400);
+            return new WP_REST_Response(['success' => false, 'message' => __('This event has already ended.', 'wsmaker')], 400);
         }
 
         $first_name  = trim($request->get_param('nome'));
@@ -129,11 +129,11 @@ final class WSMA_Rest_Intake implements WSMA_Module {
         $num_persone = max(1, (int) $request->get_param('numero_persone'));
 
         if (!$email || !is_email($email) || !$first_name) {
-            return new WP_REST_Response(['success' => false, 'message' => __('Nome ed email sono obbligatori.', 'wsmaker')], 400);
+            return new WP_REST_Response(['success' => false, 'message' => __('Name and email are required.', 'wsmaker')], 400);
         }
 
         if (!$message) {
-            return new WP_REST_Response(['success' => false, 'message' => __('Il messaggio è obbligatorio.', 'wsmaker')], 400);
+            return new WP_REST_Response(['success' => false, 'message' => __('The message is required.', 'wsmaker')], 400);
         }
 
         $titolo = trim($first_name . ' ' . $last_name);
@@ -146,7 +146,7 @@ final class WSMA_Rest_Intake implements WSMA_Module {
                 'post_title'  => $titolo
             ]);
             if (!$pid || is_wp_error($pid)) {
-                return new WP_REST_Response(['success' => false, 'message' => __('Errore durante il salvataggio dei dati.', 'wsmaker')], 500);
+                return new WP_REST_Response(['success' => false, 'message' => __('Error while saving the data.', 'wsmaker')], 500);
             }
         }
 
@@ -172,7 +172,7 @@ final class WSMA_Rest_Intake implements WSMA_Module {
 
             return new WP_REST_Response([
                 'success' => true,
-                'message' => __('Abbiamo già una tua richiesta per questo evento. Abbiamo aggiornato il tuo messaggio!', 'wsmaker')
+                'message' => __('We already have a request from you for this event. We\'ve updated your message!', 'wsmaker')
             ], 200);
         }
 
@@ -183,7 +183,7 @@ final class WSMA_Rest_Intake implements WSMA_Module {
         ]);
 
         if (!$isc || is_wp_error($isc)) {
-            return new WP_REST_Response(['success' => false, 'message' => __('Errore durante la creazione dell\'iscrizione.', 'wsmaker')], 500);
+            return new WP_REST_Response(['success' => false, 'message' => __('Error while creating the registration.', 'wsmaker')], 500);
         }
 
         WSMA_Data::update_field('partecipante', $pid, $isc);
@@ -211,7 +211,7 @@ final class WSMA_Rest_Intake implements WSMA_Module {
 
         return new WP_REST_Response([
             'success' => true,
-            'message' => __('Richiesta di iscrizione inviata con successo! Ti abbiamo inviato un\'email di conferma.', 'wsmaker')
+            'message' => __('Your registration request was sent successfully! We\'ve sent you a confirmation email.', 'wsmaker')
         ], 200);
     }
 
@@ -245,16 +245,16 @@ final class WSMA_Rest_Intake implements WSMA_Module {
         $evento_label = WSMA_Data::evento_label($evento_id);
         $subject = $is_update
             /* translators: %1$s: participant name, %2$s: event label */
-            ? sprintf(__('Nuovo messaggio da %1$s — %2$s', 'wsmaker'), $nome, $evento_label)
+            ? sprintf(__('New message from %1$s — %2$s', 'wsmaker'), $nome, $evento_label)
             /* translators: %1$s: participant name, %2$s: event label */
-            : sprintf(__('Nuova richiesta di iscrizione: %1$s — %2$s', 'wsmaker'), $nome, $evento_label);
+            : sprintf(__('New registration request: %1$s — %2$s', 'wsmaker'), $nome, $evento_label);
 
         $geo_enabled = class_exists('WSMA_Settings') && !empty(WSMA_Settings::get('intake_geolocation_enabled', 0));
         $geo = ($ip && $geo_enabled) ? self::geolocate_ip($ip) : '';
 
         $body = sprintf(
             "%s\n\nEvento: %s\nEmail: %s\nTelefono: %s\nCittà: %s\nNumero persone: %d\nIP: %s\n\nMessaggio:\n%s\n\nGestiscila dal pannello Riepilogo.",
-            $is_update ? __('Messaggio aggiuntivo su una richiesta già esistente:', 'wsmaker') : __('Nuova richiesta ricevuta dal form:', 'wsmaker'),
+            $is_update ? __('Additional message on an existing request:', 'wsmaker') : __('New request received from the form:', 'wsmaker'),
             $evento_label,
             $email,
             $phone ?: '—',

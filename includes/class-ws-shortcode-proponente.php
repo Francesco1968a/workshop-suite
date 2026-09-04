@@ -146,7 +146,7 @@ final class WSMA_Shortcode_Proponente implements WSMA_Module {
                 <div class="ws-bio-actions">
                     <?php if (!empty($sito)) : ?>
                         <a href="<?php echo esc_url($sito); ?>" target="_blank" rel="noopener noreferrer" class="ws-bio-action-btn ws-bio-site-btn">
-                            🌐 <?php esc_html_e('Sito Ufficiale', 'wsmaker'); ?>
+                            🌐 <?php esc_html_e('Official Website', 'wsmaker'); ?>
                         </a>
                     <?php endif; ?>
 

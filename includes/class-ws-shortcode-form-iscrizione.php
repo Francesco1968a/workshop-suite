@@ -42,9 +42,9 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
             'restUrl' => esc_url_raw(rest_url('workshop-suite/v1/iscrizione/invia')),
             'nonce'   => wp_create_nonce('wp_rest'),
             'i18n'    => [
-                'sending' => __('Invio in corso...', 'wsmaker'),
-                'success' => __('Richiesta inviata con successo!', 'wsmaker'),
-                'error'   => __('Si è verificato un errore. Riprova più tardi.', 'wsmaker'),
+                'sending' => __('Sending...', 'wsmaker'),
+                'success' => __('Request sent successfully!', 'wsmaker'),
+                'error'   => __('An error occurred. Please try again later.', 'wsmaker'),
             ],
         ];
         wp_localize_script('ws-form-iscrizione', 'WSMA_Form_Vars', $form_iscrizione_vars);
@@ -101,9 +101,9 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
             <form id="ws-registration-form" class="ws-form">
                 <?php if ($show_dropdown): ?>
                     <div class="ws-form-group">
-                        <label for="ws-evento-id"><?php esc_html_e('Data di interesse', 'wsmaker'); ?> <span class="req">*</span></label>
+                        <label for="ws-evento-id"><?php esc_html_e('Date of interest', 'wsmaker'); ?> <span class="req">*</span></label>
                         <select id="ws-evento-id" name="evento_id" class="ws-select" required>
-                            <option value=""><?php esc_html_e('Seleziona una data', 'wsmaker'); ?></option>
+                            <option value=""><?php esc_html_e('Select a date', 'wsmaker'); ?></option>
                             <?php foreach ($eventi_categoria as $ev): ?>
                                 <option value="<?php echo esc_attr($ev['id']); ?>" <?php selected($evento_id, $ev['id']); ?>><?php echo esc_html($ev['label']); ?></option>
                             <?php endforeach; ?>
@@ -120,11 +120,11 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
 
                 <div class="ws-form-row ws-form-row-2">
                     <div class="ws-form-group">
-                        <label for="ws-nome"><?php esc_html_e('Nome', 'wsmaker'); ?> <span class="req">*</span></label>
+                        <label for="ws-nome"><?php esc_html_e('First Name', 'wsmaker'); ?> <span class="req">*</span></label>
                         <input type="text" id="ws-nome" name="nome" class="ws-input" autocomplete="off" required placeholder="Es. Mario">
                     </div>
                     <div class="ws-form-group">
-                        <label for="ws-cognome"><?php esc_html_e('Cognome', 'wsmaker'); ?> <span class="req">*</span></label>
+                        <label for="ws-cognome"><?php esc_html_e('Last Name', 'wsmaker'); ?> <span class="req">*</span></label>
                         <input type="text" id="ws-cognome" name="cognome" class="ws-input" autocomplete="off" required placeholder="Es. Rossi">
                     </div>
                 </div>
@@ -135,18 +135,18 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
                         <input type="email" id="ws-email" name="email" class="ws-input" autocomplete="off" required placeholder="mario.rossi@email.com">
                     </div>
                     <div class="ws-form-group">
-                        <label for="ws-telefono"><?php esc_html_e('Telefono / WhatsApp', 'wsmaker'); ?></label>
+                        <label for="ws-telefono"><?php esc_html_e('Phone / WhatsApp', 'wsmaker'); ?></label>
                         <input type="tel" id="ws-telefono" name="telefono" class="ws-input" autocomplete="off" placeholder="+39 333 1234567">
                     </div>
                 </div>
 
                 <div class="ws-form-row ws-form-row-2">
                     <div class="ws-form-group">
-                        <label for="ws-citta"><?php esc_html_e('Città di provenienza', 'wsmaker'); ?></label>
+                        <label for="ws-citta"><?php esc_html_e('City you\'re coming from', 'wsmaker'); ?></label>
                         <input type="text" id="ws-citta" name="citta" class="ws-input" autocomplete="off" placeholder="Es. Milano">
                     </div>
                     <div class="ws-form-group">
-                        <label for="ws-persone"><?php esc_html_e('Numero persone', 'wsmaker'); ?></label>
+                        <label for="ws-persone"><?php esc_html_e('Number of people', 'wsmaker'); ?></label>
                         <select id="ws-persone" name="numero_persone" class="ws-select">
                             <option value="1">1 persona</option>
                             <option value="2">2 persone</option>
@@ -157,13 +157,13 @@ final class WSMA_Shortcode_Form_Iscrizione implements WSMA_Module {
                 </div>
 
                 <div class="ws-form-group">
-                    <label for="ws-messaggio"><?php esc_html_e('Messaggio / Richiesta informazioni', 'wsmaker'); ?> <span class="req">*</span></label>
-                    <textarea id="ws-messaggio" name="messaggio" class="ws-textarea" rows="4" required placeholder="<?php esc_attr_e('Scrivi qui le tue domande o note particolari...', 'wsmaker'); ?>"></textarea>
+                    <label for="ws-messaggio"><?php esc_html_e('Message / Info request', 'wsmaker'); ?> <span class="req">*</span></label>
+                    <textarea id="ws-messaggio" name="messaggio" class="ws-textarea" rows="4" required placeholder="<?php esc_attr_e('Write your questions or special notes here...', 'wsmaker'); ?>"></textarea>
                 </div>
 
                 <div class="ws-form-actions">
                     <button type="submit" class="ws-btn-submit" id="ws-submit-btn">
-                        <span><?php esc_html_e('Invia Richiesta Iscrizione', 'wsmaker'); ?></span>
+                        <span><?php esc_html_e('Submit Registration Request', 'wsmaker'); ?></span>
                     </button>
                 </div>
 

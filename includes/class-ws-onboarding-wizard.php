@@ -70,7 +70,7 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
         if ($request_method !== 'POST' || !isset($_POST['ws_wizard_nonce_field'])) return;
 
         if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ws_wizard_nonce_field'])), 'wsma_wizard_nonce')) {
-            wp_die(esc_html__('Richiesta non valida, riprova.', 'wsmaker'));
+            wp_die(esc_html__('Invalid request, please try again.', 'wsmaker'));
         }
 
         if (isset($_POST['ws_wizard_step1_submit'])) {
@@ -105,7 +105,7 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
     public function add_hidden_page(): void {
         add_submenu_page(
             'options.php',
-            __('Configurazione guidata', 'wsmaker'),
+            __('Setup Wizard', 'wsmaker'),
             '',
             'manage_options',
             self::PAGE_SLUG,
@@ -131,8 +131,8 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
         <div class="wrap ws-wizard-wrap">
             <div class="ws-wizard-box">
                 <div class="ws-wizard-steps">
-                    <span class="ws-wizard-step<?php echo $step === 1 ? ' ws-wizard-step--active' : ''; ?>">1. <?php esc_html_e('Condivisione dati', 'wsmaker'); ?></span>
-                    <span class="ws-wizard-step<?php echo $step === 2 ? ' ws-wizard-step--active' : ''; ?>">2. <?php esc_html_e('Casella mail', 'wsmaker'); ?></span>
+                    <span class="ws-wizard-step<?php echo $step === 1 ? ' ws-wizard-step--active' : ''; ?>">1. <?php esc_html_e('Data Sharing', 'wsmaker'); ?></span>
+                    <span class="ws-wizard-step<?php echo $step === 2 ? ' ws-wizard-step--active' : ''; ?>">2. <?php esc_html_e('Mailbox', 'wsmaker'); ?></span>
                 </div>
 
                 <?php if ($step === 1): $this->render_step1(); else: $this->render_step2(); endif; ?>
@@ -143,28 +143,28 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
 
     private function render_step1(): void {
         ?>
-        <h1><?php esc_html_e('Benvenuto in WSMaker 👋', 'wsmaker'); ?></h1>
-        <p class="ws-wizard-lead"><?php esc_html_e('Prima di iniziare, una scelta che riguarda solo te: vuoi condividere i tuoi eventi pubblicati con la directory pubblica di WSMaker?', 'wsmaker'); ?></p>
+        <h1><?php esc_html_e('Welcome to WSMaker 👋', 'wsmaker'); ?></h1>
+        <p class="ws-wizard-lead"><?php esc_html_e('Before you start, a choice that\'s entirely up to you: do you want to share your published events with WSMaker\'s public directory?', 'wsmaker'); ?></p>
 
         <div class="ws-wizard-disclosure">
-            <p><strong><?php esc_html_e('Cosa viene inviato, se accetti:', 'wsmaker'); ?></strong></p>
-            <p><?php esc_html_e('Titolo, descrizione, date e luogo, categoria, prezzo e acconto, posti disponibili, immagine in evidenza, URL della pagina di prenotazione, e il tuo profilo pubblico da proponente (nome, ruolo, bio, foto, sito, lingue) come lo configurerai nelle impostazioni.', 'wsmaker'); ?></p>
-            <p><?php esc_html_e('Va a wsmaker.pro, la directory pubblica del progetto WSMaker — serve a farti trovare da chi cerca corsi come i tuoi. Puoi cambiare questa scelta in qualsiasi momento da Impostazioni → Moduli & Add-ons.', 'wsmaker'); ?></p>
+            <p><strong><?php esc_html_e('What gets sent, if you opt in:', 'wsmaker'); ?></strong></p>
+            <p><?php esc_html_e('Title, description, dates and location, category, price and deposit, seat availability, featured image, booking page URL, and your public trainer profile (name, role, bio, photo, website, languages) as you configure it in settings.', 'wsmaker'); ?></p>
+            <p><?php esc_html_e('It goes to wsmaker.pro, WSMaker\'s public directory — it helps people looking for courses like yours find you. You can change this choice at any time from Settings → Modules & Add-ons.', 'wsmaker'); ?></p>
         </div>
 
         <form method="post">
             <?php wp_nonce_field('wsma_wizard_nonce', 'ws_wizard_nonce_field'); ?>
             <label class="ws-wizard-choice">
                 <input type="radio" name="ws_hub_consent" value="1">
-                <span><strong><?php esc_html_e('Sì, condividi i miei eventi', 'wsmaker'); ?></strong> — <?php esc_html_e('aumenta la visibilità, aiuta anche la bio proponente ad avere uno scopo', 'wsmaker'); ?></span>
+                <span><strong><?php esc_html_e('Yes, share my events', 'wsmaker'); ?></strong> — <?php esc_html_e('increases visibility, and gives your trainer bio a purpose too', 'wsmaker'); ?></span>
             </label>
             <label class="ws-wizard-choice">
                 <input type="radio" name="ws_hub_consent" value="0" checked>
-                <span><strong><?php esc_html_e('No, resta tutto sul mio sito', 'wsmaker'); ?></strong> — <?php esc_html_e('nessun dato lascia il tuo sito', 'wsmaker'); ?></span>
+                <span><strong><?php esc_html_e('No, keep everything on my site', 'wsmaker'); ?></strong> — <?php esc_html_e('no data leaves your site', 'wsmaker'); ?></span>
             </label>
 
             <div class="ws-wizard-actions">
-                <button type="submit" name="ws_wizard_step1_submit" value="1" class="button button-primary button-hero"><?php esc_html_e('Continua →', 'wsmaker'); ?></button>
+                <button type="submit" name="ws_wizard_step1_submit" value="1" class="button button-primary button-hero"><?php esc_html_e('Continue →', 'wsmaker'); ?></button>
             </div>
         </form>
         <?php
@@ -172,14 +172,14 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
 
     private function render_step2(): void {
         ?>
-        <h1><?php esc_html_e('Casella mail per la messaggistica', 'wsmaker'); ?></h1>
-        <p class="ws-wizard-lead"><?php esc_html_e('WSMaker può inviare conferme, promemoria e rispondere ai partecipanti direttamente dalla tua casella mail. Puoi configurarla ora, oppure più tardi da Impostazioni → Mail.', 'wsmaker'); ?></p>
+        <h1><?php esc_html_e('Mailbox for messaging', 'wsmaker'); ?></h1>
+        <p class="ws-wizard-lead"><?php esc_html_e('WSMaker can send confirmations, reminders, and reply to participants directly from your mailbox. You can set it up now, or later from Settings → Mail.', 'wsmaker'); ?></p>
 
         <form method="post">
             <?php wp_nonce_field('wsma_wizard_nonce', 'ws_wizard_nonce_field'); ?>
             <div class="ws-wizard-actions">
-                <button type="submit" name="ws_wizard_finish" value="1" class="button button-secondary"><?php esc_html_e('Configura dopo', 'wsmaker'); ?></button>
-                <button type="submit" name="ws_wizard_finish" value="1" data-go-mail="1" onclick="document.getElementById('ws-wizard-go-mail').value='1';" class="button button-primary button-hero"><?php esc_html_e('Configura ora →', 'wsmaker'); ?></button>
+                <button type="submit" name="ws_wizard_finish" value="1" class="button button-secondary"><?php esc_html_e('Set up later', 'wsmaker'); ?></button>
+                <button type="submit" name="ws_wizard_finish" value="1" data-go-mail="1" onclick="document.getElementById('ws-wizard-go-mail').value='1';" class="button button-primary button-hero"><?php esc_html_e('Set up now →', 'wsmaker'); ?></button>
                 <input type="hidden" id="ws-wizard-go-mail" name="ws_go_to_mail" value="0">
             </div>
         </form>

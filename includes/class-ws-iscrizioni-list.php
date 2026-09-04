@@ -32,13 +32,13 @@ final class WSMA_Iscrizioni_List implements WSMA_Module {
         foreach ($columns as $key => $label) {
             $new[$key] = $label;
             if ($key === 'title') {
-                $new['ws_nome']       = __('Nome', 'wsmaker');
+                $new['ws_nome']       = __('Name', 'wsmaker');
                 $new['ws_email']      = __('Email', 'wsmaker');
-                $new['ws_telefono']   = __('Telefono', 'wsmaker');
-                $new['ws_citta']      = __('Città', 'wsmaker');
-                $new['wsma_evento']     = __('Evento / Corso', 'wsmaker');
-                $new['ws_stato']      = __('Stato', 'wsmaker');
-                $new['ws_provenienza'] = __('Pagina di Provenienza', 'wsmaker');
+                $new['ws_telefono']   = __('Phone', 'wsmaker');
+                $new['ws_citta']      = __('City', 'wsmaker');
+                $new['wsma_evento']     = __('Event / Course', 'wsmaker');
+                $new['ws_stato']      = __('Status', 'wsmaker');
+                $new['ws_provenienza'] = __('Referring Page', 'wsmaker');
             }
         }
         unset($new['comments']);
@@ -74,7 +74,7 @@ final class WSMA_Iscrizioni_List implements WSMA_Module {
                 $stato = (string) WSMA_Data::get_field('stato', $post_id);
                 $is_confermato = $stato === 'confermato';
                 echo '<span style="color:' . ($is_confermato ? '#065f46' : '#92400e') . ';font-weight:600;">';
-                echo $is_confermato ? '✓ ' . esc_html__('Confermato', 'wsmaker') : '● ' . esc_html__('Richiesta', 'wsmaker');
+                echo $is_confermato ? '✓ ' . esc_html__('Confirmed', 'wsmaker') : '● ' . esc_html__('Requested', 'wsmaker');
                 echo '</span>';
                 break;
             case 'ws_provenienza':
@@ -132,9 +132,9 @@ final class WSMA_Iscrizioni_List implements WSMA_Module {
         $current = isset($_GET['ws_stato_filter']) ? sanitize_key(wp_unslash($_GET['ws_stato_filter'])) : '';
         ?>
         <select name="ws_stato_filter">
-            <option value=""><?php esc_html_e('Tutti gli stati', 'wsmaker'); ?></option>
-            <option value="confermato" <?php selected($current, 'confermato'); ?>><?php esc_html_e('Confermato', 'wsmaker'); ?></option>
-            <option value="richiesta" <?php selected($current, 'richiesta'); ?>><?php esc_html_e('Richiesta', 'wsmaker'); ?></option>
+            <option value=""><?php esc_html_e('All statuses', 'wsmaker'); ?></option>
+            <option value="confermato" <?php selected($current, 'confermato'); ?>><?php esc_html_e('Confirmed', 'wsmaker'); ?></option>
+            <option value="richiesta" <?php selected($current, 'richiesta'); ?>><?php esc_html_e('Requested', 'wsmaker'); ?></option>
         </select>
         <?php
     }
