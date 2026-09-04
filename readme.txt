@@ -1,6 +1,6 @@
-=== WSMaker — All-in-One Event Manager, CRM & Social Banner Builder ===
+=== WSMaker — Training Management System, CRM & Event Manager ===
 Contributors: frak68
-Tags: workshop, training management system, events, event management, crm
+Tags: training management system, workshop, events, event management, crm
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
@@ -8,7 +8,7 @@ Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-All-in-one suite to manage workshops, courses and events, attendee CRM with communication tracking, and a social banner builder.
+A full Training Management System (TMS) for WordPress: workshop and event scheduling, attendee CRM with communication tracking, and a social banner builder.
 
 == Description ==
 

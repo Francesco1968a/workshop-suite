@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: WSMaker — All-in-One Event Manager, CRM & Social Banner Builder
+ * Plugin Name: WSMaker — Training Management System, CRM & Event Manager
  * Plugin URI: https://wsmaker.pro/
- * Description: The complete all-in-one suite for WordPress to manage workshops, courses and events, participant CRM with timeline tracking, automatic T-15 email reminders, and social poster graphic builder.
+ * Description: A full Training Management System (TMS) for WordPress: workshop and course scheduling, participant CRM with timeline tracking, automatic T-15 email reminders, and a social poster graphic builder.
  * Version: 1.1.5
  * Author: Francesco Verolino
  * Author URI: https://francescoverolino.com
