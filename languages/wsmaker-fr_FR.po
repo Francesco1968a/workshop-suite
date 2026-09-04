@@ -1,0 +1,688 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WSMaker 1.1.5\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wsmaker\n"
+"POT-Creation-Date: 2026-09-04T00:00:00+00:00\n"
+"PO-Revision-Date: 2026-09-04T00:00:00+00:00\n"
+"Last-Translator: Francesco Verolino\n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: wsmaker\n"
+
+msgid "A high-resolution square image is recommended (min. 400x400 px)."
+msgstr "Une image carrée en haute résolution est recommandée (min. 400x400 px)."
+
+msgid "ACTIVE"
+msgstr "ACTIF"
+
+msgid "AI Workshop Assistant & Copywriter"
+msgstr "Assistant IA Workshop & Copywriting"
+
+msgid "AI assistant to generate engaging course descriptions, teaching programs, Instagram post copy, and email replies to students."
+msgstr "Assistant IA pour générer des descriptions de cours attrayantes, des programmes pédagogiques, des textes pour Instagram et des réponses par e-mail aux élèves."
+
+msgid "Academy: Multi-Trainer & Roles"
+msgstr "Academy : Multi-formateurs & Rôles"
+
+msgid "Account Password"
+msgstr "Mot de passe du compte"
+
+msgid "Action"
+msgstr "Opération"
+
+msgid "Active"
+msgstr "Actif"
+
+msgid "Add Event Type"
+msgstr "Ajouter un type d'événement"
+
+msgid "Add city/country inferred from the IP to the notification email (sends the IP to ip-api.com)"
+msgstr "Ajouter la ville/pays déduit de l'IP à l'e-mail de notification (envoie l'IP à ip-api.com)"
+
+msgid "Additional message on an existing request:"
+msgstr "Message supplémentaire sur une demande existante :"
+
+msgid "Address that reply/reminder emails will be sent from, and that will receive alerts for new requests from the registration form."
+msgstr "Adresse utilisée pour l'envoi des e-mails de réponse/rappel, et qui recevra les alertes pour les nouvelles demandes du formulaire d'inscription."
+
+msgid "Admin Calendar"
+msgstr "Calendrier d'administration"
+
+msgid "All statuses"
+msgstr "Tous les statuts"
+
+msgid "An error occurred. Please try again later."
+msgstr "Une erreur est survenue. Veuillez réessayer plus tard."
+
+msgid "Anti-Spam Protection & Registration Rate Limiting"
+msgstr "Protection anti-spam & Limitation du débit d'inscription"
+
+msgid "Automatically adds every new request from the registration form as a FluentCRM contact, with configurable tag and/or list."
+msgstr "Ajoute automatiquement chaque nouvelle demande du formulaire d'inscription comme contact FluentCRM, avec tag et/ou liste configurables."
+
+msgid "Automatically generates and attaches to the confirmation email a personalized PDF Voucher/Pass with QR code and logistics details for the participant."
+msgstr "Génère automatiquement et joint à l'e-mail de confirmation un bon/pass PDF personnalisé avec code QR et détails logistiques pour le participant."
+
+msgid "Automatically sends a summary email to confirmed participants 15 days before the start date."
+msgstr "Envoie automatiquement un e-mail récapitulatif aux participants confirmés 15 jours avant la date de début."
+
+msgid "Automatically syncs your workshops and events to the global woorkshoop.space / wsmaker.pro directory and the interactive world map."
+msgstr "Synchronise automatiquement vos ateliers et événements avec l'annuaire mondial woorkshoop.space / wsmaker.pro et la carte du monde interactive."
+
+msgid "Available Shortcodes List"
+msgstr "Liste des shortcodes disponibles"
+
+msgid "Base Location / City"
+msgstr "Lieu principal / Ville"
+
+msgid "Before you start, a choice that's entirely up to you: do you want to share your published events with WSMaker's public directory?"
+msgstr "Avant de commencer, un choix qui vous appartient entièrement : souhaitez-vous partager vos événements publiés avec l'annuaire public de WSMaker ?"
+
+msgid "Biography / Introduction"
+msgstr "Biographie / Présentation"
+
+msgid "Blocks submissions with the trap field filled in (invisible anti-bot)"
+msgstr "Bloque les soumissions dont le champ piège est rempli (anti-robot invisible)"
+
+msgid "Brand / Organization Name"
+msgstr "Nom de marque / Organisation"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Categories & Types"
+msgstr "Catégories & Types"
+
+msgid "Category"
+msgstr "Catégorie"
+
+msgid "City"
+msgstr "Ville"
+
+msgid "City you're coming from"
+msgstr "Ville de provenance"
+
+msgid "Configure"
+msgstr "Configurer"
+
+msgid "Confirmation"
+msgstr "Confirmation d'inscription"
+
+msgid "Confirmed"
+msgstr "Confirmé"
+
+msgid "Contacts & Participants"
+msgstr "Contacts et participants"
+
+msgid "Contacts & Web Presence"
+msgstr "Contacts & Présence en ligne"
+
+msgid "Continue →"
+msgstr "Continuer →"
+
+msgid "Copy"
+msgstr "Copier"
+
+msgid "Copy and paste these shortcodes into your site's WordPress pages to integrate WSMaker's features."
+msgstr "Copiez et collez ces shortcodes dans les pages WordPress de votre site pour intégrer les fonctionnalités de WSMaker."
+
+msgid "Currency Symbol"
+msgstr "Symbole monétaire"
+
+msgid "Currency symbol shown in registration forms (e.g. €)."
+msgstr "Symbole monétaire affiché dans les formulaires d'inscription (ex. €)."
+
+msgid "Dark Theme"
+msgstr "Thème sombre"
+
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+msgid "Data Sharing"
+msgstr "Partage des données"
+
+msgid "Date of interest"
+msgstr "Date souhaitée"
+
+msgid "Default Frontend Theme"
+msgstr "Thème frontend par défaut"
+
+msgid "Describe your experience, your teaching approach, and your achievements..."
+msgstr "Décrivez votre expérience, votre approche pédagogique et vos réalisations..."
+
+msgid "Description"
+msgstr "Description détaillée"
+
+msgid "Dynamic ICS feed that syncs workshop dates in real time to the trainer's and participants' personal calendars."
+msgstr "Flux ICS dynamique qui synchronise en temps réel les dates des ateliers avec les calendriers personnels du formateur et des participants."
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Email Sender Name"
+msgstr "Nom de l'expéditeur de l'e-mail"
+
+msgid "Enable automatic reminder emails 15 days before the event (T-15)"
+msgstr "Activer les e-mails de rappel automatiques 15 jours avant l'événement (J-15)"
+
+msgid "Enable request limiting per IP address"
+msgstr "Activer la limitation des demandes par adresse IP"
+
+msgid "Encryption"
+msgstr "Chiffrement"
+
+msgid "Enter password"
+msgstr "Saisir le mot de passe"
+
+msgid "Enter your purchased license key to enable support and automatic updates."
+msgstr "Saisissez votre clé de licence achetée pour activer le support et les mises à jour automatiques."
+
+msgid "Error while creating the registration."
+msgstr "Erreur lors de la création de l'inscription."
+
+msgid "Error while saving the data."
+msgstr "Erreur lors de l'enregistrement des données."
+
+msgid "Event"
+msgstr "Événement"
+
+msgid "Event / Course"
+msgstr "Événement / Cours"
+
+msgid "Events"
+msgstr "Événements"
+
+msgid "Events & Registrations"
+msgstr "Événements & Inscriptions"
+
+msgid "Events Archive"
+msgstr "Archives des événements"
+
+msgid "Every new request from the registration form is added as a contact, with the tag and/or list below (created automatically if they don't exist)."
+msgstr "Chaque nouvelle demande du formulaire d'inscription est ajoutée comme contact, avec le tag et/ou la liste ci-dessous (créés automatiquement s'ils n'existent pas)."
+
+msgid "Expires on: %s"
+msgstr "Expire le : %s"
+
+msgid "Extends the Overview panel with revenue (30-day and total) broken down by category, and — if the Marketing module is active — coupons issued/used and discounts granted."
+msgstr "Étend le panneau Vue d'ensemble avec les revenus (30 jours et total) ventilés par catégorie, et — si le module Marketing est actif — les coupons émis/utilisés et les réductions accordées."
+
+msgid "Feature"
+msgstr "Fonctionnalité"
+
+msgid "First & Last Name"
+msgstr "Prénom & Nom"
+
+msgid "First Name"
+msgstr "Prénom"
+
+msgid "FluentCRM Connector"
+msgstr "Connecteur FluentCRM"
+
+msgid "General"
+msgstr "Général"
+
+msgid "Geolocation Service URL"
+msgstr "URL du service de géolocalisation"
+
+msgid "Go to the video call →"
+msgstr "Rejoindre l'appel vidéo →"
+
+msgid "Google Calendar & Apple iCal Auto-Sync"
+msgstr "Synchronisation automatique Google Calendar & Apple iCal"
+
+msgid "Honeypot Protection"
+msgstr "Protection Honeypot"
+
+msgid "IMAP Host"
+msgstr "Hôte IMAP"
+
+msgid "IMAP Port"
+msgstr "Port IMAP"
+
+msgid "IMAP Username"
+msgstr "Nom d'utilisateur IMAP"
+
+msgid "IP Geolocation"
+msgstr "Géolocalisation IP"
+
+msgid "IP Rate Limiting"
+msgstr "Limitation du débit par IP"
+
+msgid "In-browser graphic generator for posters ready for Instagram Feed (1:1), Stories (9:16), and Facebook, rendered with HTML5 Canvas."
+msgstr "Générateur graphique intégré pour des affiches prêtes pour le fil Instagram (1:1), les Stories (9:16) et Facebook, avec rendu Canvas HTML5."
+
+msgid "Inactive"
+msgstr "Inactif"
+
+msgid "Indicate the languages you can teach workshops or communicate with participants in."
+msgstr "Indiquez les langues dans lesquelles vous pouvez animer des ateliers ou communiquer avec les participants."
+
+msgid "Instant collection of deposits or balances via credit card, Apple Pay, and Google Pay, with zero middleman plugins."
+msgstr "Encaissement instantané des acomptes ou soldes par carte bancaire, Apple Pay et Google Pay, sans extension intermédiaire."
+
+msgid "Invalid request, please try again."
+msgstr "Demande invalide, veuillez réessayer."
+
+msgid "It goes to wsmaker.pro, WSMaker's public directory — it helps people looking for courses like yours find you. You can change this choice at any time from Settings → Modules & Add-ons."
+msgstr "Ces données sont transmises à wsmaker.pro, l'annuaire public de WSMaker — cela aide les personnes recherchant des cours comme les vôtres à vous trouver. Vous pouvez modifier ce choix à tout moment depuis Réglages → Modules & Extensions."
+
+msgid "Languages Spoken"
+msgstr "Langues parlées"
+
+msgid "Last Name"
+msgstr "Nom de famille"
+
+msgid "License"
+msgstr "Licence"
+
+msgid "License Key"
+msgstr "Clé de licence"
+
+msgid "License Status"
+msgstr "Statut de la licence"
+
+msgid "Light Theme"
+msgstr "Thème clair"
+
+msgid "Live (real payments)"
+msgstr "En production (vrais paiements)"
+
+msgid "Mail Configuration"
+msgstr "Configuration de la messagerie"
+
+msgid "Mail Inbox"
+msgstr "Boîte de réception"
+
+msgid "Mailbox"
+msgstr "Boîte aux lettres"
+
+msgid "Mailbox for messaging"
+msgstr "Boîte de messagerie"
+
+msgid "Mailbox settings saved and protected with AES-256 encryption."
+msgstr "Paramètres de messagerie enregistrés et protégés par chiffrement AES-256."
+
+msgid "Manage the list of default event types (e.g. Workshop, Photo Tour, Masterclass). You can edit them or add new ones."
+msgstr "Gérez la liste des types d'événements par défaut (ex. Atelier, Voyage photo, Masterclass). Vous pouvez les modifier ou en ajouter de nouveaux."
+
+msgid "Manual Global Hub & World Map Sync"
+msgstr "Synchronisation manuelle Hub mondial & Carte du monde"
+
+msgid "Manual coupons for special offers (Earlybird, etc.) and an automatic loyalty program: attendees who join more events/courses within the last 12 months get an increasing discount. Works with both native Stripe payments and WooCommerce."
+msgstr "Coupons manuels pour offres spéciales (Early bird, etc.) et programme de fidélité automatique : les participants s'inscrivant à plusieurs événements/cours au cours des 12 derniers mois bénéficient d'une réduction croissante. Compatible avec les paiements natifs Stripe et WooCommerce."
+
+msgid "Marketing: Loyalty & Coupons"
+msgstr "Marketing : Fidélité & Coupons"
+
+msgid "Maximum Request Threshold"
+msgstr "Seuil maximal de demandes"
+
+msgid "Maximum number of registrations allowed from the same IP (default: 5)."
+msgstr "Nombre maximal d'inscriptions autorisées depuis la même IP (par défaut : 5)."
+
+msgid "Message / Info request"
+msgstr "Message / Demande d'information"
+
+msgid "Mode"
+msgstr "Mode de fonctionnement"
+
+msgid "Module activated successfully"
+msgstr "Module activé avec succès"
+
+msgid "Module deactivated"
+msgstr "Module désactivé"
+
+msgid "Modules & Add-ons"
+msgstr "Modules & Extensions"
+
+msgid "NOT ACTIVE / INVALID"
+msgstr "NON ACTIF / INVALIDE"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Name and email are required."
+msgstr "Le nom et l'e-mail sont obligatoires."
+
+msgid "Name shown to the recipient as the sender of notifications."
+msgstr "Nom affiché au destinataire en tant qu'expéditeur des notifications."
+
+msgid "Native Stripe & Apple Pay Payments"
+msgstr "Paiements natifs Stripe & Apple Pay"
+
+msgid "New message from %1$s — %2$s"
+msgstr "Nouveau message de %1$s — %2$s"
+
+msgid "New registration"
+msgstr "Nouvelle inscription"
+
+msgid "New registration request: %1$s — %2$s"
+msgstr "Nouvelle demande d'inscription : %1$s — %2$s"
+
+msgid "New request received from the form:"
+msgstr "Nouvelle demande reçue depuis le formulaire :"
+
+msgid "No virtual classroom specified."
+msgstr "Aucune classe virtuelle spécifiée."
+
+msgid "No, keep everything on my site"
+msgstr "Non, tout garder sur mon site"
+
+msgid "Number of people"
+msgstr "Nombre de personnes"
+
+msgid "Official Website"
+msgstr "Site web officiel"
+
+msgid "On-demand video course platform, recorded masterclasses, module/lesson management with an advanced video player and Zoom/Meet streaming."
+msgstr "Plateforme de cours vidéo à la demande, masterclasses enregistrées, gestion des modules/leçons avec lecteur vidéo avancé et streaming Zoom/Meet."
+
+msgid "Optional. Leave empty to use ip-api.com (free, suited to non-commercial use). If you have your own geolocation provider (for commercial use compliant with its terms, or higher volumes), enter its URL here: it must accept the IP and respond with JSON containing \"city\" and \"country\" fields."
+msgstr "Facultatif. Laissez vide pour utiliser ip-api.com (gratuit, adapté à un usage non commercial). Si vous disposez de votre propre fournisseur de géolocalisation (pour un usage commercial conforme à ses conditions ou des volumes plus élevés), saisissez son URL ici : il doit accepter l'IP et renvoyer un JSON contenant les champs \"city\" et \"country\"."
+
+msgid "Organization Email"
+msgstr "E-mail de l'organisation"
+
+msgid "Participant"
+msgstr "Participant(e)"
+
+msgid "Participants"
+msgstr "Liste des participants"
+
+msgid "Participation Voucher & PDF Pass"
+msgstr "Bon de participation & Pass PDF"
+
+msgid "Password protected with OpenSSL AES-256 encryption."
+msgstr "Mot de passe protégé par chiffrement OpenSSL AES-256."
+
+msgid "Paste this shortcode into any page, post, or footer:"
+msgstr "Collez ce shortcode dans n'importe quelle page, article ou pied de page :"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "Phone / WhatsApp"
+msgstr "Téléphone / WhatsApp"
+
+msgid "Poster Studio & Social Banner Builder"
+msgstr "Studio d'affiches & Créateur de bannières sociales"
+
+msgid "Poster Templates"
+msgstr "Modèles d'affiches"
+
+msgid "Profile Photo / Avatar"
+msgstr "Photo de profil / Avatar"
+
+msgid "Protect the server and the registration endpoint from automated bot submissions and flood attacks."
+msgstr "Protège le serveur et le point d'accès aux inscriptions contre les soumissions automatisées de robots et les attaques par inondation."
+
+msgid "Public Email"
+msgstr "E-mail public"
+
+msgid "Reading Mail (IMAP)"
+msgstr "Lecture des e-mails (IMAP)"
+
+msgid "Referring Page"
+msgstr "Page de provenance"
+
+msgid "Registration"
+msgstr "Inscription"
+
+msgid "Registrations"
+msgstr "Inscriptions"
+
+msgid "Reminder Automations"
+msgstr "Automatisations de rappel"
+
+msgid "Remove"
+msgstr "Supprimer"
+
+msgid "Request received."
+msgstr "Demande reçue."
+
+msgid "Request sent successfully!"
+msgstr "Demande envoyée avec succès !"
+
+msgid "Requested"
+msgstr "Demandé"
+
+msgid "Requests"
+msgstr "Demandes"
+
+msgid "Requires PRO"
+msgstr "Nécessite PRO"
+
+msgid "SMTP Host"
+msgstr "Hôte SMTP"
+
+msgid "SMTP Port"
+msgstr "Port SMTP"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Save Event Types"
+msgstr "Enregistrer les types d'événements"
+
+msgid "Save Mail & Security Configuration"
+msgstr "Enregistrer la configuration messagerie & sécurité"
+
+msgid "Save Module Status"
+msgstr "Enregistrer l'état des modules"
+
+msgid "Save Settings"
+msgstr "Enregistrer les réglages"
+
+msgid "Save Trainer Profile"
+msgstr "Enregistrer le profil formateur"
+
+msgid "Save and Verify License"
+msgstr "Enregistrer et vérifier la licence"
+
+msgid "Select a date"
+msgstr "Sélectionner une date"
+
+msgid "Selected event is not valid."
+msgstr "L'événement sélectionné n'est pas valide."
+
+msgid "Sender Email"
+msgstr "E-mail de l'expéditeur"
+
+msgid "Sender Name"
+msgstr "Nom de l'expéditeur"
+
+msgid "Sending Mail (SMTP / Sender)"
+msgstr "Envoi d'e-mails (SMTP / Expéditeur)"
+
+msgid "Sending..."
+msgstr "Envoi en cours..."
+
+msgid "Sends a JSON payload to Zapier, Make.com, Zoho CRM, or Google Sheets (via their \"Catch Webhook\" trigger) on every new registration and/or confirmation."
+msgstr "Envoie une charge utile JSON à Zapier, Make.com, Zoho CRM ou Google Sheets (via leur déclencheur \"Catch Webhook\") à chaque nouvelle inscription et/ou confirmation."
+
+msgid "Sends a real-time JSON payload to Make.com, Zapier, Zoho CRM, or Google Sheets on every new registration or payment confirmation."
+msgstr "Envoie une charge utile JSON en temps réel à Make.com, Zapier, Zoho CRM ou Google Sheets à chaque nouvelle inscription ou confirmation de paiement."
+
+msgid "Sends all your published workshops and events to the wsmaker.pro directory and the interactive map in one go."
+msgstr "Envoie en une seule fois tous vos ateliers et événements publiés vers l'annuaire wsmaker.pro et la carte interactive."
+
+msgid "Set up later"
+msgstr "Configurer plus tard"
+
+msgid "Set up now →"
+msgstr "Configurer maintenant →"
+
+msgid "Settings"
+msgstr "Réglages"
+
+msgid "Setup Wizard"
+msgstr "Assistant de configuration"
+
+msgid "Shortcode Tag"
+msgstr "Balise shortcode"
+
+msgid "Shortcodes"
+msgstr "Codes courts (shortcodes)"
+
+msgid "Social Channels"
+msgstr "Réseaux sociaux"
+
+msgid "Statistics & Analytics"
+msgstr "Statistiques & Analyses"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Stripe"
+msgstr "Stripe"
+
+msgid "Submit Registration Request"
+msgstr "Soumettre la demande d'inscription"
+
+msgid "Sync all Workshops with the Hub now"
+msgstr "Synchroniser tous les ateliers avec le Hub maintenant"
+
+msgid "Sync complete: %d workshops successfully sent to the Hub!"
+msgstr "Synchronisation terminée : %d ateliers envoyés au Hub avec succès !"
+
+msgid "Syncs workshops as WooCommerce cart products so you can use your own payment gateways and electronic invoicing."
+msgstr "Synchronise les ateliers en tant que produits du panier WooCommerce afin que vous puissiez utiliser vos propres passerelles de paiement et la facturation électronique."
+
+msgid "The message is required."
+msgstr "Le message est obligatoire."
+
+msgid "The video call takes place on %s."
+msgstr "L'appel vidéo a lieu le %s."
+
+msgid "The virtual classroom link is not available yet."
+msgstr "Le lien de la classe virtuelle n'est pas encore disponible."
+
+msgid "Theme:"
+msgstr "Thème :"
+
+msgid "This biography will be shown on the trainer card on your site and on the global Workshop Hub portal."
+msgstr "Cette biographie sera affichée sur la fiche formateur de votre site et sur le portail mondial Workshop Hub."
+
+msgid "This event has already ended."
+msgstr "Cet événement est déjà terminé."
+
+msgid "This event is not a virtual classroom."
+msgstr "Cet événement n'est pas une classe virtuelle."
+
+msgid "Time Window (seconds)"
+msgstr "Fenêtre temporelle (secondes)"
+
+msgid "Time interval used to calculate the limit (default: 60 seconds)."
+msgstr "Intervalle de temps utilisé pour calculer la limite (par défaut : 60 secondes)."
+
+msgid "Title / Role"
+msgstr "Titre / Rôle"
+
+msgid "Title, description, dates and location, category, price and deposit, seat availability, featured image, booking page URL, and your public trainer profile (name, role, bio, photo, website, languages) as you configure it in settings."
+msgstr "Titre, description, dates et lieu, catégorie, prix et acompte, disponibilité des places, image mise en avant, URL de la page de réservation et votre profil public de formateur (nom, rôle, bio, photo, site web, langues) tel que configuré dans les réglages."
+
+msgid "Trainer / Presenter Details"
+msgstr "Coordonnées du formateur / intervenant"
+
+msgid "Trainer Profile / Bio"
+msgstr "Profil formateur / Bio"
+
+msgid "Trainer profile and bio card saved successfully."
+msgstr "Profil du formateur et fiche bio enregistrés avec succès."
+
+msgid "Trainer/Manager accounts with separate permissions, categories and courses assigned per trainer, with complete data isolation between trainers."
+msgstr "Comptes Formateur/Gestionnaire avec autorisations distinctes, catégories et cours attribués par formateur, avec isolation complète des données entre formateurs."
+
+msgid "Upload / Choose Photo"
+msgstr "Téléverser / Choisir une photo"
+
+msgid "Used in automatic email signatures and ICS calendar files."
+msgstr "Utilisé dans les signatures automatiques d'e-mails et les fichiers de calendrier ICS."
+
+msgid "Virtual classroom"
+msgstr "Classe virtuelle"
+
+msgid "Visual style applied to shortcodes and public modules on the site's frontend."
+msgstr "Style visuel appliqué aux shortcodes et aux modules publics sur le frontend du site."
+
+msgid "WSMaker"
+msgstr "WSMaker"
+
+msgid "WSMaker Dashboard"
+msgstr "Tableau de bord WSMaker"
+
+msgid "WSMaker Settings"
+msgstr "Réglages WSMaker"
+
+msgid "WSMaker can send confirmations, reminders, and reply to participants directly from your mailbox. You can set it up now, or later from Settings → Mail."
+msgstr "WSMaker peut envoyer des confirmations, des rappels et répondre aux participants directement depuis votre boîte de messagerie. Vous pouvez le configurer maintenant ou plus tard depuis Réglages → Messagerie."
+
+msgid "Warning: the automatic mailbox check (IMAP Cron) failed on %s with error:"
+msgstr "Attention : la vérification automatique de la boîte aux lettres (Cron IMAP) a échoué le %s avec l'erreur :"
+
+msgid "We already have a request from you for this event. We've updated your message!"
+msgstr "Nous avons déjà reçu une demande de votre part pour cet événement. Nous avons mis à jour votre message !"
+
+msgid "Webhook & Zapier / Make Connectors"
+msgstr "Webhooks & Connecteurs Zapier / Make"
+
+msgid "Webhook URL"
+msgstr "URL du webhook"
+
+msgid "Webhooks"
+msgstr "Points de terminaison Webhooks"
+
+msgid "Welcome to WSMaker 👋"
+msgstr "Bienvenue sur WSMaker 👋"
+
+msgid "What gets sent, if you opt in:"
+msgstr "Ce qui est envoyé si vous acceptez :"
+
+msgid "WooCommerce Cart Integration"
+msgstr "Intégration du panier WooCommerce"
+
+msgid "Woorkshoop Global Hub & World Map Sync"
+msgstr "Hub mondial Woorkshoop & Synchronisation avec la carte du monde"
+
+msgid "Workshop Categories"
+msgstr "Catégories d'ateliers"
+
+msgid "Workshop Online & LMS"
+msgstr "Workshop Online & LMS"
+
+msgid "Workshop deposit/balance payment via Stripe Checkout (page hosted by Stripe — Apple Pay/Google Pay appear automatically when supported)."
+msgstr "Paiement de l'acompte/du solde de l'atelier via Stripe Checkout (page hébergée par Stripe — Apple Pay/Google Pay s'affichent automatiquement lorsqu'ils sont pris en charge)."
+
+msgid "Write your questions or special notes here..."
+msgstr "Écrivez vos questions ou remarques particulières ici..."
+
+msgid "Yes, share my events"
+msgstr "Oui, partager mes événements"
+
+msgid "You've sent too many requests in a short time. Please wait a few minutes before trying again."
+msgstr "Vous avez envoyé trop de demandes en peu de temps. Veuillez patienter quelques minutes avant de réessayer."
+
+msgid "Your registration request was sent successfully! We've sent you a confirmation email."
+msgstr "Votre demande d'inscription a été envoyée avec succès ! Nous vous avons envoyé un e-mail de confirmation."
+
+msgid "increases visibility, and gives your trainer bio a purpose too"
+msgstr "augmente la visibilité et donne également un sens à votre bio de formateur"
+
+msgid "no data leaves your site"
+msgstr "aucune donnée ne quitte votre site"
+
+msgid "•••••••• (Unchanged)"
+msgstr "•••••••• (Inchangé)"
+
+msgid "🏷️ Event Types"
+msgstr "🏷️ Types d'événements"
+
+msgid "💡 How to show the Bio on your site"
+msgstr "💡 Comment afficher la Bio sur votre site"
+
+msgid "🔌 Webhooks"
+msgstr "🔌 Intégrations Webhooks"
