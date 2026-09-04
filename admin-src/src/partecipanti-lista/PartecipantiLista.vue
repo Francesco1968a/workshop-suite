@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
+import { t } from '../shared/i18n.js';
 
 const q = ref('');
 const items = ref([]);
@@ -38,16 +39,16 @@ onMounted(load);
 
 <template>
   <div class="wvpl">
-    <h2>Partecipanti</h2>
+    <h2>{{ t('pl_h2', 'Participants') }}</h2>
     <input
       type="text"
       class="wvpl-search"
       v-model="q"
-      placeholder="Cerca per nome, email, telefono, città…"
+      :placeholder="t('pl_ph_cerca', 'Search by name, email, phone, city…')"
     />
     <div class="wvpl-count">
-      {{ count }} contatti
-      <span v-if="q">&nbsp;per "{{ q }}"</span>
+      {{ count }} {{ t('pl_contatti', 'contacts') }}
+      <span v-if="q">&nbsp;{{ t('pl_per', 'for') }} "{{ q }}"</span>
     </div>
     <div :class="{ 'wvpl-loading': loading }">
       <div v-for="p in items" :key="p.id" class="wvpl-row">
@@ -56,8 +57,8 @@ onMounted(load);
           {{ p.email }}
           <template v-if="p.citta"> · {{ p.citta }}</template>
         </span>
-        <span class="wvpl-badge">{{ p.totali }} iscr.</span>
-        <span v-if="p.confermate > 0" class="wvpl-badge wvpl-badge--ok">{{ p.confermate }} conf.</span>
+        <span class="wvpl-badge">{{ p.totali }} {{ t('pl_iscr_abbr', 'reg.') }}</span>
+        <span v-if="p.confermate > 0" class="wvpl-badge wvpl-badge--ok">{{ p.confermate }} {{ t('pl_conf_abbr', 'conf.') }}</span>
       </div>
     </div>
   </div>

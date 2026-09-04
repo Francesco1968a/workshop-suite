@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
+import { t } from '../shared/i18n.js';
 
 const loading = ref(true);
 const contatti = ref([]);
@@ -55,10 +56,10 @@ async function conferma() {
     });
     const data = await res.json();
     if (!res.ok) {
-      flash(data.message || 'Impossibile confermare.');
+      flash(data.message || t('msg_err_conferma', 'Could not confirm.'));
       return;
     }
-    flash(c.nome + ' confermato.');
+    flash(c.nome + ' ' + t('msg_confermato_suffix', 'confirmed.'));
     load();
   } finally {
     sending.value.delete(c.isc_id);
@@ -68,17 +69,17 @@ async function conferma() {
 async function eliminaConversazione() {
   const c = selected.value;
   if (!c) return;
-  if (!confirm(`Eliminare definitivamente la conversazione con ${c.nome}? L'iscrizione e tutto lo storico verranno cancellati.`)) return;
+  if (!confirm(t('msg_confirm_elimina', 'Permanently delete the conversation with') + ' ' + c.nome + '? ' + t('msg_confirm_elimina2', "The registration and its entire history will be deleted."))) return;
   sending.value.add(c.isc_id);
   try {
     const res = await fetch(apiUrl('riepilogo/iscrizione/' + c.isc_id), { method: 'DELETE', headers: headers() });
     const data = await res.json();
     if (!res.ok) {
-      flash(data.message || 'Impossibile eliminare.');
+      flash(data.message || t('msg_err_elimina', 'Could not delete.'));
       return;
     }
     selectedId.value = 0;
-    flash('Conversazione eliminata.');
+    flash(t('msg_conversazione_eliminata', 'Conversation deleted.'));
     load();
   } finally {
     sending.value.delete(c.isc_id);
@@ -129,7 +130,7 @@ async function inviaRisposta() {
     });
     const data = await res.json();
     if (!res.ok) {
-      flash(data.message || 'Invio fallito.');
+      flash(data.message || t('msg_err_invio', 'Send failed.'));
       return;
     }
     c.reply_draft = '';
@@ -158,7 +159,7 @@ async function generateAiReplyDraft() {
     });
     const data = await res.json();
     if (!res.ok || !data.success) {
-      flash(data.message || 'Errore nella generazione.');
+      flash(data.message || t('msg_err_generazione', 'Error during generation.'));
       return;
     }
     replyBody.value = data.reply;
@@ -172,12 +173,12 @@ onMounted(load);
 
 <template>
   <div class="wvm wv-dash">
-    <h2>Messaggi</h2>
+    <h2>{{ t('msg_h2', 'Messages') }}</h2>
     <div v-if="msg" class="msg">{{ msg }}</div>
 
     <div v-if="!loading" class="wvm-layout">
       <div class="wvm-list">
-        <div v-if="!contatti.length" class="wvm-empty">Nessun contatto su eventi in programma.</div>
+        <div v-if="!contatti.length" class="wvm-empty">{{ t('msg_nessun_contatto', 'No contacts on upcoming events.') }}</div>
         <div
           v-for="c in contatti"
           :key="c.isc_id"
@@ -191,9 +192,9 @@ onMounted(load);
           </div>
           <div class="wvm-card-meta">
             {{ c.evento_label }}
-            <template v-if="c.tipo === 'conferma'"> · da confermare</template>
-            <template v-else-if="c.tipo === 't15'"> · promemoria T-15</template>
-            <template v-else> · confermato</template>
+            <template v-if="c.tipo === 'conferma'"> · {{ t('msg_da_confermare', 'to confirm') }}</template>
+            <template v-else-if="c.tipo === 't15'"> · {{ t('msg_promemoria_t15', 'T-15 reminder') }}</template>
+            <template v-else> · {{ t('msg_confermato', 'confirmed') }}</template>
           </div>
           <div v-if="c.messaggio_originale" class="wvm-card-date">{{ c.messaggio_originale_data }}</div>
         </div>
@@ -201,58 +202,58 @@ onMounted(load);
 
       <div class="wvm-detail">
         <template v-if="selected">
-          <div class="wvm-field-row"><span class="l">Nome</span><span class="v">{{ selected.nome }}</span></div>
+          <div class="wvm-field-row"><span class="l">{{ t('msg_lbl_nome', 'Name') }}</span><span class="v">{{ selected.nome }}</span></div>
           <div class="wvm-field-row"><span class="l">Email</span><span class="v">{{ selected.email || '—' }}</span></div>
-          <div v-if="selected.telefono" class="wvm-field-row"><span class="l">Telefono</span><span class="v">{{ selected.telefono }}</span></div>
-          <div v-if="selected.citta" class="wvm-field-row"><span class="l">Città</span><span class="v">{{ selected.citta }}</span></div>
-          <div class="wvm-field-row"><span class="l">Evento</span><span class="v">{{ selected.evento_label }}</span></div>
+          <div v-if="selected.telefono" class="wvm-field-row"><span class="l">{{ t('msg_lbl_telefono', 'Phone') }}</span><span class="v">{{ selected.telefono }}</span></div>
+          <div v-if="selected.citta" class="wvm-field-row"><span class="l">{{ t('msg_lbl_citta', 'City') }}</span><span class="v">{{ selected.citta }}</span></div>
+          <div class="wvm-field-row"><span class="l">{{ t('msg_lbl_evento', 'Event') }}</span><span class="v">{{ selected.evento_label }}</span></div>
 
           <div class="wvm-section-label">
-            Primo messaggio ricevuto
+            {{ t('msg_primo_messaggio', 'First message received') }}
             <span v-if="selected.messaggio_originale" class="wvm-date-highlight">{{ selected.messaggio_originale_data }}</span>
           </div>
           <div class="wvm-msg-box" :class="{ empty: !selected.messaggio_originale }">
-            {{ selected.messaggio_originale || 'Nessun messaggio registrato dal form.' }}
+            {{ selected.messaggio_originale || t('msg_nessun_messaggio', 'No message recorded from the form.') }}
           </div>
 
           <template v-if="selected.note">
-            <div class="wvm-section-label">Note</div>
+            <div class="wvm-section-label">{{ t('msg_lbl_note', 'Notes') }}</div>
             <div class="wvm-msg-box">{{ selected.note }}</div>
           </template>
 
           <template v-if="selected.thread.length">
-            <div class="wvm-section-label">Storico risposte</div>
-            <div v-for="(t, i) in selected.thread" :key="i" class="wvm-msg-box" style="margin-bottom: 8px">
+            <div class="wvm-section-label">{{ t('msg_storico_risposte', 'Reply history') }}</div>
+            <div v-for="(msgT, i) in selected.thread" :key="i" class="wvm-msg-box" style="margin-bottom: 8px">
               <div style="color: #888; font-size: 11px; margin-bottom: 6px">
-                {{ t.direction === 'out' ? '→ Inviata' : '← Ricevuta' }} · {{ t.date }} · {{ t.subject }}
+                {{ msgT.direction === 'out' ? '→ ' + t('msg_inviata', 'Sent') : '← ' + t('msg_ricevuta', 'Received') }} · {{ msgT.date }} · {{ msgT.subject }}
               </div>
-              {{ t.body }}
+              {{ msgT.body }}
             </div>
           </template>
 
-          <div class="wvm-section-label">Rispondi</div>
+          <div class="wvm-section-label">{{ t('msg_rispondi', 'Reply') }}</div>
           <div class="wv-field">
-            <label>Oggetto</label>
+            <label>{{ t('msg_lbl_oggetto', 'Subject') }}</label>
             <input type="text" v-model="replySubject" />
           </div>
           <div class="wv-field">
-            <textarea v-model="replyBody" rows="8" placeholder="Scrivi la risposta…"></textarea>
+            <textarea v-model="replyBody" rows="8" :placeholder="t('msg_ph_scrivi_risposta', 'Write your reply…')"></textarea>
           </div>
           <div v-if="selected.thread && selected.thread.length" style="margin: -6px 0 12px">
             <button type="button" class="wv-btn wv-btn-ghost wv-btn-sm" :disabled="aiDraftLoading" @click="generateAiReplyDraft">
-              {{ aiDraftLoading ? '✨ Generazione…' : '✨ Bozza con AI' }}
+              {{ aiDraftLoading ? '✨ ' + t('msg_generazione_corso', 'Generating…') : '✨ ' + t('msg_bozza_ai', 'AI draft') }}
             </button>
           </div>
           <div class="wvm-detail-actions">
-            <button class="wv-btn wv-btn-ghost" :disabled="savingBozza" @click="salvaBozza">Bozza</button>
-            <button class="wv-btn" :disabled="sendingReply || !selected.email || !replyBody.trim()" @click="inviaRisposta">Invia</button>
+            <button class="wv-btn wv-btn-ghost" :disabled="savingBozza" @click="salvaBozza">{{ t('msg_btn_bozza', 'Draft') }}</button>
+            <button class="wv-btn" :disabled="sendingReply || !selected.email || !replyBody.trim()" @click="inviaRisposta">{{ t('msg_btn_invia', 'Send') }}</button>
             <button
               v-if="selected.tipo === 'conferma'"
               class="wv-btn wv-btn-ghost"
               :disabled="sending.has(selected.isc_id) || !selected.email"
               @click="conferma"
             >
-              Conferma
+              {{ t('msg_btn_conferma', 'Confirm') }}
             </button>
             <button
               v-else-if="selected.tipo === 't15'"
@@ -260,7 +261,7 @@ onMounted(load);
               :disabled="sending.has(selected.isc_id) || !selected.email"
               @click="inviaT15"
             >
-              Invia promemoria T-15
+              {{ t('msg_btn_invia_t15', 'Send T-15 reminder') }}
             </button>
             <button
               class="wv-btn wv-btn-ghost wv-btn-danger"
@@ -268,11 +269,11 @@ onMounted(load);
               @click="eliminaConversazione"
               style="margin-left: auto;"
             >
-              Elimina
+              {{ t('msg_btn_elimina', 'Delete') }}
             </button>
           </div>
         </template>
-        <div v-else class="wvm-detail-empty">Seleziona un contatto dalla lista.</div>
+        <div v-else class="wvm-detail-empty">{{ t('msg_seleziona_contatto', 'Select a contact from the list.') }}</div>
       </div>
     </div>
   </div>

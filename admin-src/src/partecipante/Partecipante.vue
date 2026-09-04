@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, nextTick, onMounted } from 'vue';
+import { t } from '../shared/i18n.js';
 
 const pid = ref(0);
 const loaded = ref(false);
@@ -69,9 +70,9 @@ async function saveAnagrafica() {
   try {
     data.value = await apiPost('partecipante/' + pid.value + '/anagrafica', { ...form });
     editing.value = false;
-    showToast('Anagrafica aggiornata');
+    showToast(t('px_toast_anagrafica_ok', 'Details updated'));
   } catch {
-    showToast('Errore salvataggio anagrafica', 'error');
+    showToast(t('px_toast_anagrafica_err', 'Error saving details'), 'error');
   } finally {
     savingAnagrafica.value = false;
   }
@@ -82,9 +83,9 @@ async function saveNote() {
   try {
     const result = await apiPost('partecipante/' + pid.value + '/note', { note_interne: noteInterne.value });
     noteInterne.value = result.note_interne;
-    showToast('Note salvate');
+    showToast(t('px_toast_note_ok', 'Notes saved'));
   } catch {
-    showToast('Errore salvataggio note', 'error');
+    showToast(t('px_toast_note_err', 'Error saving notes'), 'error');
   } finally {
     savingNote.value = false;
   }
@@ -108,24 +109,24 @@ onMounted(async () => {
     <div class="head">
       <template v-if="editing">
         <div class="head-row" style="margin-bottom: 8px">
-          <h2>Modifica anagrafica</h2>
+          <h2>{{ t('px_h2_modifica', 'Edit details') }}</h2>
         </div>
         <div class="wvpx-grid2">
-          <div><label>Nome</label><input type="text" v-model="form.nome" /></div>
-          <div><label>Cognome</label><input type="text" v-model="form.cognome" /></div>
+          <div><label>{{ t('px_lbl_nome', 'First name') }}</label><input type="text" v-model="form.nome" /></div>
+          <div><label>{{ t('px_lbl_cognome', 'Last name') }}</label><input type="text" v-model="form.cognome" /></div>
           <div><label>Email</label><input type="text" v-model="form.email" /></div>
-          <div><label>Telefono</label><input type="text" v-model="form.telefono" /></div>
-          <div style="grid-column: 1 / -1"><label>Città</label><input type="text" v-model="form.citta" /></div>
+          <div><label>{{ t('px_lbl_telefono', 'Phone') }}</label><input type="text" v-model="form.telefono" /></div>
+          <div style="grid-column: 1 / -1"><label>{{ t('px_lbl_citta', 'City') }}</label><input type="text" v-model="form.citta" /></div>
         </div>
         <div class="wvpx-actions">
-          <button class="wvpx-btn wvpx-btn--accent" :disabled="savingAnagrafica" @click="saveAnagrafica">💾 Salva</button>
-          <button class="wvpx-btn wvpx-btn--ghost" @click="cancelEdit">Annulla</button>
+          <button class="wvpx-btn wvpx-btn--accent" :disabled="savingAnagrafica" @click="saveAnagrafica">💾 {{ t('px_btn_salva', 'Save') }}</button>
+          <button class="wvpx-btn wvpx-btn--ghost" @click="cancelEdit">{{ t('px_btn_annulla', 'Cancel') }}</button>
         </div>
       </template>
       <template v-else>
         <div class="head-row">
           <h2>{{ (data.nome + ' ' + data.cognome).trim() }}</h2>
-          <button class="wvpx-btn wvpx-btn--ghost" @click="startEdit">✏ Modifica anagrafica</button>
+          <button class="wvpx-btn wvpx-btn--ghost" @click="startEdit">✏ {{ t('px_h2_modifica', 'Edit details') }}</button>
         </div>
         <div class="meta">
           <a v-if="data.email" :href="'mailto:' + data.email">{{ data.email }}</a>
@@ -137,8 +138,8 @@ onMounted(async () => {
           <template v-if="data.citta"> · {{ data.citta }}</template>
           <br v-if="data.stats.prima_iscr_fmt" />
           <template v-if="data.stats.prima_iscr_fmt">
-            Cliente dal <strong>{{ data.stats.prima_iscr_fmt }}</strong>
-            <template v-if="data.stats.giorni_ultimo !== null"> · Ultimo contatto <strong>{{ data.stats.giorni_ultimo }} giorni fa</strong></template>
+            {{ t('px_cliente_dal', 'Customer since') }} <strong>{{ data.stats.prima_iscr_fmt }}</strong>
+            <template v-if="data.stats.giorni_ultimo !== null"> · {{ t('px_ultimo_contatto', 'Last contact') }} <strong>{{ data.stats.giorni_ultimo }} {{ t('px_giorni_fa', 'days ago') }}</strong></template>
           </template>
         </div>
       </template>
@@ -146,41 +147,41 @@ onMounted(async () => {
 
     <template v-if="!editing">
       <div class="wvpx-stats">
-        <div class="wvpx-stat"><div class="n">{{ data.stats.totali }}</div><div class="l">Iscrizioni</div></div>
-        <div class="wvpx-stat wvpx-stat--accent"><div class="n">{{ data.stats.confermate }}</div><div class="l">Confermate</div></div>
-        <div class="wvpx-stat"><div class="n">{{ data.stats.richieste }}</div><div class="l">Richieste</div></div>
-        <div class="wvpx-stat"><div class="n">{{ data.stats.abbandonate }}</div><div class="l">Abbandonate</div></div>
-        <div class="wvpx-stat"><div class="n">{{ data.stats.conv_pct }}%</div><div class="l">Conversione</div></div>
-        <div class="wvpx-stat"><div class="n">{{ data.stats.mail_inviate }}</div><div class="l">Mail inviate</div></div>
+        <div class="wvpx-stat"><div class="n">{{ data.stats.totali }}</div><div class="l">{{ t('px_stat_iscrizioni', 'Registrations') }}</div></div>
+        <div class="wvpx-stat wvpx-stat--accent"><div class="n">{{ data.stats.confermate }}</div><div class="l">{{ t('px_stat_confermate', 'Confirmed') }}</div></div>
+        <div class="wvpx-stat"><div class="n">{{ data.stats.richieste }}</div><div class="l">{{ t('px_stat_richieste', 'Requested') }}</div></div>
+        <div class="wvpx-stat"><div class="n">{{ data.stats.abbandonate }}</div><div class="l">{{ t('px_stat_abbandonate', 'Abandoned') }}</div></div>
+        <div class="wvpx-stat"><div class="n">{{ data.stats.conv_pct }}%</div><div class="l">{{ t('px_stat_conversione', 'Conversion') }}</div></div>
+        <div class="wvpx-stat"><div class="n">{{ data.stats.mail_inviate }}</div><div class="l">{{ t('px_stat_mail_inviate', 'Emails sent') }}</div></div>
       </div>
 
       <div class="wvpx-card">
-        <h3>Iscrizioni</h3>
+        <h3>{{ t('px_h3_iscrizioni', 'Registrations') }}</h3>
         <ul v-if="data.iscrizioni.length" class="wvpx-isc-list">
           <li v-for="(isc, i) in data.iscrizioni" :key="i" class="wvpx-isc-row">
             <a v-if="isc.evento_url" class="wvpx-isc-evento" :href="isc.evento_url">{{ isc.evento }}</a>
             <span v-else class="wvpx-isc-evento">{{ isc.evento }}</span>
-            <span class="wvpx-badge" :class="'wvpx-badge--' + isc.stato">{{ isc.stato === 'confermato' ? 'Confermato' : 'Richiesta' }}</span>
+            <span class="wvpx-badge" :class="'wvpx-badge--' + isc.stato">{{ isc.stato === 'confermato' ? t('px_stat_confermate_sing', 'Confirmed') : t('px_richiesta_sing', 'Requested') }}</span>
             <span class="wvpx-badge" :class="'wvpx-badge--pag-' + isc.stato_pagamento">
-              {{ isc.stato_pagamento === 'saldato' ? 'Saldato' : isc.stato_pagamento === 'acconto_pagato' ? 'Acconto pagato' : 'In attesa' }}
+              {{ isc.stato_pagamento === 'saldato' ? t('px_saldato', 'Paid in full') : isc.stato_pagamento === 'acconto_pagato' ? t('px_acconto_pagato', 'Deposit paid') : t('px_in_attesa', 'Pending') }}
             </span>
             <span class="wvpx-isc-data">{{ isc.data_fmt }}</span>
           </li>
         </ul>
-        <div v-else class="wvpx-empty">Nessuna iscrizione.</div>
+        <div v-else class="wvpx-empty">{{ t('px_nessuna_iscrizione', 'No registrations.') }}</div>
       </div>
 
       <div class="wvpx-card">
-        <h3>Note interne</h3>
-        <textarea v-model="noteInterne" rows="5" placeholder="Appunti veloci su questo contatto…"></textarea>
+        <h3>{{ t('px_h3_note', 'Internal notes') }}</h3>
+        <textarea v-model="noteInterne" rows="5" :placeholder="t('px_ph_note', 'Quick notes about this contact…')"></textarea>
         <div class="wvpx-actions">
-          <button class="wvpx-btn" :disabled="savingNote" @click="saveNote">💾 Salva note</button>
+          <button class="wvpx-btn" :disabled="savingNote" @click="saveNote">💾 {{ t('px_btn_salva_note', 'Save notes') }}</button>
         </div>
       </div>
 
       <div class="wvpx-card">
-        <h3>Timeline</h3>
-        <div v-if="!data.timeline.length" class="wvpx-empty">Nessun evento registrato.</div>
+        <h3>{{ t('px_h3_timeline', 'Timeline') }}</h3>
+        <div v-if="!data.timeline.length" class="wvpx-empty">{{ t('px_nessun_evento_reg', 'No events recorded.') }}</div>
         <ul v-else class="wvpx-tl">
           <li v-for="(e, i) in data.timeline" :key="i">
             <span class="icon">{{ e.icon }}</span>
