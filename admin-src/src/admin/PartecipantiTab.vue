@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
+import { t } from '../shared/i18n.js';
 
 const emit = defineEmits(['message']);
 
@@ -97,7 +98,7 @@ async function submit() {
     });
     const data = await res.json();
     if (!res.ok) {
-      emit('message', data.message || 'Errore.');
+      emit('message', data.message || t('pt_err_generico', 'Error.'));
       return;
     }
     emit('message', data.msg);
@@ -117,61 +118,61 @@ onMounted(() => {
 
 <template>
   <div v-if="!loading" class="wv-dash">
-    <h3>Aggiungi partecipante a evento</h3>
+    <h3>{{ t('pt_h3_aggiungi', 'Add participant to event') }}</h3>
     <div v-if="preEvento && preEventoLabel" class="hint">
-      Evento pre-selezionato: <strong>{{ preEventoLabel }}</strong>
+      {{ t('pt_evento_preselezionato', 'Pre-selected event:') }} <strong>{{ preEventoLabel }}</strong>
     </div>
 
     <form @submit.prevent="submit">
       <div class="wv-field">
-        <label>Evento</label>
+        <label>{{ t('pt_lbl_evento', 'Event') }}</label>
         <select :value="form.evento" required @change="onEventoChange(Number($event.target.value))">
-          <option :value="0">— scegli —</option>
-          <optgroup label="In programma">
+          <option :value="0">{{ t('pt_opt_scegli', '— choose —') }}</option>
+          <optgroup :label="t('pt_optgroup_in_programma', 'Upcoming')">
             <option v-for="e in eventiInProgramma" :key="e.id" :value="e.id">
-              {{ e.label }} ({{ e.disponibili }} liberi){{ e.sold_out ? ' · solo richieste' : '' }}
+              {{ e.label }} ({{ e.disponibili }} {{ t('pt_liberi', 'available') }}){{ e.sold_out ? ' · ' + t('pt_solo_richieste', 'requests only') : '' }}
             </option>
           </optgroup>
-          <optgroup label="Conclusi">
-            <option v-for="e in eventiConclusi" :key="e.id" :value="e.id">{{ e.label }} · concluso</option>
+          <optgroup :label="t('pt_optgroup_conclusi', 'Past')">
+            <option v-for="e in eventiConclusi" :key="e.id" :value="e.id">{{ e.label }} · {{ t('pt_concluso', 'ended') }}</option>
           </optgroup>
         </select>
       </div>
 
       <div class="wv-field">
-        <label>Partecipante esistente (opzionale)</label>
+        <label>{{ t('pt_lbl_esistente', 'Existing participant (optional)') }}</label>
         <select v-model.number="form.existing" @change="onExistingChange">
-          <option :value="0">— nuovo partecipante —</option>
+          <option :value="0">{{ t('pt_opt_nuovo', '— new participant —') }}</option>
           <option v-for="p in partecipanti" :key="p.id" :value="p.id">{{ p.nome }} {{ p.cognome }} · {{ p.email }}</option>
         </select>
       </div>
 
-      <div class="wv-field"><label>Nome</label><input type="text" v-model="form.nome" required /></div>
-      <div class="wv-field"><label>Cognome</label><input type="text" v-model="form.cognome" required /></div>
+      <div class="wv-field"><label>{{ t('pt_lbl_nome', 'First name') }}</label><input type="text" v-model="form.nome" required /></div>
+      <div class="wv-field"><label>{{ t('pt_lbl_cognome', 'Last name') }}</label><input type="text" v-model="form.cognome" required /></div>
       <div class="wv-field">
-        <label>Email (se già esistente, riusa la scheda)</label>
+        <label>{{ t('pt_lbl_email', 'Email (if already existing, reuses that record)') }}</label>
         <input type="email" v-model="form.email" required />
       </div>
-      <div class="wv-field"><label>Telefono</label><input type="text" v-model="form.telefono" /></div>
-      <div class="wv-field"><label>Città di provenienza</label><input type="text" v-model="form.citta" /></div>
+      <div class="wv-field"><label>{{ t('pt_lbl_telefono', 'Phone') }}</label><input type="text" v-model="form.telefono" /></div>
+      <div class="wv-field"><label>{{ t('pt_lbl_citta', "City they're coming from") }}</label><input type="text" v-model="form.citta" /></div>
       <div class="wv-field">
-        <label>Numero persone (gruppo)</label>
+        <label>{{ t('pt_lbl_num_persone', 'Number of people (group)') }}</label>
         <input type="number" min="1" v-model.number="form.num_persone" />
-        <div class="hint">Se prenota per un gruppo, inserisci il totale (incluso lui). Default: 1.</div>
+        <div class="hint">{{ t('pt_hint_num_persone', 'If booking for a group, enter the total (including them). Default: 1.') }}</div>
       </div>
       <div class="wv-field">
-        <label>Stato iniziale</label>
+        <label>{{ t('pt_lbl_stato_iniziale', 'Initial status') }}</label>
         <select v-model="form.stato_iniziale">
-          <option value="richiesta">Richiesta (default — niente mail)</option>
-          <option value="confermato">Confermato (caricamento retroattivo)</option>
+          <option value="richiesta">{{ t('pt_opt_richiesta', 'Requested (default — no email sent)') }}</option>
+          <option value="confermato">{{ t('pt_opt_confermato', 'Confirmed (backfilling past data)') }}</option>
         </select>
       </div>
-      <div class="wv-field"><label>Anticipo (€)</label><input type="number" step="0.01" v-model.number="form.anticipo" /></div>
-      <div class="wv-field"><label>Saldo (€)</label><input type="number" step="0.01" v-model.number="form.saldo" /></div>
-      <div class="wv-field"><label>Note</label><textarea v-model="form.note" rows="3"></textarea></div>
+      <div class="wv-field"><label>{{ t('pt_lbl_anticipo', 'Deposit (€)') }}</label><input type="number" step="0.01" v-model.number="form.anticipo" /></div>
+      <div class="wv-field"><label>{{ t('pt_lbl_saldo', 'Balance (€)') }}</label><input type="number" step="0.01" v-model.number="form.saldo" /></div>
+      <div class="wv-field"><label>{{ t('pt_lbl_note', 'Notes') }}</label><textarea v-model="form.note" rows="3"></textarea></div>
 
       <div class="wv-form-actions">
-        <button type="submit" :disabled="saving">Crea iscrizione</button>
+        <button type="submit" :disabled="saving">{{ t('pt_btn_crea', 'Create registration') }}</button>
       </div>
     </form>
   </div>
