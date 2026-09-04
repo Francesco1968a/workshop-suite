@@ -23,7 +23,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
     }
 
     public function handle_modules_settings_save(): void {
-        if (isset($_POST['ws_save_modules_action']) && check_admin_referer('ws_save_modules_nonce')) {
+        if (isset($_POST['ws_save_modules_action']) && check_admin_referer('wsma_save_modules_nonce')) {
             if (current_user_can('manage_options')) {
                 $current = WSMA_Settings::get_all();
                 // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- only checked with !empty() below (cast to 1/0), never output or stored raw.
@@ -50,7 +50,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
     }
 
     public function handle_proponente_settings_save(): void {
-        if (isset($_POST['ws_save_proponente_action']) && check_admin_referer('ws_save_proponente_nonce')) {
+        if (isset($_POST['ws_save_proponente_action']) && check_admin_referer('wsma_save_proponente_nonce')) {
             if (current_user_can('manage_options')) {
                 $current = WSMA_Settings::get_all();
                 // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each field is sanitized individually below (sanitize_text_field/sanitize_email/esc_url_raw/etc).
@@ -80,7 +80,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
     }
 
     public function handle_mail_settings_save(): void {
-        if (isset($_POST['ws_save_mail_action']) && check_admin_referer('ws_save_mail_nonce')) {
+        if (isset($_POST['ws_save_mail_action']) && check_admin_referer('wsma_save_mail_nonce')) {
             if (current_user_can('manage_options')) {
                 // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each field is sanitized inside WSMA_Mail_Inbox::save_settings().
                 WSMA_Mail_Inbox::save_settings(isset($_POST['ws_mail']) ? (array) wp_unslash($_POST['ws_mail']) : []);
@@ -746,7 +746,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                 <?php endif; ?>
 
                 <form method="post" action="">
-                    <?php wp_nonce_field('ws_save_modules_nonce'); ?>
+                    <?php wp_nonce_field('wsma_save_modules_nonce'); ?>
                     <input type="hidden" name="ws_save_modules_action" value="1">
 
                     <div class="ws-s15">
@@ -1183,7 +1183,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                 <?php endif; ?>
 
                 <form method="post" action="">
-                    <?php wp_nonce_field('ws_save_proponente_nonce'); ?>
+                    <?php wp_nonce_field('wsma_save_proponente_nonce'); ?>
                     <input type="hidden" name="ws_save_proponente_action" value="1">
 
                     <div class="ws-s25">
@@ -1411,7 +1411,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                 <?php endif; ?>
 
                 <form method="post" action="">
-                    <?php wp_nonce_field('ws_save_mail_nonce'); ?>
+                    <?php wp_nonce_field('wsma_save_mail_nonce'); ?>
                     <input type="hidden" name="ws_save_mail_action" value="1">
 
                     <div class="ws-s44">

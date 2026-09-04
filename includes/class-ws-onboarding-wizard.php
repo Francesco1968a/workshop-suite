@@ -69,7 +69,7 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
         $request_method = isset($_SERVER['REQUEST_METHOD']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])) : '';
         if ($request_method !== 'POST' || !isset($_POST['ws_wizard_nonce_field'])) return;
 
-        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ws_wizard_nonce_field'])), 'ws_wizard_nonce')) {
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ws_wizard_nonce_field'])), 'wsma_wizard_nonce')) {
             wp_die(esc_html__('Richiesta non valida, riprova.', 'wsmaker'));
         }
 
@@ -153,7 +153,7 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
         </div>
 
         <form method="post">
-            <?php wp_nonce_field('ws_wizard_nonce', 'ws_wizard_nonce_field'); ?>
+            <?php wp_nonce_field('wsma_wizard_nonce', 'ws_wizard_nonce_field'); ?>
             <label class="ws-wizard-choice">
                 <input type="radio" name="ws_hub_consent" value="1">
                 <span><strong><?php esc_html_e('Sì, condividi i miei eventi', 'wsmaker'); ?></strong> — <?php esc_html_e('aumenta la visibilità, aiuta anche la bio proponente ad avere uno scopo', 'wsmaker'); ?></span>
@@ -176,7 +176,7 @@ final class WSMA_Onboarding_Wizard implements WSMA_Module {
         <p class="ws-wizard-lead"><?php esc_html_e('WSMaker può inviare conferme, promemoria e rispondere ai partecipanti direttamente dalla tua casella mail. Puoi configurarla ora, oppure più tardi da Impostazioni → Mail.', 'wsmaker'); ?></p>
 
         <form method="post">
-            <?php wp_nonce_field('ws_wizard_nonce', 'ws_wizard_nonce_field'); ?>
+            <?php wp_nonce_field('wsma_wizard_nonce', 'ws_wizard_nonce_field'); ?>
             <div class="ws-wizard-actions">
                 <button type="submit" name="ws_wizard_finish" value="1" class="button button-secondary"><?php esc_html_e('Configura dopo', 'wsmaker'); ?></button>
                 <button type="submit" name="ws_wizard_finish" value="1" data-go-mail="1" onclick="document.getElementById('ws-wizard-go-mail').value='1';" class="button button-primary button-hero"><?php esc_html_e('Configura ora →', 'wsmaker'); ?></button>
