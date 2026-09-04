@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { t } from '../shared/i18n.js';
 
 const eventi = ref([]);
 const anni = ref([]);
@@ -45,32 +46,32 @@ onMounted(() => {
 
 <template>
   <div class="wva">
-    <h2>Archivio Workshop</h2>
-    <div class="wva-intro">Eventi conclusi · ordinati dal più recente</div>
+    <h2>{{ t('arch_h2', 'Workshop Archive') }}</h2>
+    <div class="wva-intro">{{ t('arch_intro', 'Past events · sorted by most recent') }}</div>
 
     <div v-if="anni.length" class="wva-anni">
-      <a href="#" :class="{ on: !anno }" @click.prevent="filtraAnno(0)">Tutti</a>
+      <a href="#" :class="{ on: !anno }" @click.prevent="filtraAnno(0)">{{ t('arch_tutti', 'All') }}</a>
       <a v-for="a in anni" :key="a" href="#" :class="{ on: a === anno }" @click.prevent="filtraAnno(a)">{{ a }}</a>
     </div>
 
-    <div v-if="loading" class="wva-empty">Caricamento…</div>
+    <div v-if="loading" class="wva-empty">{{ t('arch_caricamento', 'Loading…') }}</div>
     <template v-else>
-      <div v-if="!eventi.length" class="wva-empty">Nessun evento in archivio.</div>
+      <div v-if="!eventi.length" class="wva-empty">{{ t('arch_nessun_evento', 'No events in the archive.') }}</div>
       <div v-else class="wva-grid">
         <div v-for="e in eventi" :key="e.id" class="wva-card">
           <div class="wva-card-foto" :style="e.foto ? { backgroundImage: `url('${e.foto}')` } : {}"></div>
           <div class="wva-card-body">
             <div class="wva-card-cat">{{ e.cat_name }}</div>
             <div class="wva-card-periodo">{{ e.periodo }}</div>
-            <div v-if="e.ora" class="wva-card-meta">ore {{ e.ora }}</div>
+            <div v-if="e.ora" class="wva-card-meta">{{ t('arch_ore', 'at') }} {{ e.ora }}</div>
             <div class="wva-card-stats">
-              Partecipanti finali
+              {{ t('arch_partecipanti_finali', 'Final participants') }}
               <strong>{{ e.occupati }}/{{ e.totali }}</strong>
             </div>
             <div class="wva-card-actions">
-              <a v-if="e.link_partecipanti" class="wva-link" :href="e.link_partecipanti">Partecipanti</a>
-              <a v-if="e.link_gestisci" class="wva-link" :href="e.link_gestisci">Apri</a>
-              <a v-if="e.link_pagina" class="wva-link" :href="e.link_pagina" target="_blank" rel="noopener">Pagina</a>
+              <a v-if="e.link_partecipanti" class="wva-link" :href="e.link_partecipanti">{{ t('arch_link_partecipanti', 'Participants') }}</a>
+              <a v-if="e.link_gestisci" class="wva-link" :href="e.link_gestisci">{{ t('arch_link_apri', 'Open') }}</a>
+              <a v-if="e.link_pagina" class="wva-link" :href="e.link_pagina" target="_blank" rel="noopener">{{ t('arch_link_pagina', 'Page') }}</a>
             </div>
           </div>
         </div>

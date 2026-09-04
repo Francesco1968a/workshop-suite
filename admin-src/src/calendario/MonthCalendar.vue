@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
+import { t } from '../shared/i18n.js';
 
 const props = defineProps({
   eventi: { type: Array, default: () => [] },
@@ -10,10 +11,15 @@ const viewYear = ref(today.getFullYear());
 const viewMonth = ref(today.getMonth()); // 0-based
 
 const MONTH_NAMES = [
-  'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-  'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre',
+  t('mcal_gennaio', 'January'), t('mcal_febbraio', 'February'), t('mcal_marzo', 'March'),
+  t('mcal_aprile', 'April'), t('mcal_maggio', 'May'), t('mcal_giugno', 'June'),
+  t('mcal_luglio', 'July'), t('mcal_agosto', 'August'), t('mcal_settembre', 'September'),
+  t('mcal_ottobre', 'October'), t('mcal_novembre', 'November'), t('mcal_dicembre', 'December'),
 ];
-const DAY_NAMES = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+const DAY_NAMES = [
+  t('mcal_lun', 'Mon'), t('mcal_mar', 'Tue'), t('mcal_mer', 'Wed'), t('mcal_gio', 'Thu'),
+  t('mcal_ven', 'Fri'), t('mcal_sab', 'Sat'), t('mcal_dom', 'Sun'),
+];
 
 function toISO(y, m, d) {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -90,7 +96,7 @@ function eventUrl(id) {
       <button type="button" class="btn" @click="prevMonth">‹</button>
       <div class="wvcal-month-label">{{ monthLabel }}</div>
       <button type="button" class="btn" @click="nextMonth">›</button>
-      <button type="button" class="btn" @click="goToday">Oggi</button>
+      <button type="button" class="btn" @click="goToday">{{ t('mcal_oggi', 'Today') }}</button>
     </div>
 
     <div class="wvcal-grid wvcal-grid-head">

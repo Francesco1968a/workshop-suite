@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { showToast } from '../shared/toast.js';
 import MonthCalendar from './MonthCalendar.vue';
+import { t } from '../shared/i18n.js';
 
 const url = ref('');
 const webcal = ref('');
@@ -20,7 +21,7 @@ async function load() {
 }
 
 async function revokeToken() {
-  if (!window.confirm('Il link attuale smetterà di funzionare: ogni calendario già collegato (Apple/Google/Zoho...) andrà ricollegato con il nuovo URL. Continuare?')) return;
+  if (!window.confirm(t('cal_confirm_revoca', 'The current link will stop working: every already-connected calendar (Apple/Google/Zoho...) will need to be reconnected with the new URL. Continue?'))) return;
   revoking.value = true;
   try {
     const res = await fetch(window.WSMA_CONFIG.restUrl + 'calendario/revoca-token', {
@@ -30,7 +31,7 @@ async function revokeToken() {
     const data = await res.json();
     url.value = data.url;
     webcal.value = data.webcal;
-    showToast('Token rigenerato — il vecchio link non funziona più');
+    showToast(t('cal_toast_token_rigenerato', 'Token regenerated — the old link no longer works'));
   } finally {
     revoking.value = false;
   }
@@ -43,7 +44,7 @@ async function copyUrl() {
   } catch {
     document.execCommand('copy');
   }
-  showToast('URL copiato negli appunti');
+  showToast(t('cal_toast_url_copiato', 'URL copied to clipboard'));
 }
 
 onMounted(load);
@@ -51,7 +52,7 @@ onMounted(load);
 
 <template>
   <div class="wvcal">
-    <h2>Calendario Workshop</h2>
+    <h2>{{ t('cal_h2', 'Workshop Calendar') }}</h2>
 
     <div class="wvcal-layout">
       <div class="wvcal-col-main">
@@ -60,7 +61,7 @@ onMounted(load);
 
       <div class="wvcal-col-side">
         <div class="card">
-          <h3>URL del calendario</h3>
+          <h3>{{ t('cal_h3_url', 'Calendar URL') }}</h3>
           <div class="url-box">
             <input
               ref="urlInput"
@@ -70,83 +71,76 @@ onMounted(load);
               readonly
               @click="($event) => $event.target.select()"
             />
-            <button type="button" class="btn accent" @click="copyUrl">📋 Copia</button>
-            <a class="btn" :href="webcal">📅 Aggiungi</a>
+            <button type="button" class="btn accent" @click="copyUrl">📋 {{ t('cal_btn_copia', 'Copy') }}</button>
+            <a class="btn" :href="webcal">📅 {{ t('cal_btn_aggiungi', 'Add') }}</a>
           </div>
           <div class="hint">
-            Il bottone <strong>Aggiungi</strong> apre il tuo calendario di sistema (su iPhone/Mac →
-            Apple Calendar, su Windows → Outlook).<br />
-            Per Google Calendar/Zoho Calendar usa <strong>Copia</strong> + istruzioni sotto.
+            {{ t('cal_hint_aggiungi_pre', 'The') }} <strong>{{ t('cal_btn_aggiungi', 'Add') }}</strong> {{ t('cal_hint_aggiungi_post', 'button opens your system calendar app (on iPhone/Mac →') }}
+            Apple Calendar, {{ t('cal_hint_on_windows', 'on Windows →') }} Outlook).<br />
+            {{ t('cal_hint_google_zoho_pre', 'For Google Calendar/Zoho Calendar use') }} <strong>{{ t('cal_btn_copia', 'Copy') }}</strong> {{ t('cal_hint_google_zoho_post', '+ the instructions below.') }}
           </div>
           <div class="hint token-box">
-            L'URL contiene un token legato al tuo account: chi lo conosce vede nome/telefono/email
-            degli iscritti di ogni evento. Se pensi sia trapelato, rigeneralo — il vecchio link
-            smette subito di funzionare.
+            {{ t('cal_hint_token', "The URL contains a token tied to your account: anyone who knows it can see the name/phone/email of every event's registrants. If you think it's leaked, regenerate it — the old link stops working immediately.") }}
             <div style="margin-top: 8px">
               <button type="button" class="btn" :disabled="revoking" @click="revokeToken">
-                🔄 {{ revoking ? 'Rigenerazione…' : 'Rigenera token' }}
+                🔄 {{ revoking ? t('cal_btn_rigenerazione_corso', 'Regenerating…') : t('cal_btn_rigenera_token', 'Regenerate token') }}
               </button>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <h3>📱 Apple Calendar (iPhone / Mac / iPad)</h3>
+          <h3>📱 {{ t('cal_h3_apple', 'Apple Calendar (iPhone / Mac / iPad)') }}</h3>
           <ol>
-            <li>Clicca il bottone <strong>📅 Aggiungi</strong> qui sopra dal dispositivo Apple.</li>
-            <li>Si apre Calendario → click <strong>Iscriviti</strong>.</li>
+            <li>{{ t('cal_apple_step1_pre', 'Click the') }} <strong>📅 {{ t('cal_btn_aggiungi', 'Add') }}</strong> {{ t('cal_apple_step1_post', 'button above from your Apple device.') }}</li>
+            <li>{{ t('cal_apple_step2_pre', 'Calendar opens → click') }} <strong>{{ t('cal_apple_step2_iscriviti', 'Subscribe') }}</strong>.</li>
             <li>
-              Conferma. Imposta <strong>Aggiornamento automatico: Ogni 15 minuti</strong> (o
-              orario).
+              {{ t('cal_apple_step3_pre', 'Confirm. Set') }} <strong>{{ t('cal_apple_step3_setting', 'Auto-refresh: Every 15 minutes') }}</strong> {{ t('cal_apple_step3_post', '(or hourly).') }}
             </li>
           </ol>
           <div class="hint">
-            In alternativa: Calendario → File → Nuova sottoscrizione calendario → incolla l'URL.
+            {{ t('cal_apple_hint', 'Alternatively: Calendar → File → New Calendar Subscription → paste the URL.') }}
           </div>
         </div>
 
         <div class="card">
-          <h3>📧 Google Calendar (desktop)</h3>
+          <h3>📧 {{ t('cal_h3_google', 'Google Calendar (desktop)') }}</h3>
           <ol>
             <li>
-              Apri
+              {{ t('cal_google_step1_pre', 'Open') }}
               <a href="https://calendar.google.com" target="_blank" class="link-accent"
                 >calendar.google.com</a
               >
-              sul computer.
+              {{ t('cal_google_step1_post', 'on your computer.') }}
             </li>
             <li>
-              Sidebar sinistra → <strong>Altri calendari</strong> → click sul <strong>+</strong> →
-              <strong>Da URL</strong>.
+              {{ t('cal_google_step2_pre', 'Left sidebar →') }} <strong>{{ t('cal_google_step2_other', 'Other calendars') }}</strong> {{ t('cal_google_step2_mid', '→ click the') }} <strong>+</strong> →
+              <strong>{{ t('cal_google_step2_from_url', 'From URL') }}</strong>.
             </li>
-            <li>Incolla l'URL → <strong>Aggiungi calendario</strong>.</li>
+            <li>{{ t('cal_google_step3_pre', 'Paste the URL →') }} <strong>{{ t('cal_google_step3_add', 'Add calendar') }}</strong>.</li>
           </ol>
           <div class="hint">
-            ⚠ <strong>Importante</strong>: Google rinfresca i calendari sottoscritti ogni 8–24 ore
-            (non puoi cambiarlo). Per realtime su Google ci vuole l'integrazione API → un altro
-            snippet.<br />
-            Una volta aggiunto, lo vedi anche sull'app Google Calendar di telefono e tablet.
+            ⚠ <strong>{{ t('cal_important', 'Important') }}</strong>: {{ t('cal_google_hint', "Google refreshes subscribed calendars every 8–24 hours (you can't change this). Real-time sync on Google requires an API integration — a separate project.") }}<br />
+            {{ t('cal_google_hint2', 'Once added, you\'ll also see it on the Google Calendar app on phone and tablet.') }}
           </div>
         </div>
 
         <div class="card">
-          <h3>📇 Zoho Calendar</h3>
+          <h3>📇 {{ t('cal_h3_zoho', 'Zoho Calendar') }}</h3>
           <ol>
             <li>
-              Apri
+              {{ t('cal_zoho_step1', 'Open') }}
               <a href="https://calendar.zoho.com" target="_blank" class="link-accent"
                 >calendar.zoho.com</a
               >.
             </li>
             <li>
-              Icona <strong>+</strong> accanto a "Altri calendari" → <strong>Aggiungi tramite
-              URL</strong> (Add by URL / Sottoscrivi da URL, a seconda della lingua).
+              {{ t('cal_zoho_step2_pre', 'Click the') }} <strong>+</strong> {{ t('cal_zoho_step2_mid', 'icon next to "Other calendars" →') }} <strong>{{ t('cal_zoho_step2_add', 'Add by URL') }}</strong> {{ t('cal_zoho_step2_post', '(the exact label may vary).') }}
             </li>
-            <li>Incolla l'URL → conferma.</li>
+            <li>{{ t('cal_zoho_step3', 'Paste the URL → confirm.') }}</li>
           </ol>
           <div class="hint">
-            Anche qui l'aggiornamento è periodico (non istantaneo): Zoho ricontrolla il feed a
-            intervalli propri, non modificabili da qui.
+            {{ t('cal_zoho_hint', "Here too, updates are periodic (not instant): Zoho rechecks the feed on its own schedule, which can't be changed from here.") }}
           </div>
         </div>
       </div>
