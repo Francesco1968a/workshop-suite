@@ -1,6 +1,6 @@
-=== WSMaker — All-in-One Event Manager, CRM & Social Banner Builder ===
+=== WSMaker — Training Management System, CRM & Event Manager ===
 Contributors: frak68
-Tags: workshop, events, event management, crm, poster builder
+Tags: training management system, workshop, events, event management, crm
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
@@ -8,15 +8,15 @@ Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-All-in-one suite to manage workshops, courses and events, attendee CRM with communication tracking, and a social banner builder.
+A full Training Management System (TMS) for WordPress: workshop and event scheduling, attendee CRM with communication tracking, and a social banner builder.
 
 == Description ==
 
-**WSMaker** is an all-in-one event management, attendee CRM, and marketing creative suite designed for course creators, educators, trainers, agencies, academies, and event organizers across any industry.
+**WSMaker** is a full Training Management System (TMS) — not just a CRM, not just an LMS. It combines event and workshop scheduling, an attendee CRM with two-way communication tracking, and a marketing creative suite in one plugin, designed for course creators, educators, trainers, agencies, academies, and event organizers across any industry.
 
-Full, human-readable source code (including the Vue.js source behind the compiled admin panel bundles in assets/dist/, under `admin-src/`) is publicly available at: https://github.com/Francesco1968a/wsmaker — to rebuild a bundle: `cd admin-src && npm install && WS_BUNDLE=<bundle-name> npx vite build` (bundle names match the `assets/dist/*.js` filenames).
+Full, human-readable source code (including the Vue.js source behind the compiled admin panel bundles in assets/dist/, under `admin-src/`) is publicly available at: [github.com/Francesco1968a/wsmaker](https://github.com/Francesco1968a/wsmaker) — to rebuild a bundle: `cd admin-src && npm install && WS_BUNDLE=<bundle-name> npx vite build` (bundle names match the `assets/dist/*.js` filenames).
 
-Developed by Francesco Verolino — https://francescoverolino.com/wsmaker
+Developed by [Francesco Verolino](https://francescoverolino.com/wsmaker)
 
 Whether you run photography workshops, masterclasses, business seminars, art retreats, or online training, WSMaker provides the frictionless workflow to manage every aspect of your events.
 
@@ -41,20 +41,20 @@ Whether you run photography workshops, masterclasses, business seminars, art ret
 
 This plugin connects to the following external services:
 
-* **WSMaker Global Hub — event syndication** (https://wsmaker.pro): Off by default. Only when the administrator explicitly activates the "Global Hub Sync" module, published workshop data is sent to the WSMaker global directory to increase event discovery, on every publish/update of an event. This includes: title, description/excerpt, dates and location (city, country, address), category, price and deposit, seat availability, the featured image, the booking page URL, and the organizer's public profile (name, role, bio, photo, website, languages) as configured in the plugin's own settings.
-  Terms of Service: https://wsmaker.pro/terms/ — Privacy Policy: https://wsmaker.pro/privacy-policy/
+* **WSMaker Global Hub — event syndication** ([wsmaker.pro](https://wsmaker.pro)): Off by default. Only when the administrator explicitly activates the "Global Hub Sync" module, published workshop data is sent to the WSMaker global directory to increase event discovery, on every publish/update of an event. This includes: title, description/excerpt, dates and location (city, country, address), category, price and deposit, seat availability, the featured image, the booking page URL, and the organizer's public profile (name, role, bio, photo, website, languages) as configured in the plugin's own settings.
+  Terms of Service: [wsmaker.pro/terms](https://wsmaker.pro/terms/) — Privacy Policy: [wsmaker.pro/privacy-policy](https://wsmaker.pro/privacy-policy/)
 
-* **WSMaker Global Hub — shared category list** (https://wsmaker.pro): Used to keep the "Categories & Types" dropdown suggestions in sync with a shared, curated taxonomy list maintained centrally, so every installation offers the same well-organized set of workshop categories/event types instead of each site inventing its own. This is a one-way, anonymous GET request (no site URL, email, or identifying data is sent) that fires at most once every 24 hours (cached) when an admin opens that screen. If the service is unreachable, the plugin falls back to a small built-in default list — nothing else in the plugin depends on this call succeeding.
-  Terms of Service: https://wsmaker.pro/terms/ — Privacy Policy: https://wsmaker.pro/privacy-policy/
+* **WSMaker Global Hub — shared category list** ([wsmaker.pro](https://wsmaker.pro)): Used to keep the "Categories & Types" dropdown suggestions in sync with a shared, curated taxonomy list maintained centrally, so every installation offers the same well-organized set of workshop categories/event types instead of each site inventing its own. This is a one-way, anonymous GET request (no site URL, email, or identifying data is sent) that fires at most once every 24 hours (cached) when an admin opens that screen. If the service is unreachable, the plugin falls back to a small built-in default list — nothing else in the plugin depends on this call succeeding.
+  Terms of Service: [wsmaker.pro/terms](https://wsmaker.pro/terms/) — Privacy Policy: [wsmaker.pro/privacy-policy](https://wsmaker.pro/privacy-policy/)
 
-* **WSMaker PRO — license verification** (https://api.francescoverolino.com): Only called when the administrator manually submits a PRO license key in WSMaker → Settings → License. Sends the entered license key and the site's home URL to verify the license and unlock PRO features; no other data is transmitted, and nothing is sent unless the admin actively submits that form.
-  Privacy Policy: https://francescoverolino.com/privacy/
+* **WSMaker PRO — license verification** ([api.francescoverolino.com](https://api.francescoverolino.com)): Only called when the administrator manually submits a PRO license key in WSMaker → Settings → License. Sends the entered license key and the site's home URL to verify the license and unlock PRO features; no other data is transmitted, and nothing is sent unless the admin actively submits that form.
+  Privacy Policy: [francescoverolino.com/privacy](https://francescoverolino.com/privacy/)
 
-* **ip-api.com — IP geolocation for the admin notification email** (http://ip-api.com): Off by default. Only when the administrator explicitly enables "IP Geolocation" in Settings → General, the submitting visitor's IP address is sent to ip-api.com's free lookup endpoint after a new registration request, to add a city/country hint to the admin notification email. The result is cached for 7 days per IP. Nothing is sent unless this setting is turned on. The administrator can replace ip-api.com with their own geolocation provider's URL in the same settings section (e.g. for a service with commercial-use terms, or higher volume) — in that case this plugin instead contacts whatever URL the administrator has configured.
-  Terms of Service: https://ip-api.com/docs/legal — Privacy Policy: https://ip-api.com/docs/legal
+* **ip-api.com — IP geolocation for the admin notification email** ([ip-api.com](http://ip-api.com)): Off by default. Only when the administrator explicitly enables "IP Geolocation" in Settings → General, the submitting visitor's IP address is sent to ip-api.com's free lookup endpoint after a new registration request, to add a city/country hint to the admin notification email. The result is cached for 7 days per IP. Nothing is sent unless this setting is turned on. The administrator can replace ip-api.com with their own geolocation provider's URL in the same settings section (e.g. for a service with commercial-use terms, or higher volume) — in that case this plugin instead contacts whatever URL the administrator has configured.
+  Terms of Service: [ip-api.com/docs/legal](https://ip-api.com/docs/legal) — Privacy Policy: [ip-api.com/docs/legal](https://ip-api.com/docs/legal)
 
-* **Jitsi Meet** (https://meet.jit.si): Only loaded on the "Virtual Classroom" shortcode output for an event whose organizer has selected "Jitsi Meet" as the virtual platform and left the link field empty (an automatically-generated public meet.jit.si room is used) or entered a meet.jit.si link. The visitor's browser loads Jitsi's external_api.js script directly from meet.jit.si and connects to Jitsi's public video-conferencing service to join the room; standard data shared with any Jitsi Meet session applies (see Jitsi's own policies). No data is sent unless a visitor actually opens a page containing an event configured for Jitsi.
-  Terms of Service: https://jitsi.org/meet-jit-si-terms-of-service/ — Privacy Policy: https://jitsi.org/meet-jit-si-privacy/
+* **Jitsi Meet** ([meet.jit.si](https://meet.jit.si)): Only loaded on the "Virtual Classroom" shortcode output for an event whose organizer has selected "Jitsi Meet" as the virtual platform and left the link field empty (an automatically-generated public meet.jit.si room is used) or entered a meet.jit.si link. The visitor's browser loads Jitsi's external_api.js script directly from meet.jit.si and connects to Jitsi's public video-conferencing service to join the room; standard data shared with any Jitsi Meet session applies (see Jitsi's own policies). No data is sent unless a visitor actually opens a page containing an event configured for Jitsi.
+  Terms of Service: [jitsi.org/meet-jit-si-terms-of-service](https://jitsi.org/meet-jit-si-terms-of-service/) — Privacy Policy: [jitsi.org/meet-jit-si-privacy](https://jitsi.org/meet-jit-si-privacy/)
 
 == Frequently Asked Questions ==
 
