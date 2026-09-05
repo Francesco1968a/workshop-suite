@@ -686,3 +686,6 @@ msgstr "💡 So zeigen Sie die Biografie auf Ihrer Website an"
 
 msgid "🔌 Webhooks"
 msgstr "🔌 Webhook-Integration"
+
+msgid "https://yourservice.example.com/lookup"
+msgstr "https://ihrdienst.beispiel.com/lookup"

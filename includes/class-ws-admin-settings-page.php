@@ -1560,7 +1560,7 @@ final class WSMA_Admin_Settings_Page implements WSMA_Module {
                                 <tr>
                                     <th scope="row"><label for="intake_geolocation_api_url"><?php esc_html_e('Geolocation Service URL', 'wsmaker'); ?></label></th>
                                     <td>
-                                        <input name="ws_security[intake_geolocation_api_url]" type="url" id="intake_geolocation_api_url" value="<?php echo esc_attr($settings['intake_geolocation_api_url'] ?? ''); ?>" class="regular-text" placeholder="https://tuoservizio.esempio.com/lookup">
+                                        <input name="ws_security[intake_geolocation_api_url]" type="url" id="intake_geolocation_api_url" value="<?php echo esc_attr($settings['intake_geolocation_api_url'] ?? ''); ?>" class="regular-text" placeholder="<?php echo esc_attr__('https://yourservice.example.com/lookup', 'wsmaker'); ?>">
                                         <p class="description"><?php esc_html_e('Optional. Leave empty to use ip-api.com (free, suited to non-commercial use). If you have your own geolocation provider (for commercial use compliant with its terms, or higher volumes), enter its URL here: it must accept the IP and respond with JSON containing "city" and "country" fields.', 'wsmaker'); ?></p>
                                     </td>
                                 </tr>

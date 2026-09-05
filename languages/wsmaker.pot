@@ -686,3 +686,6 @@ msgstr ""
 msgid "🔌 Webhooks"
 msgstr ""
 
+
+msgid "https://yourservice.example.com/lookup"
+msgstr ""

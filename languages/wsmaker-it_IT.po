@@ -687,3 +687,6 @@ msgstr "💡 Come mostrare la Bio nel sito"
 msgid "🔌 Webhooks"
 msgstr "🔌 Webhook"
 
+
+msgid "https://yourservice.example.com/lookup"
+msgstr "https://tuoservizio.esempio.com/lookup"
