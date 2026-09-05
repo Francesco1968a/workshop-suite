@@ -73,6 +73,9 @@ The poster builder operates entirely client-side using the HTML5 Canvas API. It 
 2. **Participant CRM**: Searchable attendee directory with contact info and booking history.
 3. **Poster & Banner Builder**: 3-column layout with customizable typography, colors, background zoom/positioning, and template saving.
 4. **Settings & Security**: Native configuration panel with AES-256 encrypted mail credentials and rate limit protection.
+5. **Categories & Types**: Manage workshop categories and event types, with photos, pricing, and landing pages.
+6. **Admin Calendar**: Monthly calendar view with one-click subscription for Apple Calendar and Google Calendar.
+7. **Mail Inbox**: Interactive communication timeline per attendee, with reply history and draft composer.
 
 == Changelog ==
 
